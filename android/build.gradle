@@ -1,0 +1,54 @@
+buildscript {
+    ext {
+        agp_version = '7.2.1'  // Android Gradle Plugin version
+    }
+}
+allprojects {
+    repositories {
+        google()  // Google's Maven repository
+        mavenCentral()  // Maven Central repository
+    }
+}
+
+rootProject.buildDir = '../build'  // Custom build directory for root project
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"  // Custom build directory for subprojects
+}
+subprojects {
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {  // Applies only to Android projects
+            project.android {
+                compileSdkVersion 34  // Set compile SDK version to 34
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_1_8  // Java source compatibility
+                    targetCompatibility JavaVersion.VERSION_1_8  // Java target compatibility
+                }
+            }
+
+            // Kotlin compile options
+            project.tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).configureEach {
+                kotlinOptions {
+                    jvmTarget = "1.8"  // Set JVM target to 1.8 for Kotlin
+                }
+            }
+            
+            // Namespace configuration (optional)
+            project.android {
+                if (namespace == null) {  // Check if the namespace is not already defined
+                    namespace project.group  // Set namespace to project group
+                }
+            }
+        }
+    }
+}
+
+configurations.all {
+    resolutionStrategy {
+        force 'androidx.core:core-ktx:1.6.0'  // Force the use of androidx.core:core-ktx version 1.6.0
+    }
+}
+
+// Register clean task to delete the build directory
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}
