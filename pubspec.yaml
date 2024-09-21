@@ -59,6 +59,8 @@ dependencies:
   toggle_switch: ^2.3.0
   animated_toggle_switch: ^0.8.3
   flutter_launcher_icons: "^0.13.1"
+  dropdown_button2: ^2.3.9
+  animated_custom_dropdown: ^3.1.1
 
 dev_dependencies:
   flutter_test:

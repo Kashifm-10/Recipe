@@ -382,94 +382,110 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
     });
   }
 
-  Future<void> _chooseIcon() async {
-    IconData? selectedIcon = await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Select an Icon'),
-          content: Container(
-            width: double.maxFinite,
-            child: GridView.count(
-              crossAxisCount: 10,
-              children: [
-                FontAwesomeIcons.apple,
-                FontAwesomeIcons.bowlRice,
-                FontAwesomeIcons.bowlFood,
-                FontAwesomeIcons.plateWheat,
-                FontAwesomeIcons.bacon,
-                FontAwesomeIcons.breadSlice,
-                FontAwesomeIcons.coffee,
-                FontAwesomeIcons.cocktail,
-                FontAwesomeIcons.cookie,
-                FontAwesomeIcons.cutlery,
-                FontAwesomeIcons.drumstickBite,
-                FontAwesomeIcons.fish,
-                FontAwesomeIcons.hamburger,
-                FontAwesomeIcons.hotdog,
-                FontAwesomeIcons.hotjar,
-                FontAwesomeIcons.iceCream,
-                FontAwesomeIcons.lemon,
-                FontAwesomeIcons.martiniGlass,
-                FontAwesomeIcons.mugHot,
-                FontAwesomeIcons.pizzaSlice,
-                FontAwesomeIcons.utensils,
-                FontAwesomeIcons.wineBottle,
-                Ionicons.fast_food,
-                Ionicons.fast_food_outline,
-                Ionicons.fast_food_sharp,
-                Ionicons.pizza,
-                Ionicons.pizza_outline,
-                Ionicons.pizza_sharp,
-                Ionicons.cafe,
-                Ionicons.cafe_outline,
-                Ionicons.cafe_sharp,
-                Ionicons.beer,
-                Ionicons.beer_outline,
-                Ionicons.beer_sharp,
-                Ionicons.wine,
-                Ionicons.wine_outline,
-                Ionicons.wine_sharp,
-                Ionicons.ice_cream,
-                Ionicons.ice_cream_outline,
-                Ionicons.ice_cream_sharp,
-                FrinoIcons.f_cocktail,
-                FrinoIcons.f_cook,
-                FrinoIcons.f_mug,
-                FrinoIcons.f_palm,
-                FrinoIcons.f_pot_flower,
-                FrinoIcons.f_piggy_bank__1_,
-                FrinoIcons.f_meat,
-                Icons.fastfood,
-                Icons.restaurant,
-                Icons.local_restaurant,
-                Icons.coffee,
-                Icons.local_pizza,
-                Icons.local_bar,
-                Icons.local_cafe,
-                Icons.local_offer,
-              ]
-                  .map(
-                    (icon) => IconButton(
-                      icon: Icon(icon),
-                      onPressed: () {
-                        Navigator.of(context).pop(icon);
-                      },
-                    ),
-                  )
-                  .toList(),
+Future<void> _chooseIcon() async {
+  IconData? selectedIcon = await showDialog(
+    context: context,
+    builder: (context) {
+      return AlertDialog(
+        title: const Text('Select an Icon'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              width: double.maxFinite,
+              child: Wrap(
+                spacing: 8.0, // Horizontal spacing between icons
+                runSpacing: 8.0, // Vertical spacing between rows
+                children: [
+                  FontAwesomeIcons.apple,
+                  FontAwesomeIcons.bowlRice,
+                  FontAwesomeIcons.bowlFood,
+                  FontAwesomeIcons.plateWheat,
+                  FontAwesomeIcons.bacon,
+                  FontAwesomeIcons.breadSlice,
+                  FontAwesomeIcons.coffee,
+                  FontAwesomeIcons.cocktail,
+                  FontAwesomeIcons.cookie,
+                  FontAwesomeIcons.cutlery,
+                  FontAwesomeIcons.drumstickBite,
+                  FontAwesomeIcons.fish,
+                  FontAwesomeIcons.hamburger,
+                  FontAwesomeIcons.hotdog,
+                  FontAwesomeIcons.hotjar,
+                  FontAwesomeIcons.iceCream,
+                  FontAwesomeIcons.lemon,
+                  FontAwesomeIcons.martiniGlass,
+                  FontAwesomeIcons.mugHot,
+                  FontAwesomeIcons.pizzaSlice,
+                  FontAwesomeIcons.utensils,
+                  FontAwesomeIcons.wineBottle,
+                  Ionicons.fast_food,
+                  Ionicons.fast_food_outline,
+                  Ionicons.fast_food_sharp,
+                  Ionicons.pizza,
+                  Ionicons.pizza_outline,
+                  Ionicons.pizza_sharp,
+                  Ionicons.cafe,
+                  Ionicons.cafe_outline,
+                  Ionicons.cafe_sharp,
+                  Ionicons.beer,
+                  Ionicons.beer_outline,
+                  Ionicons.beer_sharp,
+                  Ionicons.wine,
+                  Ionicons.wine_outline,
+                  Ionicons.wine_sharp,
+                  Ionicons.ice_cream,
+                  Ionicons.ice_cream_outline,
+                  Ionicons.ice_cream_sharp,
+                  FrinoIcons.f_cocktail,
+                  FrinoIcons.f_cook,
+                  FrinoIcons.f_mug,
+                  FrinoIcons.f_palm,
+                  FrinoIcons.f_pot_flower,
+                  FrinoIcons.f_piggy_bank__1_,
+                  FrinoIcons.f_meat,
+                  Icons.fastfood,
+                  Icons.restaurant,
+                  Icons.local_restaurant,
+                  Icons.coffee,
+                  Icons.local_pizza,
+                  Icons.local_bar,
+                  Icons.local_cafe,
+                  Icons.local_offer,
+                ]
+                    .map(
+                      (icon) => IconButton(
+                        icon: Icon(icon),
+                        onPressed: () {
+                          Navigator.of(context).pop(icon);
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
             ),
-          ),
-        );
-      },
-    );
+            SizedBox(height: 8.0), // Space between icons and close button
+            Align(
+              alignment: Alignment.bottomRight,
+              child: TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Close'),
+              ),
+            ),
+          ],
+        ),
+      );
+    },
+  );
 
-    if (selectedIcon != null) {
-      setState(() {
-        _currentIcon = selectedIcon;
-      });
-    }
+  if (selectedIcon != null) {
+    setState(() {
+      _currentIcon = selectedIcon;
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -496,7 +512,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () {
-                      Navigator.of(context).pop(); // Close dialog
+                    //  Navigator.of(context).pop(); // Close dialog
                       _chooseIcon(); // Call the method to choose an icon
                     },
                     child: const Text("Choose Icon"),

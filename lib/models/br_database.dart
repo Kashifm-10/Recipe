@@ -75,9 +75,9 @@ Future<void> addType(String textFromUser, String type, String duration, String w
   final List<Recipe> currentRecipe = [];
   final List<Links> currentLink = [];
   final List<Title> currentTitle = [];
-  Future<void> addIng(String textFromUser, String type, String dish) async {
+  Future<void> addIng(String textFromUser, String type, String dish, String quantity, String uom) async {
     //create a new note object
-    final newName = Ingredients(name: textFromUser)..dish = dish;
+    final newName = Ingredients(name: textFromUser, quantity: quantity, uom: uom)..dish = dish;
 
     //save to db
     await isar.writeTxn(() => isar.ingredients.put(newName));
@@ -95,10 +95,12 @@ Future<void> addType(String textFromUser, String type, String duration, String w
   }
 
   //UPDATE
-  Future<void> updateIng(int id, String newText, String type) async {
+  Future<void> updateIng(int id, String newText, String type, String quantity, String uom) async {
     final existingNote = await isar.ingredients.get(id);
     if (existingNote != null) {
       existingNote.name = newText;
+      existingNote.quantity = quantity;
+      existingNote.uom = uom;
       await isar.writeTxn(() => isar.ingredients.put(existingNote));
       await fetchNotes(type);
     }
@@ -158,18 +160,19 @@ Future<void> fetchRecipe(String dish, String type) async {
   }
 
 
-Future<String?> fetchLink(String dish, String type) async {
+Future<List<Links>> fetchLink(String dish, String type) async {
   List<Links> fetchedLink = await isar.links.where().filter().dishEqualTo(dish).and().typeEqualTo(type).findAll();
   currentLink.clear();
   currentLink.addAll(fetchedLink);
   notifyListeners();
+  return fetchedLink.toList();
   
   // Assuming you want to return a specific string from the fetchedLink list
-  if (fetchedLink.isNotEmpty) {
+ /*  if (fetchedLink.isNotEmpty) {
     return fetchedLink.last.link; // Replace `link` with the actual property you want to return
-  }
+  } */
   
-  return null; // Return null if no link is found
+ /*  return null; */ // Return null if no link is found
 }
 
   //UPDATE
@@ -184,7 +187,7 @@ Future<String?> fetchLink(String dish, String type) async {
 
   //DELETE
   Future<void> deleteLink(int id, String type, String dish) async {
-    await isar.writeTxn(() => isar.recipes.delete(id));
+    await isar.writeTxn(() => isar.links.delete(id));
     await fetchLink(dish, type);
   }
 
@@ -238,6 +241,13 @@ Future<void> fetchTitle(String title, String type) async {
     notifyListeners();
   }
 
+  Future<void> fetchOneTitle( String type) async {
+    List<Title> fetchedTitle = await isar.titles.where().filter().typeEqualTo(type).findAll();
+    currentTitle.clear();
+    currentTitle.addAll(fetchedTitle);
+    notifyListeners();
+  }
+
   Future<bool> titleExists(String title, String type) async {
     final query = await isar.titles.where().filter().typeEqualTo(type).titleEqualTo(title).findAll();
     return query.isNotEmpty;
@@ -252,10 +262,23 @@ Future<void> fetchTitle(String title, String type) async {
       });
     }
   }
-  Future<List<Title>> fetchtitlesFromIsar() async {
-  final titles = await isar.titles.where().findAll();
-  return titles;
+Future<List<Map<String, String>>> fetchtitlesFromIsar(String? type) async {
+  List<Map<String, String>> title = [];
+
+  final titles = await isar.titles.where().filter().typeEqualTo(type).findAll();
+
+  title.addAll(titles.map((deal) {
+    return {
+      'title': deal.title ?? '',
+    };
+  }).toList());
+  
+  return title;
 }
 
 
+ 
 }
+
+
+

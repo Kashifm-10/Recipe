@@ -9,10 +9,10 @@ class Recipe {
   String? name;
   String? type;
   String? dish;
-  String? link;
+  
 
   Recipe({
-    this.link,this.name,this.type, this.dish
+    this.name,this.type, this.dish
 
   });
 

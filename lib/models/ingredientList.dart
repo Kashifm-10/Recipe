@@ -3,80 +3,172 @@ import 'package:popover/popover.dart';
 import 'package:recipe/pages/recipe.dart';
 import 'package:recipe/models/noteSettings.dart';
 
+import 'package:flutter/material.dart';
+
 class ingredientList extends StatelessWidget {
-   ingredientList(
-      {super.key,
-      required this.dish,
-      required this.type,
-      required this.text,
-      this.onEditPressed,
-      this.onDeletePressed});
-      String? dish;
-  String? type;
+  ingredientList({
+    super.key,
+    required this.dish,
+    required this.type,
+    required this.text,
+    required this.quantity,
+    required this.count,
+    required this.uom,
+    this.onEditPressed,
+    this.onDeletePressed,
+  });
+  int? count;
+  final String? dish;
+  final String? type;
+  final int? quantity;
+  final String? uom;
   final String text;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-  child: Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      ListTile(
-        title: GestureDetector(
-  onLongPress: () => showPopover(
-    width: 100,
-    height: 100,
-    backgroundColor: Theme.of(context).colorScheme.surface,
-    context: context,
-    bodyBuilder: (context) => Notesettings(
-      onEditTap: onEditPressed,
-      onDeleteTap: onDeletePressed,
-    ),
-  ),
-  child: Row(
-    children: [
-      Padding(
-        padding: const EdgeInsets.only(left: 10.0),
-        child: Text(
-          '• ',
-          style: TextStyle(
-            fontSize: 20,
-            color: Colors.black,
-          ),
-        ),
-      ),
-      Expanded(
-        child: Text(
-          text,
-          textAlign: TextAlign.left,
-          style: TextStyle(color: const Color.fromARGB(255, 20, 17, 17), fontSize: 20 ),
-        ),
-      ),
-    ],
-  ),
-)
+    // Sample data for demonstration
+    final List<Map<String, String>> items = [
+      {
+        'text': text,
+        'quantity': quantity!.toString(),
+        'uom': uom!,
+        'quantityCal': (quantity! * count!).toString(),
+      },
+    ];
 
-        /* trailing: Builder(
-          builder: (context) => IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () => showPopover(
-              width: 100,
-              height: 100,
-              backgroundColor: Theme.of(context).colorScheme.surface,
-              context: context,
-              bodyBuilder: (context) => Notesettings(
-                onEditTap: onEditPressed,
-                onDeleteTap: onDeletePressed,
-              ),
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 2, vertical: 2),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            height: 50.0, // Limit the height of the whole list
+            child: ListView.builder(
+              itemCount: items.length,
+              itemBuilder: (context, index) {
+                final item = items[index];
+                return GestureDetector(
+                  onLongPress: () {
+                    onEditPressed!();
+                  },
+                  child: Container(
+                    // margin: const EdgeInsets.only(bottom: 8.0),
+                    child: Table(
+                      // border: TableBorder.all(),
+                      columnWidths: const {
+                        0: FlexColumnWidth(2),
+                        1: FlexColumnWidth(1),
+                        2: FlexColumnWidth(1),
+                      },
+                      children: [
+                        TableRow(
+                          children: [
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  item['text']!,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      item['quantity']!,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        item['uom']!,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Row(
+                                  children: [
+                                    Text(
+                                      item['quantityCal']!,
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8.0),
+                                      child: Text(
+                                        item['uom']!,
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           ),
-        ), */
+        ],
       ),
-    ],
-  ),
-);
-
+    );
   }
 }
+
+
+
+
+
+
+ /* Expanded(
+                    flex: 1,
+                    child: Text(
+                      "$quantity $uom",
+                      style: const TextStyle(
+                        fontSize: 25,
+                        color: Colors.black,
+                      ),
+                      textAlign: TextAlign.left,
+                    ),
+                  ), */
+
+  /*  title: GestureDetector(
+              onLongPress: () => showPopover(
+                width: 100,
+                height: 100,
+                backgroundColor: Theme.of(context).colorScheme.surface,
+                context: context,
+                bodyBuilder: (context) => Notesettings(
+                  onEditTap: onEditPressed,
+                  onDeleteTap: onDeletePressed,
+                ),
+              ), */

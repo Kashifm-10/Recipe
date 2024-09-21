@@ -1,3 +1,4 @@
+import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:isar/isar.dart';
@@ -32,9 +33,9 @@ class _recipeState extends State<recipe> {
   TextEditingController textController = TextEditingController();
   List<Map<String, String>> linkData = [];
 
-  String? dish;
   String? type;
-  String? fetchedlink;
+  List<String>? fetchedlink;
+  List<int>? fetchedlinkid;
 
   @override
   void initState() {
@@ -42,17 +43,109 @@ class _recipeState extends State<recipe> {
     // on app startup, fetch the existing notes
     readIngeadints(widget.dish!);
     readRecipe(widget.dish!, widget.type!);
-    dish = widget.dish;
-    type = widget.type;
     readLink(widget.dish!, widget.type!);
   }
 
-  Future<void> _launchUrl() async {
-    final Uri _url = Uri.parse(fetchedlink!);
-    if (!await launchUrl(_url)) {
-      throw Exception('Could not launch $_url');
+  Future<void> _launchUrl(
+      List<String> fetchedLinks, List<int> fetchedLinksId) async {
+    if (fetchedLinks.isEmpty) return;
+
+    String? selectedLink;
+
+    if (fetchedLinks.length == 1) {
+      selectedLink = fetchedLinks.first;
+    } else {
+      selectedLink = await showDialog<String>(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text('Select a link to redirect'),
+            content: Container(
+              width: 400.0, // Set the desired width
+              height: 120.0, // Set the desired height
+              child: StatefulBuilder(
+                builder: (BuildContext context, StateSetter setState) {
+                  return SingleChildScrollView(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 0.0),
+                          child: ListView.builder(
+                            shrinkWrap: true,
+                            physics: const NeverScrollableScrollPhysics(),
+                            itemCount: fetchedLinks.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              String link = fetchedLinks[index];
+
+                              return Column(
+                                children: [
+                                  ListTile(
+                                    title: Column(
+                                      children: [
+                                        Text(
+                                          link,
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: const TextStyle(fontSize: 16),
+                                        ),
+                                        // const Divider(endIndent: 30,),
+                                      ],
+                                    ),
+                                    trailing: Padding(
+                                      padding:
+                                          const EdgeInsets.only(bottom: 15.0),
+                                      child: IconButton(
+                                        icon: const Icon(Icons.delete,
+                                            color: Colors.red),
+                                        onPressed: () async {
+                                          int linkId = fetchedLinksId[index];
+                                          await deleteLink(linkId);
+
+                                          setState(() {
+                                            fetchedLinks.removeAt(index);
+                                            fetchedLinksId.removeAt(index);
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                    onTap: () {
+                                      Navigator.pop(context, link);
+                                    },
+                                  ),
+                                  Divider(
+                                    indent: 20,
+                                    endIndent: 35,
+                                    height: 0,
+                                  )
+                                ],
+                              );
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+            ),
+          );
+        },
+      );
+    }
+
+    if (selectedLink != null) {
+      final Uri _url = Uri.parse(selectedLink);
+      if (!await launchUrl(_url)) {
+        throw Exception('Could not launch $_url');
+      }
     }
   }
+
+/* Future<void> deleteLink(int id, String type, String dish) async {
+  await isar!.writeTxn(() => isar!.recipes.delete(id)); // Deleting the item
+  readLink(dish, type); // Fetch updated list after deletion
+} */
 
   /* Future<List<Map<String, String>>> _fetchLink() async {
     // Check if isar instance is null before proceeding
@@ -96,35 +189,94 @@ class _recipeState extends State<recipe> {
 
   //function to create a note
   void createIngredient() {
+    // Additional TextEditingController for the second input
+    TextEditingController quantityController = TextEditingController();
+    TextEditingController textController = TextEditingController();
+
+    // Dropdown selection options
+    String? selectedUnit;
+    List<String> unitOptions = ['gm', 'kg', 'ltr', 'cups'];
+
     showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-                title: const Text('Add Ingredient'),
-                content: TextField(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Add Ingredient'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // First text field for the ingredient name
+                TextField(
                   controller: textController,
                   decoration: const InputDecoration(
                     hintText: 'Ingredient',
                   ),
                 ),
-                actions: [
-                  //create button
-                  MaterialButton(
-                      textColor: Colors.white,
-                      onPressed: () async {
-                        if (textController.text.isNotEmpty) {
-                          await context.read<database>().addIng(
-                              textController.text, widget.type!, widget.dish!);
-                          Navigator.pop(context);
-                          readIngeadints(widget.dish!);
-                          textController.clear();
-                        }
-                      },
-                      child: Text('Create',
-                          style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .inversePrimary)))
-                ]));
+                const SizedBox(height: 10),
+
+                // Second text field for quantity
+                TextField(
+                  controller: quantityController,
+                  decoration: const InputDecoration(
+                    hintText: 'Quantity',
+                  ),
+                  keyboardType:
+                      TextInputType.number, // Only allow numeric input
+                ),
+                const SizedBox(height: 10),
+
+                // Dropdown button for selecting a unit
+                DropdownButton<String>(
+                  hint: const Text('Select Unit'),
+                  isExpanded: true,
+                  items: unitOptions.map((String unit) {
+                    return DropdownMenuItem<String>(
+                      value: unit,
+                      child: Text(unit),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    setState(() => selectedUnit = value);
+                  },
+                  value: selectedUnit,
+                ),
+              ],
+            ),
+            actions: [
+              // Create button
+              MaterialButton(
+                textColor: Colors.white,
+                onPressed: () async {
+                  if (textController.text.isNotEmpty &&
+                      quantityController.text.isNotEmpty &&
+                      selectedUnit != null) {
+                    // Assuming addIng method is modified to accept the quantity and unit
+                    await context.read<database>().addIng(
+                          textController.text,
+                          widget.type!,
+                          widget.dish!,
+                          quantityController.text,
+                          selectedUnit!,
+                        );
+
+                    Navigator.pop(context);
+                    readIngeadints(widget.dish!);
+                    textController.clear();
+                    quantityController.clear();
+                  }
+                },
+                child: Text(
+                  'Create',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary),
+                ),
+              )
+            ],
+          );
+        },
+      ),
+    );
   }
 
   //read notes
@@ -133,38 +285,99 @@ class _recipeState extends State<recipe> {
   }
 
   //update note
-  void updateIng(Ingredients name) async {
-    //pre-fill the current note text into our controller
-    textController.text = name.name!;
-    await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-                title: const Text('Edit'),
-                content: TextField(
-                  controller: textController,
-                  decoration: const InputDecoration(),
+  void updateIng(Ingredients ingredient) async {
+  // Create controllers for the text fields and unit selection
+  TextEditingController textController = TextEditingController(text: ingredient.name);
+  TextEditingController quantityController = TextEditingController(text: ingredient.quantity);
+  String? selectedUnit = ingredient.uom; // Assuming Ingredients has a unit field
+  
+  // Dropdown selection options
+  List<String> unitOptions = ['gm', 'kg', 'ltr', 'cups'];
+
+  await showDialog(
+    context: context,
+    builder: (context) => StatefulBuilder(
+      builder: (BuildContext context, StateSetter setState) {
+        return AlertDialog(
+          title: const Text('Edit Ingredient'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Text field for the ingredient name
+              TextField(
+                controller: textController,
+                decoration: const InputDecoration(
+                  hintText: 'Ingredient',
                 ),
-                backgroundColor: Theme.of(context).colorScheme.onPrimary,
-                actions: [
-                  MaterialButton(
-                      onPressed: () async {
-                        //update note in db
-                        await context.read<database>().updateIng(
-                            name.id, textController.text, widget.type!);
-                        //clear the controller
-                        textController.clear();
-                        readIngeadints(widget.dish!);
-                        //pop dialog box
-                        Navigator.pop(context);
-                      },
-                      child: Text('Update',
-                          style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .inversePrimary)))
-                ]));
-    readIngeadints(widget.dish!);
-  }
+              ),
+              const SizedBox(height: 10),
+
+              // Text field for quantity
+              TextField(
+                controller: quantityController,
+                decoration: const InputDecoration(
+                  hintText: 'Quantity',
+                ),
+                keyboardType: TextInputType.number, // Only allow numeric input
+              ),
+              const SizedBox(height: 10),
+
+              // Dropdown button for selecting a unit
+              DropdownButton<String>(
+                hint: const Text('Select Unit'),
+                isExpanded: true,
+                items: unitOptions.map((String unit) {
+                  return DropdownMenuItem<String>(
+                    value: unit,
+                    child: Text(unit),
+                  );
+                }).toList(),
+                onChanged: (String? value) {
+                  setState(() => selectedUnit = value);
+                },
+                value: selectedUnit,
+              ),
+            ],
+          ),
+          actions: [
+            // Update button
+            MaterialButton(
+              textColor: Colors.white,
+              onPressed: () async {
+                if (textController.text.isNotEmpty &&
+                    quantityController.text.isNotEmpty &&
+                    selectedUnit != null) {
+                  // Update the ingredient in the database
+                  await context.read<database>().updateIng(
+                        ingredient.id,
+                        textController.text,
+                        widget.type!,
+                        quantityController.text,
+                        selectedUnit!,
+                      );
+
+                  // Clear the controllers and refresh the list
+                  textController.clear();
+                  quantityController.clear();
+                  readIngeadints(widget.dish!);
+
+                  // Pop the dialog box
+                  Navigator.pop(context);
+                }
+              },
+              child: Text(
+                'Update',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.inversePrimary,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    ),
+  );
+}
 
   //delete a note
   void deleteIng(int id) async {
@@ -250,45 +463,60 @@ class _recipeState extends State<recipe> {
     readRecipe(widget.dish!, widget.type!);
   }
 
-  void createLink() {
-    showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-                title: const Text('Add Link'),
-                content: TextField(
-                  controller: textController,
-                  decoration: const InputDecoration(
-                    hintText: 'www.youtube.com',
-                  ),
-                ),
-                actions: [
-                  //create button
-                  MaterialButton(
-                      textColor: Colors.white,
-                      onPressed: () async {
-                        if (textController.text.isNotEmpty) {
-                          await context.read<database>().addLink(
-                              textController.text, widget.type!, widget.dish!);
-                          Navigator.pop(context);
-                          readRecipe(widget.dish!, widget.type!);
-                          textController.clear();
-                        }
-                      },
-                      child: Text('Create',
-                          style: TextStyle(
-                              color: Theme.of(context)
-                                  .colorScheme
-                                  .inversePrimary)))
-                ]));
+  void createLink() async {
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Add Link'),
+        content: TextField(
+          controller: textController,
+          decoration: const InputDecoration(
+            hintText: 'www.youtube.com',
+          ),
+        ),
+        actions: [
+          //create button
+          MaterialButton(
+              textColor: Colors.white,
+              onPressed: () async {
+                if (textController.text.isNotEmpty) {
+                  await context
+                      .read<database>()
+                      .addLink(textController.text, widget.type!, widget.dish!);
+                  Navigator.pop(context);
+                  readRecipe(widget.dish!, widget.type!);
+                  readLink(widget.dish!, widget.type!);
+
+                  textController.clear();
+                }
+              },
+              child: Text('Create',
+                  style: TextStyle(
+                      color: Theme.of(context).colorScheme.inversePrimary)))
+        ],
+      ),
+    );
   }
 
   //read notes
   void readLink(String dish, String type) async {
-    // Await the result of fetchLink to get the actual string
-    String? link = await context.read<database>().fetchLink(dish, type);
-    fetchedlink = link;
-    // Handle the link (e.g., print it, use it, etc.)
-    //print(link);
+    // Await the result of fetchLink to get the actual list of Links
+    List<Links> link = await context.read<database>().fetchLink(dish, type);
+
+    // If the list is not empty, map over it to extract all titles
+    if (link.isNotEmpty) {
+      // Extract all titles into a List<String>
+      List<String> fetchedTitles = link.map((item) => item.link).toList();
+      List<int> fetchedTitlesId = link.map((item) => item.id).toList();
+      fetchedlink = fetchedTitles;
+      fetchedlinkid = fetchedTitlesId;
+      // Handle the fetched list of titles (e.g., use it, store it, etc.)
+      // For example, you can print the list of titles
+      print(fetchedTitles);
+    } else {
+      // Handle case where no links are found
+      print('No links found');
+    }
   }
 
   void updateLink() {
@@ -299,7 +527,8 @@ class _recipeState extends State<recipe> {
         content: TextField(
           controller: textController,
           decoration: const InputDecoration(
-            hintText: 'www.youtube.com', hintStyle: TextStyle(color: Colors.grey),
+            hintText: 'www.youtube.com',
+            hintStyle: TextStyle(color: Colors.grey),
           ),
         ),
         actions: [
@@ -313,6 +542,8 @@ class _recipeState extends State<recipe> {
                     .addLink(textController.text, widget.type!, widget.dish!);
                 Navigator.pop(context);
                 readRecipe(widget.dish!, widget.type!);
+                readLink(widget.dish!, widget.type!);
+
                 textController.clear();
               }
             },
@@ -362,7 +593,7 @@ class _recipeState extends State<recipe> {
   } */
 
   //delete a note
-  void deleteLink(int id) async {
+  Future<void> deleteLink(int id) async {
     await context.read<database>().deleteLink(id, widget.type!, widget.dish!);
     readRecipe(widget.dish!, widget.type!);
   }
@@ -374,12 +605,12 @@ class _recipeState extends State<recipe> {
       foregroundColor: Theme.of(context).colorScheme.inversePrimary,
       children: [
         SpeedDialChild(
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
           label: 'add Ingredient',
           onTap: createIngredient,
         ),
         SpeedDialChild(
-          child: Icon(Icons.add),
+          child: const Icon(Icons.add),
           label: 'add Recipe',
           onTap: () {
             createRecipe();
@@ -387,7 +618,7 @@ class _recipeState extends State<recipe> {
           },
         ),
         SpeedDialChild(
-          child: Icon(Icons.delete),
+          child: const Icon(Icons.delete),
           label: 'Delete Note',
           onTap: () {
             // Add delete action here
@@ -397,138 +628,318 @@ class _recipeState extends State<recipe> {
     );
   }
 
+  void add() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                createIngredient();
+              },
+              child: const Text('Add Ingredient'),
+            ),
+            const SizedBox(width: 20), // Space between buttons
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                createRecipe();
+              },
+              child: const Text('Add Instructions'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  final List<String> items = [
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10'
+  ];
+  String? selectedValue = "1";
   @override
   Widget build(BuildContext context) {
-    //note database
+    // note database
     final noteDatabase = context.watch<database>();
 
-    //current notes
+    // current notes
     List<Ingredients> currentNotes = noteDatabase.currentIng;
     List<Recipe> currentRecipe = noteDatabase.currentRecipe;
 
-    return Scaffold(
-      backgroundColor: Colors.blue.shade50,
-      appBar: AppBar(
-  elevation: 0,
-  backgroundColor: Colors.transparent,
-  foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-  leading: IconButton(
-    icon: Icon(Icons.arrow_back),
-    onPressed: () {
-      Navigator.pop(context); // Navigate back when pressed
-    },
-  ),
-),
+    return DefaultTabController(
+      length: 2, // Number of tabs
+      child: Scaffold(
+        backgroundColor: Colors.blue.shade50,
+        appBar: PreferredSize(
+          preferredSize: const Size.fromHeight(
+              140.0), // Increase the height to fit the content
+          child: AppBar(
+              elevation: 0,
+              backgroundColor: Colors.transparent,
+              foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+              leading: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context); // Navigate back when pressed
+                  },
+                ),
+              ),
+              title: Padding(
+                padding: const EdgeInsets.only(
+                    top: 10.0), // Add bottom padding to push content down
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Recipe',
+                      style: GoogleFonts.dmSerifDisplay(
+                        fontSize: 40,
+                        color: Theme.of(context).colorScheme.inversePrimary,
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 5.0, right: 20),
+                          child: GestureDetector(
+                            onTap: add,
+                            onLongPress: updateLink,
+                            child: const Icon(
+                              Icons.add,
+                              size: 35,
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(top: 10.0, right: 30),
+                          child: GestureDetector(
+                            onTap: () {
+                              if (fetchedlink == null) {
+                                createLink();
+                              } else {
+                                final List<int> fetchedLinksId =
+                                    fetchedlinkid is List<int>
+                                        ? fetchedlinkid as List<int>
+                                        : [fetchedlinkid as int];
+                                // Safely cast fetchedlink to List<String> or wrap it in a list if it's a single string
+                                final List<String> fetchedLinks = fetchedlink
+                                        is List<String>
+                                    ? fetchedlink as List<String>
+                                    : [
+                                        fetchedlink as String
+                                      ]; // Forcefully cast to String if it's a single link
 
-      //drawer: const Drawer(),
-      /* floatingActionButton: FloatingActionButton(
-        onPressed: createNote,
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        child: Icon(Icons.add,
-            color: Theme.of(context).colorScheme.inversePrimary),
-      ), */
-      // floatingActionButton: floatingActionButtonMenu(context),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 25),
-                child: Text(
-                  'Recipe',
-                  style: GoogleFonts.dmSerifDisplay(
-                      fontSize: 60,
-                      color: Theme.of(context).colorScheme.inversePrimary),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 30.0),
-                child: GestureDetector(
-                  onTap: fetchedlink == null ? createLink : _launchUrl,
-                  onLongPress: updateLink,
-                  child: Icon(Icons.link),
-                ),
-              ),
-            ],
-          ),
-          SingleChildScrollView(
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 30),
-                      child: Text(
-                        "Ingerdients",
-                        style: GoogleFonts.dmSerifDisplay(
-                            fontSize: 30,
-                            color:
-                                Theme.of(context).colorScheme.inversePrimary),
-                      ),
+                                _launchUrl(fetchedLinks,
+                                    fetchedLinksId); // Pass the list of links
+                              }
+                            },
+                            onLongPress: updateLink,
+                            child: const Icon(
+                              Icons.link,
+                              size: 40,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    IconButton(
-                        onPressed: createIngredient,
-                        icon: Icon(Icons.add,
-                            color:
-                                Theme.of(context).colorScheme.inversePrimary))
                   ],
                 ),
-                ListView.builder(
-                  physics:
-                      NeverScrollableScrollPhysics(), // Disable individual scrolling
-                  shrinkWrap: true, // Ensures the ListView takes minimal height
-                  itemCount: currentNotes.length,
-                  itemBuilder: (context, index) {
-                    final note = currentNotes[index];
-                    return ingredientList(
-                      dish: widget.dish,
-                      type: widget.type!,
-                      text: note.name!,
-                      onEditPressed: () => updateIng(note),
-                      onDeletePressed: () => deleteIng(note.id),
-                    );
-                  },
+              ),
+              bottom: TabBar(
+                tabs: const [
+                  Tab(text: 'Ingredients'),
+                  Tab(text: 'Instructions'),
+                ],
+                labelStyle: GoogleFonts.dmSerifDisplay(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                  color: Theme.of(context).colorScheme.inversePrimary,
                 ),
-                Row(
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 20.0, top: 30),
-                      child: Text(
-                        "Instructions",
-                        style: GoogleFonts.dmSerifDisplay(
-                            fontSize: 30,
-                            color:
-                                Theme.of(context).colorScheme.inversePrimary),
+                unselectedLabelStyle: GoogleFonts.dmSerifDisplay(
+                  fontSize: 25.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey,
+                ),
+                indicatorColor: Theme.of(context)
+                    .colorScheme
+                    .inversePrimary, // Set the color of the indicator below the tabs
+              )),
+        ),
+        // floatingActionButton: floatingActionButtonMenu(context),
+        body: TabBarView(
+          children: [
+            // Ingredients Tab
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Padding(
+                    padding:
+                        const EdgeInsets.only(top: 10, right: 40.0, bottom: 10),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton2<String>(
+                        isExpanded: true,
+                        hint: const Row(
+                          children: [
+                            Icon(
+                              Icons.list,
+                              size: 16,
+                              color: Colors.white,
+                            ),
+                            SizedBox(
+                              width: 4,
+                            ),
+                            Expanded(
+                              child: Text(
+                                '1',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        ),
+                        items: items
+                            .map((String item) => DropdownMenuItem<String>(
+                                  value: item,
+                                  child: Text(
+                                    item,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ))
+                            .toList(),
+                        value: selectedValue,
+                        onChanged: (String? value) {
+                          setState(() {
+                            selectedValue = value;
+                          });
+                        },
+                        buttonStyleData: ButtonStyleData(
+                          height: 50,
+                          width: 70,
+                          padding: const EdgeInsets.only(left: 14, right: 14),
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            /* border: Border.all(
+                              color: Colors.black26,
+                            ), */
+                            color: Colors.white,
+                          ),
+                          elevation: 0,
+                        ),
+                        iconStyleData: const IconStyleData(
+                          icon: Icon(
+                            Icons.keyboard_arrow_down,
+                          ),
+                          iconSize: 14,
+                          iconEnabledColor: Colors.black,
+                          iconDisabledColor: Colors.grey,
+                        ),
+                        dropdownStyleData: DropdownStyleData(
+                          maxHeight: 200,
+                          width: 70,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(14),
+                            color: Colors.white,
+                          ),
+                          offset: const Offset(0, 0),
+                          scrollbarTheme: ScrollbarThemeData(
+                            radius: const Radius.circular(40),
+                            thickness: MaterialStateProperty.all<double>(6),
+                            thumbVisibility:
+                                MaterialStateProperty.all<bool>(true),
+                          ),
+                        ),
+                        menuItemStyleData: const MenuItemStyleData(
+                          height: 40,
+                          padding: EdgeInsets.only(left: 14, right: 14),
+                        ),
                       ),
                     ),
-                    IconButton(
-                        onPressed: createRecipe,
-                        icon: Icon(Icons.add,
-                            color:
-                                Theme.of(context).colorScheme.inversePrimary))
-                  ],
-                ),
-                ListView.builder(
-                  physics: NeverScrollableScrollPhysics(),
-                  shrinkWrap: true,
-                  itemCount: currentRecipe.length,
-                  itemBuilder: (context, index) {
-                    final note = currentRecipe[index];
-                    return recipeList(
-                      dish: widget.dish,
-                      type: widget.type!,
-                      text: note.name!,
-                      onEditPressed: () => updateRecipe(note),
-                      onDeletePressed: () => deleteRecipe(note.id),
-                    );
-                  },
-                ),
-              ],
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: ListView.builder(
+                      physics:
+                          const NeverScrollableScrollPhysics(), // Disable individual scrolling
+                      shrinkWrap:
+                          true, // Ensures the ListView takes minimal height
+                      itemCount: currentNotes.length,
+                      itemBuilder: (context, index) {
+                        final note = currentNotes[index];
+                        return ingredientList(
+                          count: int.parse(selectedValue!),
+                          dish: widget.dish,
+                          type: widget.type!,
+                          text: note.name!,
+                          quantity: int.parse(note.quantity!),
+                          uom: note.uom,
+                          onEditPressed: () => updateIng(note),
+                          onDeletePressed: () => deleteIng(note.id),
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
-          )
-        ],
+            // Instructions Tab
+            SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  /*  IconButton(
+                    onPressed: createRecipe,
+                    icon: Icon(
+                      Icons.add,
+                      color: Theme.of(context).colorScheme.inversePrimary,
+                    ),
+                  ), */
+                  ListView.builder(
+                    physics:
+                        const NeverScrollableScrollPhysics(), // Disable individual scrolling
+                    shrinkWrap:
+                        true, // Ensures the ListView takes minimal height
+                    itemCount: currentRecipe.length,
+                    itemBuilder: (context, index) {
+                      final note = currentRecipe[index];
+                      return recipeList(
+                        dish: widget.dish,
+                        type: widget.type!,
+                        text: note.name!,
+                        onEditPressed: () => updateRecipe(note),
+                        onDeletePressed: () => deleteRecipe(note.id),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

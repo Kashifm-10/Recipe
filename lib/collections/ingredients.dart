@@ -8,8 +8,12 @@ class Ingredients {
 
   String? name;
   String? dish;
+  String? quantity;
+  String? uom;
   Ingredients({
     required this.name,
-    this.dish
+    this.dish, 
+    this.quantity, 
+    this.uom
   });
 }

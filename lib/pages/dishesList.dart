@@ -32,7 +32,7 @@ class _dishesListState extends State<dishesList> {
   final isar = IsarInstance().isar;
   List<Dish> _filteredNotes = [];
   List<Dish> _sortededNotes = [];
-    List<Title> currentTitles = [];
+  List<Title> currentTitles = [];
 
   String dropdownValue = 'A-Z'; // Class-level variable
 
@@ -45,6 +45,7 @@ class _dishesListState extends State<dishesList> {
     super.initState();
     // on app startup, fetch the existing notes
     readNotes(widget.type!);
+    readTitles(widget.type!);
   }
 
   //function to create a note
@@ -177,6 +178,11 @@ class _dishesListState extends State<dishesList> {
   //read notes
   void readNotes(String type) {
     context.read<database>().fetchNotes(type);
+  }
+
+  Future<void> readTitles(String type) async {
+    final header = await context.read<database>().fetchtitlesFromIsar(type);
+    print("object::::: $header");
   }
 
   //update note
@@ -433,8 +439,6 @@ class _dishesListState extends State<dishesList> {
 
   int value = 0;
 
-
-
   @override
   Widget build(BuildContext context) {
     final noteDatabase = context.watch<database>();
@@ -446,9 +450,18 @@ class _dishesListState extends State<dishesList> {
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
           elevation: 0,
+          leading: Padding(
+                padding: const EdgeInsets.only(top: 20.0),
+                child: IconButton(
+                  icon: const Icon(Icons.arrow_back),
+                  onPressed: () {
+                    Navigator.pop(context); // Navigate back when pressed
+                  },
+                ),
+              ),
           backgroundColor: Colors.blue.shade50,
           foregroundColor: Theme.of(context).colorScheme.inversePrimary),
-      drawer: Drawer(
+/*       drawer: Drawer(
         surfaceTintColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 230, 228, 228),
         shadowColor: Colors.white,
@@ -631,7 +644,7 @@ class _dishesListState extends State<dishesList> {
             ),
           ],
         ),
-      ),
+      ), */
       floatingActionButton: FloatingActionButton(
           onPressed: createNote,
           backgroundColor: Theme.of(context).colorScheme.primary,
@@ -772,43 +785,42 @@ class _dishesListState extends State<dishesList> {
               )
             ],
           ),
-         Expanded(
-  child: GestureDetector(
-    onTap: () {
-      setState(() {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => recipe(
-                  type: widget.type,
-                  dish: dishName,
-                )));
-      });
-    },
-    child: ListView.builder(
-      itemCount: _sortededNotes.length,
-      itemBuilder: (context, index) {
-        final note = _sortededNotes[index];
-        dishName = note.name;
+          Expanded(
+            child: GestureDetector(
+              child: ListView.builder(
+                itemCount: _sortededNotes.length,
+                itemBuilder: (context, index) {
+                  final note = _sortededNotes[index];
+                  
 
-        return GestureDetector(
-          onLongPress: () {
-            // Call your update function when a long press is detected
-            updateNote(note, widget.type!);
-          },
-          child: DishTile(
-            duration: note.duration,
-            which: note.which,
-            dish: note.name,
-            type: widget.type,
-            text: note.name,
-            onEditPressed: () => updateNote(note, widget.type!),
-            onDeletePressed: () => deleteNote(note.id, widget.type!),
-          ),
-        );
-      },
-    ),
-  ),
-)
-
+                  return GestureDetector(
+                    onLongPress: () {
+                      // Call your update function when a long press is detected
+                      updateNote(note, widget.type!);
+                    },
+                    onTap: () {
+                      setState(() {
+                        Navigator.of(context).push(MaterialPageRoute(
+                            builder: (context) => recipe(
+                                  type: widget.type,
+                                  dish: note.name,
+                                )));
+                      });
+                    },
+                    child: DishTile(
+                      duration: note.duration,
+                      which: note.which,
+                      dish: note.name,
+                      type: widget.type,
+                      text: note.name,
+                      onEditPressed: () => updateNote(note, widget.type!),
+                      onDeletePressed: () => deleteNote(note.id, widget.type!),
+                    ),
+                  );
+                },
+              ),
+            ),
+          )
         ],
       ),
     );
