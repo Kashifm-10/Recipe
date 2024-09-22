@@ -1,5 +1,6 @@
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:isar/isar.dart';
 import 'package:provider/provider.dart';
@@ -15,10 +16,17 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/models/recipeList.dart';
 import 'package:linkable/linkable.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class recipe extends StatefulWidget {
-  recipe({super.key, required this.type, required this.dish});
+  recipe(
+      {super.key,
+      required this.serial,
+      required this.type,
+      required this.dish});
+  String? serial;
   String? type;
   String? dish;
 
@@ -28,26 +36,106 @@ class recipe extends StatefulWidget {
 
 final isar = IsarInstance().isar;
 
-class _recipeState extends State<recipe> {
+class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   //text controller to access what the user typed
   TextEditingController textController = TextEditingController();
   List<Map<String, String>> linkData = [];
+  late TabController _tabController;
+  int selectedTabIndex = 0;
 
   String? type;
   List<String>? fetchedlink;
+  List<String>? fetchedTitle;
   List<int>? fetchedlinkid;
 
   @override
   void initState() {
     super.initState();
+    _createTutorial();
     // on app startup, fetch the existing notes
-    readIngeadints(widget.dish!);
-    readRecipe(widget.dish!, widget.type!);
-    readLink(widget.dish!, widget.type!);
+    readIngeadints(widget.dish!, widget.serial!);
+    readRecipe(widget.dish!, widget.type!, widget.serial!);
+    readLink(widget.serial!);
+    _tabController = TabController(length: 2, vsync: this);
+    _tabController.addListener(() {
+      setState(() {
+        selectedTabIndex = _tabController.index;
+      });
+    });
   }
 
-  Future<void> _launchUrl(
-      List<String> fetchedLinks, List<int> fetchedLinksId) async {
+  @override
+  void dispose() {
+    _tabController.dispose();
+    super.dispose();
+  }
+
+  final GlobalKey _link = GlobalKey();
+  final GlobalKey _add = GlobalKey();
+
+  Future<void> _createTutorial() async {
+    // Get SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if the tutorial has already been shown
+    bool isTutorialShown = prefs.getBool('tutorialShownrecipe') ?? false;
+
+    // If it has been shown, return early
+    if (isTutorialShown) return;
+
+    // Define the tutorial targets
+    final targets = [
+      TargetFocus(
+        identify: '_add',
+        keyTarget: _add,
+        alignSkip: Alignment.bottomCenter,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Text(
+              'Use this button to add new ingredients/instructions',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'floatingButton',
+        keyTarget: _link,
+        alignSkip: Alignment.bottomCenter,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Text(
+              'Use this button to add reference links',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ];
+
+    final tutorial = TutorialCoachMark(
+      targets: targets,
+    );
+
+    // Show the tutorial after a delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      tutorial.show(context: context);
+
+      // Once the tutorial is shown, set the flag in SharedPreferences
+      prefs.setBool('tutorialShownrecipe', true);
+    });
+  }
+
+  Future<void> _launchUrl(List<String> fetchedLinks, List<int> fetchedLinksId,
+      List<String> title) async {
     if (fetchedLinks.isEmpty) return;
 
     String? selectedLink;
@@ -59,10 +147,10 @@ class _recipeState extends State<recipe> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: const Text('Select a link to redirect'),
+            // title: const Text(''),
             content: Container(
-              width: 400.0, // Set the desired width
-              height: 120.0, // Set the desired height
+              width: 0.0, // Set the desired width
+              height: 200.0, // Set the desired height
               child: StatefulBuilder(
                 builder: (BuildContext context, StateSetter setState) {
                   return SingleChildScrollView(
@@ -77,24 +165,40 @@ class _recipeState extends State<recipe> {
                             itemCount: fetchedLinks.length,
                             itemBuilder: (BuildContext context, int index) {
                               String link = fetchedLinks[index];
+                              String name = title[index];
 
                               return Column(
                                 children: [
                                   ListTile(
-                                    title: Column(
+                                    title: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
                                       children: [
                                         Text(
-                                          link,
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
+                                          name.length > 15
+                                              ? '${name.substring(0, 15)}...'
+                                              : name, // Limiting to 20 characters
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                         // const Divider(endIndent: 30,),
+                                        IconButton(
+                                          icon: const Icon(Icons.delete,
+                                              color: Colors.red),
+                                          onPressed: () async {
+                                            int linkId = fetchedLinksId[index];
+                                            await deleteLink(linkId);
+
+                                            setState(() {
+                                              fetchedLinks.removeAt(index);
+                                              fetchedLinksId.removeAt(index);
+                                            });
+                                          },
+                                        ),
                                       ],
                                     ),
-                                    trailing: Padding(
+                                    /*  trailing: Padding(
                                       padding:
-                                          const EdgeInsets.only(bottom: 15.0),
+                                          const EdgeInsets.only(bottom: 0.0),
                                       child: IconButton(
                                         icon: const Icon(Icons.delete,
                                             color: Colors.red),
@@ -108,14 +212,14 @@ class _recipeState extends State<recipe> {
                                           });
                                         },
                                       ),
-                                    ),
+                                    ), */
                                     onTap: () {
                                       Navigator.pop(context, link);
                                     },
                                   ),
-                                  Divider(
-                                    indent: 20,
-                                    endIndent: 35,
+                                  const Divider(
+                                    indent: 35,
+                                    endIndent: 55,
                                     height: 0,
                                   )
                                 ],
@@ -195,7 +299,7 @@ class _recipeState extends State<recipe> {
 
     // Dropdown selection options
     String? selectedUnit;
-    List<String> unitOptions = ['gm', 'kg', 'ltr', 'cups'];
+    List<String> unitOptions = ['gm', 'Kg', 'ltr', 'Cup(s)', 'Spoon(s)'];
 
     showDialog(
       context: context,
@@ -253,6 +357,7 @@ class _recipeState extends State<recipe> {
                       selectedUnit != null) {
                     // Assuming addIng method is modified to accept the quantity and unit
                     await context.read<database>().addIng(
+                          widget.serial!,
                           textController.text,
                           widget.type!,
                           widget.dish!,
@@ -261,7 +366,7 @@ class _recipeState extends State<recipe> {
                         );
 
                     Navigator.pop(context);
-                    readIngeadints(widget.dish!);
+                    readIngeadints(widget.dish!, widget.serial!);
                     textController.clear();
                     quantityController.clear();
                   }
@@ -280,109 +385,113 @@ class _recipeState extends State<recipe> {
   }
 
   //read notes
-  void readIngeadints(String dish) {
-    context.read<database>().fetchIng(dish);
+  void readIngeadints(String dish, String? serial) {
+    context.read<database>().fetchIng(dish, serial);
   }
 
   //update note
   void updateIng(Ingredients ingredient) async {
-  // Create controllers for the text fields and unit selection
-  TextEditingController textController = TextEditingController(text: ingredient.name);
-  TextEditingController quantityController = TextEditingController(text: ingredient.quantity);
-  String? selectedUnit = ingredient.uom; // Assuming Ingredients has a unit field
-  
-  // Dropdown selection options
-  List<String> unitOptions = ['gm', 'kg', 'ltr', 'cups'];
+    // Create controllers for the text fields and unit selection
+    TextEditingController textController =
+        TextEditingController(text: ingredient.name);
+    TextEditingController quantityController =
+        TextEditingController(text: ingredient.quantity);
+    String? selectedUnit =
+        ingredient.uom; // Assuming Ingredients has a unit field
 
-  await showDialog(
-    context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (BuildContext context, StateSetter setState) {
-        return AlertDialog(
-          title: const Text('Edit Ingredient'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Text field for the ingredient name
-              TextField(
-                controller: textController,
-                decoration: const InputDecoration(
-                  hintText: 'Ingredient',
+    // Dropdown selection options
+    List<String> unitOptions = ['gm', 'kg', 'ltr', 'cups'];
+
+    await showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (BuildContext context, StateSetter setState) {
+          return AlertDialog(
+            title: const Text('Edit Ingredient'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Text field for the ingredient name
+                TextField(
+                  controller: textController,
+                  decoration: const InputDecoration(
+                    hintText: 'Ingredient',
+                  ),
                 ),
-              ),
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // Text field for quantity
-              TextField(
-                controller: quantityController,
-                decoration: const InputDecoration(
-                  hintText: 'Quantity',
+                // Text field for quantity
+                TextField(
+                  controller: quantityController,
+                  decoration: const InputDecoration(
+                    hintText: 'Quantity',
+                  ),
+                  keyboardType:
+                      TextInputType.number, // Only allow numeric input
                 ),
-                keyboardType: TextInputType.number, // Only allow numeric input
-              ),
-              const SizedBox(height: 10),
+                const SizedBox(height: 10),
 
-              // Dropdown button for selecting a unit
-              DropdownButton<String>(
-                hint: const Text('Select Unit'),
-                isExpanded: true,
-                items: unitOptions.map((String unit) {
-                  return DropdownMenuItem<String>(
-                    value: unit,
-                    child: Text(unit),
-                  );
-                }).toList(),
-                onChanged: (String? value) {
-                  setState(() => selectedUnit = value);
+                // Dropdown button for selecting a unit
+                DropdownButton<String>(
+                  hint: const Text('Select Unit'),
+                  isExpanded: true,
+                  items: unitOptions.map((String unit) {
+                    return DropdownMenuItem<String>(
+                      value: unit,
+                      child: Text(unit),
+                    );
+                  }).toList(),
+                  onChanged: (String? value) {
+                    setState(() => selectedUnit = value);
+                  },
+                  value: selectedUnit,
+                ),
+              ],
+            ),
+            actions: [
+              // Update button
+              MaterialButton(
+                textColor: Colors.white,
+                onPressed: () async {
+                  if (textController.text.isNotEmpty &&
+                      quantityController.text.isNotEmpty &&
+                      selectedUnit != null) {
+                    // Update the ingredient in the database
+                    await context.read<database>().updateIng(
+                          ingredient.id,
+                          textController.text,
+                          widget.type!,
+                          quantityController.text,
+                          selectedUnit!,
+                        );
+
+                    // Clear the controllers and refresh the list
+                    textController.clear();
+                    quantityController.clear();
+                    readIngeadints(widget.dish!, widget.serial!);
+
+                    // Pop the dialog box
+                    Navigator.pop(context);
+                  }
                 },
-                value: selectedUnit,
+                child: Text(
+                  'Update',
+                  style: TextStyle(
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
+                ),
               ),
             ],
-          ),
-          actions: [
-            // Update button
-            MaterialButton(
-              textColor: Colors.white,
-              onPressed: () async {
-                if (textController.text.isNotEmpty &&
-                    quantityController.text.isNotEmpty &&
-                    selectedUnit != null) {
-                  // Update the ingredient in the database
-                  await context.read<database>().updateIng(
-                        ingredient.id,
-                        textController.text,
-                        widget.type!,
-                        quantityController.text,
-                        selectedUnit!,
-                      );
-
-                  // Clear the controllers and refresh the list
-                  textController.clear();
-                  quantityController.clear();
-                  readIngeadints(widget.dish!);
-
-                  // Pop the dialog box
-                  Navigator.pop(context);
-                }
-              },
-              child: Text(
-                'Update',
-                style: TextStyle(
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    ),
-  );
-}
+          );
+        },
+      ),
+    );
+  }
 
   //delete a note
   void deleteIng(int id) async {
     await context.read<database>().deleteIng(id, widget.type!);
-    readIngeadints(widget.dish!);
+    readIngeadints(widget.dish!, widget.serial!);
   }
 
   void createRecipe() {
@@ -403,9 +512,13 @@ class _recipeState extends State<recipe> {
                       onPressed: () async {
                         if (textController.text.isNotEmpty) {
                           await context.read<database>().addRecipe(
-                              textController.text, widget.type!, widget.dish!);
+                              widget.serial!,
+                              textController.text,
+                              widget.type!,
+                              widget.dish!);
                           Navigator.pop(context);
-                          readRecipe(widget.dish!, widget.type!);
+                          readRecipe(
+                              widget.dish!, widget.type!, widget.serial!);
                           textController.clear();
                         }
                       },
@@ -418,8 +531,8 @@ class _recipeState extends State<recipe> {
   }
 
   //read notes
-  void readRecipe(String dish, String type) {
-    context.read<database>().fetchRecipe(dish, type);
+  void readRecipe(String dish, String type, String serial) {
+    context.read<database>().fetchRecipe(serial);
   }
 
   //update note
@@ -439,11 +552,15 @@ class _recipeState extends State<recipe> {
                   MaterialButton(
                       onPressed: () async {
                         //update note in db
-                        await context.read<database>().updateRecipe(name.id,
-                            textController.text, widget.type!, widget.dish!);
+                        await context.read<database>().updateRecipe(
+                            widget.serial!,
+                            name.id,
+                            textController.text,
+                            widget.type!,
+                            widget.dish!);
                         //clear the controller
                         textController.clear();
-                        readRecipe(widget.dish!, widget.type!);
+                        readRecipe(widget.dish!, widget.type!, widget.serial!);
 
                         //pop dialog box
                         Navigator.pop(context);
@@ -454,62 +571,88 @@ class _recipeState extends State<recipe> {
                                   .colorScheme
                                   .inversePrimary)))
                 ]));
-    readRecipe(widget.dish!, widget.type!);
+    readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
 
   //delete a note
   void deleteRecipe(int id) async {
-    await context.read<database>().deleteRecipe(id, widget.type!, widget.dish!);
-    readRecipe(widget.dish!, widget.type!);
+    await context
+        .read<database>()
+        .deleteRecipe(widget.serial!, id, widget.type!, widget.dish!);
+    readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
 
   void createLink() async {
+    TextEditingController titleController = TextEditingController();
+
     await showDialog(
       context: context,
       builder: (context) => AlertDialog(
         title: const Text('Add Link'),
-        content: TextField(
-          controller: textController,
-          decoration: const InputDecoration(
-            hintText: 'www.youtube.com',
-          ),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                hintText: 'Enter title',
+              ),
+            ),
+            const SizedBox(height: 8),
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'www.youtube.com',
+              ),
+            ),
+          ],
         ),
         actions: [
-          //create button
+          // Create button
           MaterialButton(
-              textColor: Colors.white,
-              onPressed: () async {
-                if (textController.text.isNotEmpty) {
-                  await context
-                      .read<database>()
-                      .addLink(textController.text, widget.type!, widget.dish!);
-                  Navigator.pop(context);
-                  readRecipe(widget.dish!, widget.type!);
-                  readLink(widget.dish!, widget.type!);
+            textColor: Colors.white,
+            onPressed: () async {
+              if (textController.text.isNotEmpty &&
+                  titleController.text.isNotEmpty) {
+                await context.read<database>().addLink(
+                    titleController.text,
+                    textController.text,
+                    widget.serial!,
+                    widget.type!,
+                    widget.dish!); // Pass additional data
+                Navigator.pop(context);
+                readRecipe(widget.dish!, widget.type!, widget.serial!);
+                readLink(widget.serial!);
 
-                  textController.clear();
-                }
-              },
-              child: Text('Create',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary)))
+                textController.clear();
+                titleController.clear();
+              }
+            },
+            child: Text(
+              'Create',
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.inversePrimary),
+            ),
+          ),
         ],
       ),
     );
   }
 
   //read notes
-  void readLink(String dish, String type) async {
+  void readLink(String serial) async {
     // Await the result of fetchLink to get the actual list of Links
-    List<Links> link = await context.read<database>().fetchLink(dish, type);
+    List<Links> link = await context.read<database>().fetchLink(serial);
 
     // If the list is not empty, map over it to extract all titles
     if (link.isNotEmpty) {
       // Extract all titles into a List<String>
       List<String> fetchedTitles = link.map((item) => item.link).toList();
       List<int> fetchedTitlesId = link.map((item) => item.id).toList();
+      List<String> fetchedName = link.map((item) => item.linkName).toList();
       fetchedlink = fetchedTitles;
       fetchedlinkid = fetchedTitlesId;
+      fetchedTitle = fetchedName;
       // Handle the fetched list of titles (e.g., use it, store it, etc.)
       // For example, you can print the list of titles
       print(fetchedTitles);
@@ -520,35 +663,55 @@ class _recipeState extends State<recipe> {
   }
 
   void updateLink() {
+    TextEditingController titleController = TextEditingController();
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('New Link'),
-        content: TextField(
-          controller: textController,
-          decoration: const InputDecoration(
-            hintText: 'www.youtube.com',
-            hintStyle: TextStyle(color: Colors.grey),
-          ),
+        title: const Text('Update Link'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: titleController,
+              decoration: const InputDecoration(
+                hintText: 'Enter title',
+              ),
+            ),
+            const SizedBox(height: 8),
+            const SizedBox(height: 8),
+            TextField(
+              controller: textController,
+              decoration: const InputDecoration(
+                hintText: 'www.youtube.com',
+                hintStyle: TextStyle(color: Colors.grey),
+              ),
+            ),
+          ],
         ),
         actions: [
-          //create button
+          // Update button
           MaterialButton(
             textColor: Colors.white,
             onPressed: () async {
-              if (textController.text.isNotEmpty) {
-                await context
-                    .read<database>()
-                    .addLink(textController.text, widget.type!, widget.dish!);
+              if (textController.text.isNotEmpty &&
+                  titleController.text.isNotEmpty) {
+                await context.read<database>().addLink(
+                      titleController.text,
+                      textController.text,
+                      widget.serial!,
+                      widget.type!,
+                      widget.dish!,
+                    ); // Pass title and description
                 Navigator.pop(context);
-                readRecipe(widget.dish!, widget.type!);
-                readLink(widget.dish!, widget.type!);
-
+                readRecipe(widget.dish!, widget.type!, widget.serial!);
+                readLink(widget.serial!);
                 textController.clear();
+                titleController.clear();
               }
             },
             child: Text(
-              'Create',
+              'Update',
               style: TextStyle(
                   color: Theme.of(context).colorScheme.inversePrimary),
             ),
@@ -594,8 +757,8 @@ class _recipeState extends State<recipe> {
 
   //delete a note
   Future<void> deleteLink(int id) async {
-    await context.read<database>().deleteLink(id, widget.type!, widget.dish!);
-    readRecipe(widget.dish!, widget.type!);
+    await context.read<database>().deleteLink(id, widget.serial!);
+    readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
 
   SpeedDial floatingActionButtonMenu(BuildContext context) {
@@ -628,7 +791,15 @@ class _recipeState extends State<recipe> {
     );
   }
 
-  void add() {
+  Future<void> add(int index) async {
+    if (index == 0) {
+      createIngredient();
+    } else {
+      createRecipe();
+    }
+  }
+
+  /* void add() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -654,9 +825,10 @@ class _recipeState extends State<recipe> {
         ),
       ),
     );
-  }
+  } */
 
   final List<String> items = [
+    '0.5',
     '1',
     '2',
     '3',
@@ -668,7 +840,9 @@ class _recipeState extends State<recipe> {
     '9',
     '10'
   ];
+
   String? selectedValue = "1";
+
   @override
   Widget build(BuildContext context) {
     // note database
@@ -677,7 +851,6 @@ class _recipeState extends State<recipe> {
     // current notes
     List<Ingredients> currentNotes = noteDatabase.currentIng;
     List<Recipe> currentRecipe = noteDatabase.currentRecipe;
-
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Scaffold(
@@ -686,13 +859,14 @@ class _recipeState extends State<recipe> {
           preferredSize: const Size.fromHeight(
               140.0), // Increase the height to fit the content
           child: AppBar(
+              toolbarHeight: 200,
               elevation: 0,
               backgroundColor: Colors.transparent,
               foregroundColor: Theme.of(context).colorScheme.inversePrimary,
               leading: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
+                padding: const EdgeInsets.only(top: 25.0, left: 10),
                 child: IconButton(
-                  icon: const Icon(Icons.arrow_back),
+                  icon: const Icon(FontAwesomeIcons.anglesLeft, size: 40),
                   onPressed: () {
                     Navigator.pop(context); // Navigate back when pressed
                   },
@@ -700,15 +874,15 @@ class _recipeState extends State<recipe> {
               ),
               title: Padding(
                 padding: const EdgeInsets.only(
-                    top: 10.0), // Add bottom padding to push content down
+                    top: 20.0), // Add bottom padding to push content down
                 child: Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      'Recipe',
+                      widget.dish!,
                       style: GoogleFonts.dmSerifDisplay(
-                        fontSize: 40,
+                        fontSize: 50,
                         color: Theme.of(context).colorScheme.inversePrimary,
                       ),
                     ),
@@ -716,10 +890,12 @@ class _recipeState extends State<recipe> {
                       children: [
                         Padding(
                           padding: const EdgeInsets.only(top: 5.0, right: 20),
-                          child: GestureDetector(
-                            onTap: add,
-                            onLongPress: updateLink,
-                            child: const Icon(
+                          child: IconButton(
+                            key: _add,
+                            onPressed: () {
+                              add(selectedTabIndex);
+                            },
+                            icon: const Icon(
                               Icons.add,
                               size: 35,
                             ),
@@ -728,6 +904,7 @@ class _recipeState extends State<recipe> {
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0, right: 30),
                           child: GestureDetector(
+                            key: _link,
                             onTap: () {
                               if (fetchedlink == null) {
                                 createLink();
@@ -744,8 +921,13 @@ class _recipeState extends State<recipe> {
                                         fetchedlink as String
                                       ]; // Forcefully cast to String if it's a single link
 
-                                _launchUrl(fetchedLinks,
-                                    fetchedLinksId); // Pass the list of links
+                                final List<String> fetchedlinknames =
+                                    fetchedTitle is List<String>
+                                        ? fetchedTitle as List<String>
+                                        : [fetchedTitle as String];
+
+                                _launchUrl(fetchedLinks, fetchedLinksId,
+                                    fetchedlinknames); // Pass the list of links
                               }
                             },
                             onLongPress: updateLink,
@@ -761,6 +943,7 @@ class _recipeState extends State<recipe> {
                 ),
               ),
               bottom: TabBar(
+                controller: _tabController,
                 tabs: const [
                   Tab(text: 'Ingredients'),
                   Tab(text: 'Instructions'),
@@ -782,6 +965,7 @@ class _recipeState extends State<recipe> {
         ),
         // floatingActionButton: floatingActionButtonMenu(context),
         body: TabBarView(
+          controller: _tabController,
           children: [
             // Ingredients Tab
             SingleChildScrollView(
@@ -891,7 +1075,7 @@ class _recipeState extends State<recipe> {
                       itemBuilder: (context, index) {
                         final note = currentNotes[index];
                         return ingredientList(
-                          count: int.parse(selectedValue!),
+                          count: double.parse(selectedValue!),
                           dish: widget.dish,
                           type: widget.type!,
                           text: note.name!,
@@ -907,6 +1091,7 @@ class _recipeState extends State<recipe> {
               ),
             ),
             // Instructions Tab
+
             SingleChildScrollView(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

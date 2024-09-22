@@ -32,8 +32,18 @@ const IngredientsSchema = CollectionSchema(
       name: r'quantity',
       type: IsarType.string,
     ),
-    r'uom': PropertySchema(
+    r'serial': PropertySchema(
       id: 3,
+      name: r'serial',
+      type: IsarType.string,
+    ),
+    r'type': PropertySchema(
+      id: 4,
+      name: r'type',
+      type: IsarType.string,
+    ),
+    r'uom': PropertySchema(
+      id: 5,
       name: r'uom',
       type: IsarType.string,
     )
@@ -77,6 +87,18 @@ int _ingredientsEstimateSize(
     }
   }
   {
+    final value = object.serial;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
+    final value = object.type;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
+  {
     final value = object.uom;
     if (value != null) {
       bytesCount += 3 + value.length * 3;
@@ -94,7 +116,9 @@ void _ingredientsSerialize(
   writer.writeString(offsets[0], object.dish);
   writer.writeString(offsets[1], object.name);
   writer.writeString(offsets[2], object.quantity);
-  writer.writeString(offsets[3], object.uom);
+  writer.writeString(offsets[3], object.serial);
+  writer.writeString(offsets[4], object.type);
+  writer.writeString(offsets[5], object.uom);
 }
 
 Ingredients _ingredientsDeserialize(
@@ -107,7 +131,9 @@ Ingredients _ingredientsDeserialize(
     dish: reader.readStringOrNull(offsets[0]),
     name: reader.readStringOrNull(offsets[1]),
     quantity: reader.readStringOrNull(offsets[2]),
-    uom: reader.readStringOrNull(offsets[3]),
+    serial: reader.readStringOrNull(offsets[3]),
+    type: reader.readStringOrNull(offsets[4]),
+    uom: reader.readStringOrNull(offsets[5]),
   );
   object.id = id;
   return object;
@@ -127,6 +153,10 @@ P _ingredientsDeserializeProp<P>(
     case 2:
       return (reader.readStringOrNull(offset)) as P;
     case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
+      return (reader.readStringOrNull(offset)) as P;
+    case 5:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -728,6 +758,305 @@ extension IngredientsQueryFilter
     });
   }
 
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serial',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      serialIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serial',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      serialGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serial',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      serialStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> serialMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'serial',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      serialIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serial',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      serialIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'serial',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'type',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      typeIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'type',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'type',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'type',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'type',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> typeIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'type',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      typeIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'type',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> uomIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -920,6 +1249,30 @@ extension IngredientsQuerySortBy
     });
   }
 
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortBySerial() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortBySerialDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortByType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortByTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.desc);
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortByUom() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uom', Sort.asc);
@@ -983,6 +1336,30 @@ extension IngredientsQuerySortThenBy
     });
   }
 
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenBySerial() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenBySerialDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenByType() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenByTypeDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'type', Sort.desc);
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenByUom() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'uom', Sort.asc);
@@ -1019,6 +1396,20 @@ extension IngredientsQueryWhereDistinct
     });
   }
 
+  QueryBuilder<Ingredients, Ingredients, QDistinct> distinctBySerial(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serial', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QDistinct> distinctByType(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'type', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QDistinct> distinctByUom(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1050,6 +1441,18 @@ extension IngredientsQueryProperty
   QueryBuilder<Ingredients, String?, QQueryOperations> quantityProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'quantity');
+    });
+  }
+
+  QueryBuilder<Ingredients, String?, QQueryOperations> serialProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serial');
+    });
+  }
+
+  QueryBuilder<Ingredients, String?, QQueryOperations> typeProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'type');
     });
   }
 

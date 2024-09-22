@@ -186,147 +186,163 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/bg.png',
-              fit: BoxFit.cover,
-            ),
+  // Get screen dimensions
+  double screenHeight = MediaQuery.of(context).size.height;
+  double screenWidth = MediaQuery.of(context).size.width;
+
+  return Scaffold(
+    body: Stack(
+      children: [
+        Positioned.fill(
+          child: Image.asset(
+            'assets/images/bg.png',
+            width: screenWidth, // Scale width to 70% of screen width
+          height: screenHeight,
+            fit: BoxFit.fill, // Ensure the background covers the screen
           ),
-          FutureBuilder<void>(
-            future: _initFuture,
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    const SizedBox(height: 250),
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ..._buildCategoryRows(categories),
-                        ],
-                      ),
+        ),
+        FutureBuilder<void>(
+          future: _initFuture,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: CircularProgressIndicator());
+            } else if (snapshot.hasError) {
+              return Center(child: Text('Error: ${snapshot.error}'));
+            } else {
+              return Column(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: <Widget>[
+                  SizedBox(height: screenHeight * 0.2), // Dynamically adjust top padding
+                  Expanded(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        ..._buildCategoryRows(categories),
+                      ],
                     ),
-                  ],
-                );
-              }
-            },
-          ),
-        ],
+                  ),
+                ],
+              );
+            }
+          },
+        ),
+      ],
+    ),
+  );
+}
+
+
+  List<Widget> _buildCategoryRows(List<Map<String, dynamic>> categories) {
+  final List<Widget> rows = [];
+  const int numColumns = 3;
+
+  for (int i = 0; i < categories.length; i += numColumns) {
+    final end = (i + numColumns < categories.length)
+        ? i + numColumns
+        : categories.length;
+    final rowCategories = categories.sublist(i, end);
+
+    rows.add(
+      Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.015,
+          horizontal: MediaQuery.of(context).size.width * 0.08, // Make horizontal padding responsive
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: rowCategories.map((category) {
+            return EditableCategoryCard(
+              initialIcon: category['icon'],
+              color: category['color'],
+              initialLabel: category['label'],
+              type: category['type'],
+              onAddLink: (textFromUser, type) async {
+                addTitle(textFromUser, type);
+                // Optionally: Refresh or update the UI after adding the link
+              },
+            );
+          }).toList(),
+        ),
       ),
     );
   }
 
-  List<Widget> _buildCategoryRows(List<Map<String, dynamic>> categories) {
-    final List<Widget> rows = [];
-    const int numColumns = 3;
+  return rows;
+}
 
-    for (int i = 0; i < categories.length; i += numColumns) {
-      final end = (i + numColumns < categories.length)
-          ? i + numColumns
-          : categories.length;
-      final rowCategories = categories.sublist(i, end);
+Widget _buildCategoryCard(
+  BuildContext context, {
+  required IconData icon,
+  required Color color,
+  required String label,
+  required String type,
+}) {
+  // Get screen width and adjust card size
+  double screenWidth = MediaQuery.of(context).size.width;
+  double cardWidth = screenWidth * 0.4; // Adjust card width based on screen size
+  double cardHeight = cardWidth; // Keep the card square based on the width
 
-      rows.add(
-        Padding(
-          padding:
-              const EdgeInsets.only(top: 30, right: 55.0, left: 55, bottom: 30),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: rowCategories.map((category) {
-              return EditableCategoryCard(
-                initialIcon: category['icon'],
-                color: category['color'],
-                initialLabel: category['label'],
-                type: category['type'],
-                onAddLink: (textFromUser, type) async {
-                  addTitle(textFromUser, type);
-                  // Optionally: Refresh or update the UI after adding the link
-                },
-              );
-            }).toList(),
+  return SimpleGestureDetector(
+    onVerticalSwipe: _onVerticalSwipe,
+    onHorizontalSwipe: _onHorizontalSwipe,
+    onLongPress: _onLongPress,
+    onTap: () {
+      setState(() {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (context) => dishesList(type: type, title: label),
           ),
-        ),
-      );
-    }
-
-    return rows;
-  }
-
-  Widget _buildCategoryCard(
-    BuildContext context, {
-    required IconData icon,
-    required Color color,
-    required String label,
-    required String type,
-  }) {
-    return SimpleGestureDetector(
-      onVerticalSwipe: _onVerticalSwipe,
-      onHorizontalSwipe: _onHorizontalSwipe,
-      onLongPress: _onLongPress,
-      onTap: () {
-        setState(() {
-          Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => dishesList(type: type, title: label),
-            ),
-          );
-        });
-      },
-      swipeConfig: const SimpleSwipeConfig(
-        verticalThreshold: 40.0,
-        horizontalThreshold: 40.0,
-        swipeDetectionBehavior: SwipeDetectionBehavior.continuousDistinct,
+        );
+      });
+    },
+    swipeConfig: const SimpleSwipeConfig(
+      verticalThreshold: 40.0,
+      horizontalThreshold: 40.0,
+      swipeDetectionBehavior: SwipeDetectionBehavior.continuousDistinct,
+    ),
+    child: Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(15),
+        side: BorderSide(color: color, width: 2.0),
       ),
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-          side: BorderSide(color: color, width: 2.0),
-        ),
-        child: SizedBox(
-          width: 170,
-          height: 170,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Icon(icon, size: 80),
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Container(
-                  height: 40,
-                  width: 170,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(15.0),
-                      bottomRight: Radius.circular(15.0),
-                    ),
-                    child: Container(
-                      color: color,
-                      padding: const EdgeInsets.all(6.0),
-                      child: Text(
-                        label,
-                        style:
-                            const TextStyle(fontSize: 15, color: Colors.white),
-                        textAlign: TextAlign.center,
+      child: SizedBox(
+        width: cardWidth,  // Responsive card width
+        height: cardHeight, // Responsive card height
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: [
+            Icon(icon, size: cardWidth * 0.5), // Adjust icon size to fit card
+            Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Container(
+                height: cardHeight * 0.25,  // Responsive label container height
+                width: cardWidth,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    bottomLeft: Radius.circular(15.0),
+                    bottomRight: Radius.circular(15.0),
+                  ),
+                  child: Container(
+                    color: color,
+                    padding: const EdgeInsets.all(6.0),
+                    child: Text(
+                      label,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.white,
                       ),
+                      textAlign: TextAlign.center,
                     ),
                   ),
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 }
 
 class EditableCategoryCard extends StatefulWidget {
@@ -489,129 +505,136 @@ Future<void> _chooseIcon() async {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onLongPress: () {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            TextEditingController _dialogTextController =
-                TextEditingController(text: _currentLabel);
+    // Get screen dimensions using MediaQuery
+    final mediaQuery = MediaQuery.of(context);
+    final screenWidth = mediaQuery.size.width;
+    final screenHeight = mediaQuery.size.height;
+    final fontSize= MediaQuery.of(context).size.height * 0.017;
 
-            return AlertDialog(
-              title: const Text("Edit Icon or Text"),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextField(
-                    controller: _dialogTextController,
-                    decoration: const InputDecoration(
-                      labelText: "Edit Text",
-                      border: OutlineInputBorder(),
+    // Adjust the size based on screen width
+    final double cardWidth = screenWidth * 0.23;
+    final double cardHeight = screenHeight * 0.13;
+    final double iconSize = cardWidth * 0.5;
+
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        return GestureDetector(
+          onLongPress: () {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                TextEditingController _dialogTextController =
+                    TextEditingController(text: _currentLabel);
+
+                return AlertDialog(
+                  title: const Text("Edit Icon or Text"),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      TextField(
+                        controller: _dialogTextController,
+                        decoration: const InputDecoration(
+                          labelText: "Edit Text",
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      ElevatedButton(
+                        onPressed: _chooseIcon, // Call the method to choose an icon
+                        child: const Text("Choose Icon"),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        setState(() {
+                          _currentLabel = _dialogTextController.text;
+                        });
+                        widget.onAddLink(_currentLabel, widget.type).then((_) {
+                          // Optional: handle post-add actions if needed
+                        });
+                        Navigator.of(context).pop(); // Close the dialog
+                      },
+                      child: const Text("Save"),
                     ),
-                  ),
-                  const SizedBox(height: 20),
-                  ElevatedButton(
-                    onPressed: () {
-                    //  Navigator.of(context).pop(); // Close dialog
-                      _chooseIcon(); // Call the method to choose an icon
-                    },
-                    child: const Text("Choose Icon"),
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    setState(() {
-                      _currentLabel = _dialogTextController.text;
-                    });
-                    widget.onAddLink(_currentLabel, widget.type).then((_) {
-                      // Optional: handle post-add actions if needed
-                    });
-                    Navigator.of(context).pop(); // Close the dialog
-                  },
-                  child: const Text("Save"),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pop(); // Close the dialog without saving
-                  },
-                  child: const Text("Cancel"),
-                ),
-              ],
+                    TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(); // Close the dialog without saving
+                      },
+                      child: const Text("Cancel"),
+                    ),
+                  ],
+                );
+              },
             );
           },
-        );
-      },
-      onDoubleTap: () {
-        _editText();
-      },
-      onTap: () {
-        /* widget.onAddLink(_currentLabel, widget.type).then((_) {
-          // Optional: handle post-add actions if needed
-        }); */
-        Navigator.of(context).push(
-          MaterialPageRoute(
-            builder: (context) =>
-                dishesList(type: widget.type, title: _currentLabel),
-          ),
-        );
-      },
-      child: Card(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15),
-          side: BorderSide(color: widget.color, width: 2.0),
-        ),
-        child: SizedBox(
-          width: 170,
-          height: 170,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              _isEditing
-                  ? IconButton(
-                      icon: Icon(_currentIcon, size: 80),
-                      onPressed: _chooseIcon,
-                    )
-                  : Icon(_currentIcon, size: 80),
-              Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: Container(
-                  height: 40,
-                  width: 170,
-                  child: ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      bottomLeft: Radius.circular(15.0),
-                      bottomRight: Radius.circular(15.0),
-                    ),
+          onDoubleTap: _editText,
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) =>
+                    dishesList(type: widget.type, title: _currentLabel),
+              ),
+            );
+          },
+          child: Card(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(15),
+              side: BorderSide(color: widget.color, width: 2.0),
+            ),
+            child: SizedBox(
+              width: cardWidth,
+              height: cardHeight,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  _isEditing
+                      ? IconButton(
+                          icon: Icon(_currentIcon, size: iconSize),
+                          onPressed: _chooseIcon,
+                        )
+                      : Icon(_currentIcon, size: iconSize),
+                  Padding(
+                    padding: const EdgeInsets.only(top: 10.0),
                     child: Container(
-                      color: widget.color,
-                      padding: const EdgeInsets.all(6.0),
-                      child: _isEditing
-                          ? TextField(
-                              controller: _labelController,
-                              onSubmitted: (_) => _saveText(),
-                              decoration: const InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding:
-                                    EdgeInsets.symmetric(horizontal: 10.0),
-                              ),
-                            )
-                          : Text(
-                              _currentLabel,
-                              style: const TextStyle(
-                                  fontSize: 15, color: Colors.white),
-                              textAlign: TextAlign.center,
-                            ),
+                      height: cardHeight*0.3,
+                      width: cardWidth,
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.only(
+                          bottomLeft: Radius.circular(15.0),
+                          bottomRight: Radius.circular(15.0),
+                        ),
+                        child: Container(
+                          color: widget.color,
+                          padding: const EdgeInsets.all(6.0),
+                          child: _isEditing
+                              ? TextField(
+                                  controller: _labelController,
+                                  onSubmitted: (_) => _saveText(),
+                                  decoration: const InputDecoration(
+                                    border: InputBorder.none,
+                                    contentPadding:
+                                        EdgeInsets.symmetric(horizontal: 10.0),
+                                  ),
+                                )
+                              : Text(
+                                  _currentLabel,
+                                  style:  TextStyle(
+                                      fontSize: fontSize, fontWeight: FontWeight.bold, color: Colors.white),
+                                  textAlign: TextAlign.center,
+                                ),
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              )
-            ],
+                  )
+                ],
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }
+

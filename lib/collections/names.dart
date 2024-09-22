@@ -7,15 +7,16 @@ class Dish {
   Id id = Isar.autoIncrement;
 
   late String name;
+  String? serial;
   String? type;
   String? duration;
-  String? which;
+  String? category;
   String? time;
   String? date;
 
   Dish({
-    required this.name,
-    this.type, this.duration, this.which, this.time,this.date
+    required this.name, this.serial,
+    this.type, this.duration, this.category, this.time,this.date
   });
 
 }

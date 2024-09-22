@@ -27,8 +27,18 @@ const LinksSchema = CollectionSchema(
       name: r'link',
       type: IsarType.string,
     ),
-    r'type': PropertySchema(
+    r'linkName': PropertySchema(
       id: 2,
+      name: r'linkName',
+      type: IsarType.string,
+    ),
+    r'serial': PropertySchema(
+      id: 3,
+      name: r'serial',
+      type: IsarType.string,
+    ),
+    r'type': PropertySchema(
+      id: 4,
       name: r'type',
       type: IsarType.string,
     )
@@ -60,6 +70,13 @@ int _linksEstimateSize(
     }
   }
   bytesCount += 3 + object.link.length * 3;
+  bytesCount += 3 + object.linkName.length * 3;
+  {
+    final value = object.serial;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.type;
     if (value != null) {
@@ -77,7 +94,9 @@ void _linksSerialize(
 ) {
   writer.writeString(offsets[0], object.dish);
   writer.writeString(offsets[1], object.link);
-  writer.writeString(offsets[2], object.type);
+  writer.writeString(offsets[2], object.linkName);
+  writer.writeString(offsets[3], object.serial);
+  writer.writeString(offsets[4], object.type);
 }
 
 Links _linksDeserialize(
@@ -89,7 +108,9 @@ Links _linksDeserialize(
   final object = Links(
     dish: reader.readStringOrNull(offsets[0]),
     link: reader.readString(offsets[1]),
-    type: reader.readStringOrNull(offsets[2]),
+    linkName: reader.readString(offsets[2]),
+    serial: reader.readStringOrNull(offsets[3]),
+    type: reader.readStringOrNull(offsets[4]),
   );
   object.id = id;
   return object;
@@ -107,6 +128,10 @@ P _linksDeserializeProp<P>(
     case 1:
       return (reader.readString(offset)) as P;
     case 2:
+      return (reader.readString(offset)) as P;
+    case 3:
+      return (reader.readStringOrNull(offset)) as P;
+    case 4:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -525,6 +550,281 @@ extension LinksQueryFilter on QueryBuilder<Links, Links, QFilterCondition> {
     });
   }
 
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameEqualTo(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'linkName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameGreaterThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'linkName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameLessThan(
+    String value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'linkName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameBetween(
+    String lower,
+    String upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'linkName',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'linkName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'linkName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameContains(
+      String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'linkName',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'linkName',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'linkName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> linkNameIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'linkName',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'serial',
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'serial',
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'serial',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialContains(String value,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'serial',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'serial',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'serial',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterFilterCondition> serialIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'serial',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Links, Links, QAfterFilterCondition> typeIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -699,6 +999,30 @@ extension LinksQuerySortBy on QueryBuilder<Links, Links, QSortBy> {
     });
   }
 
+  QueryBuilder<Links, Links, QAfterSortBy> sortByLinkName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'linkName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterSortBy> sortByLinkNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'linkName', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterSortBy> sortBySerial() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterSortBy> sortBySerialDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.desc);
+    });
+  }
+
   QueryBuilder<Links, Links, QAfterSortBy> sortByType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.asc);
@@ -749,6 +1073,30 @@ extension LinksQuerySortThenBy on QueryBuilder<Links, Links, QSortThenBy> {
     });
   }
 
+  QueryBuilder<Links, Links, QAfterSortBy> thenByLinkName() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'linkName', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterSortBy> thenByLinkNameDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'linkName', Sort.desc);
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterSortBy> thenBySerial() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Links, Links, QAfterSortBy> thenBySerialDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'serial', Sort.desc);
+    });
+  }
+
   QueryBuilder<Links, Links, QAfterSortBy> thenByType() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'type', Sort.asc);
@@ -777,6 +1125,20 @@ extension LinksQueryWhereDistinct on QueryBuilder<Links, Links, QDistinct> {
     });
   }
 
+  QueryBuilder<Links, Links, QDistinct> distinctByLinkName(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'linkName', caseSensitive: caseSensitive);
+    });
+  }
+
+  QueryBuilder<Links, Links, QDistinct> distinctBySerial(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'serial', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Links, Links, QDistinct> distinctByType(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -801,6 +1163,18 @@ extension LinksQueryProperty on QueryBuilder<Links, Links, QQueryProperty> {
   QueryBuilder<Links, String, QQueryOperations> linkProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'link');
+    });
+  }
+
+  QueryBuilder<Links, String, QQueryOperations> linkNameProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'linkName');
+    });
+  }
+
+  QueryBuilder<Links, String?, QQueryOperations> serialProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'serial');
     });
   }
 

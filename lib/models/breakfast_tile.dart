@@ -10,7 +10,7 @@ class DishTile extends StatelessWidget {
     super.key,
     required this.dish,
     required this.duration,
-    required this.which,
+    required this.category,
     required this.text,
     required this.type,
     this.onEditPressed,
@@ -19,7 +19,7 @@ class DishTile extends StatelessWidget {
   String? type;
   String? dish;
   String? duration;
-  String? which;
+  String? category;
   final String text;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
@@ -51,7 +51,7 @@ class DishTile extends StatelessWidget {
               child: CircleAvatar(
                 radius: 10,
                 backgroundColor: Colors.white.withOpacity(0.0),
-                child: which == "1"
+                child: category == "1"
                     ? Icon(Icons.circle_rounded, color: Colors.red, size: 15)
                     : Icon(Icons.circle_rounded, color: Colors.green,size: 15),
               ),

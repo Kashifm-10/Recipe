@@ -17,7 +17,7 @@ class ingredientList extends StatelessWidget {
     this.onEditPressed,
     this.onDeletePressed,
   });
-  int? count;
+  double? count;
   final String? dish;
   final String? type;
   final int? quantity;

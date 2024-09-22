@@ -20,13 +20,13 @@ class database extends ChangeNotifier {
   final List<Title> currentTitles = [];
 
 
-Future<void> addType(String textFromUser, String type, String duration, String which, String date, String time) async {
+Future<void> addType(String serial, String textFromUser, String type, String duration, String category, String date, String time) async {
     //create a new note object
-    final newName = Dish(name: textFromUser, duration: duration , which: which, date: date, time: time)..type = type;
+    final newDish = Dish(name: textFromUser, duration: duration , category: category, date: date, time: time, serial: serial)..type = type;
     
 
     //save to db
-    await isar.writeTxn(() => isar.dishs.put(newName));
+    await isar.writeTxn(() => isar.dishs.put(newDish));
 
     //re-read from db
     fetchNotes(type);
@@ -52,12 +52,12 @@ Future<void> addType(String textFromUser, String type, String duration, String w
   }
 
   //UPDATE
-  Future<void> updateNote(int id, String newText, String type, String duration, String which, String date, String time) async {
+  Future<void> updateNote(int id, String newText, String type, String duration, String category, String date, String time) async {
     final existingNote = await isar.dishs.get(id);
     if (existingNote != null) {
       existingNote.name = newText;
       existingNote.duration = duration;
-      existingNote.which= which;
+      existingNote.category= category;
       existingNote.date = date;
       existingNote.time = time;
       await isar.writeTxn(() => isar.dishs.put(existingNote));
@@ -75,20 +75,20 @@ Future<void> addType(String textFromUser, String type, String duration, String w
   final List<Recipe> currentRecipe = [];
   final List<Links> currentLink = [];
   final List<Title> currentTitle = [];
-  Future<void> addIng(String textFromUser, String type, String dish, String quantity, String uom) async {
+  Future<void> addIng(String? serial, String textFromUser, String type, String dish, String quantity, String uom) async {
     //create a new note object
-    final newName = Ingredients(name: textFromUser, quantity: quantity, uom: uom)..dish = dish;
+    final newIng = Ingredients(name: textFromUser, quantity: quantity, type: type, uom: uom, serial: serial)..dish = dish;
 
     //save to db
-    await isar.writeTxn(() => isar.ingredients.put(newName));
+    await isar.writeTxn(() => isar.ingredients.put(newIng));
 
     //re-read from db
     fetchNotes(type);
   }
 
   //READ
-  Future<void> fetchIng(String dish) async {
-    List<Ingredients> fetchedIng = await isar.ingredients.where().filter().dishEqualTo(dish).findAll();
+  Future<void> fetchIng(String dish, String? serial) async {
+    List<Ingredients> fetchedIng = await isar.ingredients.where().filter().serialEqualTo(serial).findAll();
     currentIng.clear();
     currentIng.addAll(fetchedIng);
     notifyListeners();
@@ -112,56 +112,56 @@ Future<void> addType(String textFromUser, String type, String duration, String w
     await fetchNotes(type);
   }
 
-Future<void> addRecipe(String textFromUser, String type, String dish) async {
+Future<void> addRecipe(String serial, String textFromUser, String type, String dish) async {
     //create a new note object
-    final newName = Recipe(name: textFromUser, type: type)..dish = dish;
+    final newName = Recipe(name: textFromUser, type: type, serial: serial)..dish = dish;
 
     //save to db
     await isar.writeTxn(() => isar.recipes.put(newName));
 
     //re-read from db
-    fetchRecipe(dish, type);
+    fetchRecipe( serial);
   }
 
 
-Future<void> fetchRecipe(String dish, String type) async {
-    List<Recipe> fetchedRecipe = await isar.recipes.where().filter().dishEqualTo(dish).and().typeEqualTo(type).findAll();
+Future<void> fetchRecipe(String serial) async {
+    List<Recipe> fetchedRecipe = await isar.recipes.where().filter().serialEqualTo(serial).findAll();
     currentRecipe.clear();
     currentRecipe.addAll(fetchedRecipe);
     notifyListeners();
   }
 
   //UPDATE
-  Future<void> updateRecipe(int id, String newText, String type, String dish) async {
+  Future<void> updateRecipe(String serial, int id, String newText, String type, String dish) async {
     final existingRecipe = await isar.recipes.get(id);
     if (existingRecipe != null) {
       existingRecipe.name = newText;
       await isar.writeTxn(() => isar.recipes.put(existingRecipe));
-      await fetchRecipe(dish, type);
+      await fetchRecipe(serial);
     }
   }
 
   //DELETE
-  Future<void> deleteRecipe(int id, String type, String dish) async {
+  Future<void> deleteRecipe(String serial, int id, String type, String dish) async {
     await isar.writeTxn(() => isar.recipes.delete(id));
-    await fetchRecipe(dish, type);
+    await fetchRecipe(serial);
   }
 
 
-  Future<void> addLink(String textFromUser, String type, String dish,) async {
+  Future<void> addLink(String linkName, String textFromUser, String serial, String type, String dish) async {
     //create a new note object
-    final newName = Links(link: textFromUser, type: type)..dish = dish;
+    final newName = Links(link: textFromUser, type: type, serial: serial, linkName: linkName)..dish = dish;
 
     //save to db
     await isar.writeTxn(() => isar.links.put(newName));
 
     //re-read from db
-    fetchLink(dish, type);
+    fetchLink(serial);
   }
 
 
-Future<List<Links>> fetchLink(String dish, String type) async {
-  List<Links> fetchedLink = await isar.links.where().filter().dishEqualTo(dish).and().typeEqualTo(type).findAll();
+Future<List<Links>> fetchLink(String serial) async {
+  List<Links> fetchedLink = await isar.links.where().filter().serialEqualTo(serial).findAll();
   currentLink.clear();
   currentLink.addAll(fetchedLink);
   notifyListeners();
@@ -176,19 +176,19 @@ Future<List<Links>> fetchLink(String dish, String type) async {
 }
 
   //UPDATE
-  Future<void> updateLink(int id, String newText, String type, String dish) async {
+  Future<void> updateLink(int id, String newText, String serial) async {
     final existingLink = await isar.links.get(id);
     if (existingLink != null) {
       existingLink.link = newText;
       await isar.writeTxn(() => isar.links.put(existingLink));
-      await fetchLink(dish, type);
+      await fetchLink(serial);
     }
   }
 
   //DELETE
-  Future<void> deleteLink(int id, String type, String dish) async {
+  Future<void> deleteLink(int id, String serial) async {
     await isar.writeTxn(() => isar.links.delete(id));
-    await fetchLink(dish, type);
+    await fetchLink(serial);
   }
 
 
@@ -269,7 +269,7 @@ Future<List<Map<String, String>>> fetchtitlesFromIsar(String? type) async {
 
   title.addAll(titles.map((deal) {
     return {
-      'title': deal.title ?? '',
+      'title': deal.title,
     };
   }).toList());
   

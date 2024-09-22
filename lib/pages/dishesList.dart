@@ -17,12 +17,14 @@ import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class dishesList extends StatefulWidget {
   dishesList({super.key, required this.type, required this.title});
   String? type;
   String? title;
-  @override
+
   State<dishesList> createState() => _dishesListState();
 }
 
@@ -33,9 +35,10 @@ class _dishesListState extends State<dishesList> {
   List<Dish> _filteredNotes = [];
   List<Dish> _sortededNotes = [];
   List<Title> currentTitles = [];
+  late SharedPreferences prefs;
 
   String dropdownValue = 'A-Z'; // Class-level variable
-
+  int? serial = 0;
   List<bool> _isSelected = [true, false, false]; // Default to filter by all
   int _currentIndex = 0;
   String? dishName;
@@ -43,17 +46,33 @@ class _dishesListState extends State<dishesList> {
   @override
   void initState() {
     super.initState();
+    _createTutorial();
     // on app startup, fetch the existing notes
     readNotes(widget.type!);
     readTitles(widget.type!);
+    loadSerila();
+  }
+
+  Future<void> loadSerila() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      serial = prefs.getInt('serial') ?? 0;
+    });
+  }
+
+  Future<void> saveSerial(int num) async {
+    setState(() {
+      serial = num;
+    });
+    await prefs.setInt('serial', num);
   }
 
   //function to create a note
-  void createNote() {
+  void createDish() {
     String? selectedOption;
     double selectedDurationHours = 1.0; // Start with 1 hour
     bool isSwitched = false;
-    String which = '0';
+    String category = '0';
     String? duration;
 
     showDialog(
@@ -130,7 +149,7 @@ class _dishesListState extends State<dishesList> {
                     ],
                     onToggle: (index) {
                       print('switched to: $index');
-                      which = index.toString();
+                      category = index.toString();
                     },
                   ),
                 ),
@@ -139,8 +158,12 @@ class _dishesListState extends State<dishesList> {
             actions: [
               // Create button
               MaterialButton(
+             
                 textColor: Colors.white,
                 onPressed: () {
+                  serial;
+                  int incrementedSearial = (serial! + 1);
+                  saveSerial(incrementedSearial);
                   if (textController.text.isNotEmpty) {
                     final now = DateTime.now();
                     final date =
@@ -149,10 +172,11 @@ class _dishesListState extends State<dishesList> {
                         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
                     context.read<database>().addType(
+                          serial.toString(),
                           textController.text,
                           widget.type!,
                           selectedDurationHours.toStringAsFixed(1),
-                          which!,
+                          category,
                           date,
                           time,
                         );
@@ -187,7 +211,7 @@ class _dishesListState extends State<dishesList> {
 
   //update note
   void updateNote(Dish name, String type) {
-    String which = name.which!; // Default value
+    String category = name.category!; // Default value
     String selectedDurationHours = name.duration!; // Default duration
 
     showDialog(
@@ -283,7 +307,7 @@ class _dishesListState extends State<dishesList> {
                   padding: const EdgeInsets.all(10.0),
                   child: ToggleSwitch(
                     minWidth: 110.0,
-                    initialLabelIndex: int.parse(which),
+                    initialLabelIndex: int.parse(category),
                     cornerRadius: 20.0,
                     activeFgColor: Colors.white,
                     inactiveBgColor: Colors.grey,
@@ -296,7 +320,7 @@ class _dishesListState extends State<dishesList> {
                     ],
                     onToggle: (index) {
                       setState(() {
-                        which = index.toString();
+                        category = index.toString();
                       });
                     },
                   ),
@@ -319,7 +343,7 @@ class _dishesListState extends State<dishesList> {
                         textController.text,
                         type,
                         selectedDurationHours,
-                        which,
+                        category,
                         date,
                         time);
                     // Clear the controller
@@ -364,9 +388,9 @@ class _dishesListState extends State<dishesList> {
       if (_currentIndex == 0) {
         return true; // Show all items
       } else if (_currentIndex == 1) {
-        return note.which == '1'; // Filter by `which == 1`
+        return note.category == '1'; // Filter by `category == 1`
       } else if (_currentIndex == 2) {
-        return note.which == '0'; // Filter by `which == 0`
+        return note.category == '0'; // Filter by `category == 0`
       }
       return false; // Default case
     }).toList();
@@ -411,7 +435,7 @@ class _dishesListState extends State<dishesList> {
   }
 
   IconData iconDataByValue(int? value) => switch (value) {
-        0 => FontAwesomeIcons.bowlFood,
+        0 => Icons.restaurant_menu,
         1 => FrinoIcons.f_meat,
         2 => FrinoIcons.f_leaf,
         _ => Icons.lightbulb_outline_rounded,
@@ -439,6 +463,88 @@ class _dishesListState extends State<dishesList> {
 
   int value = 0;
 
+  final GlobalKey _floatingButtonKey = GlobalKey();
+  final GlobalKey _categoryButtonKey = GlobalKey();
+  final GlobalKey _sortButtonKey = GlobalKey();
+
+  Future<void> _createTutorial() async {
+    // Get SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if the tutorial has already been shown
+    bool isTutorialShown = prefs.getBool('tutorialShowndishes') ?? false;
+
+    // If it has been shown, return early
+    if (isTutorialShown) return;
+
+    // Define the tutorial targets
+    final targets = [
+      TargetFocus(
+        identify: 'floatingButton',
+        keyTarget: _floatingButtonKey,
+        alignSkip: Alignment.bottomCenter,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Text(
+              'Use this button to add new dishes to the list',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'categoryButton',
+        keyTarget: _categoryButtonKey,
+        alignSkip: Alignment.bottomCenter,
+        contents: [
+          TargetContent(
+            align: ContentAlign.right,
+            builder: (context, controller) => Text(
+              'You can slide into category',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'settingsButton',
+        keyTarget: _sortButtonKey,
+        alignSkip: Alignment.bottomCenter,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Text(
+              'You can sort your dishes by using this',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(color: Colors.white),
+            ),
+          ),
+        ],
+      ),
+    ];
+
+    final tutorial = TutorialCoachMark(
+      targets: targets,
+    );
+
+    // Show the tutorial after a delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      tutorial.show(context: context);
+
+      // Once the tutorial is shown, set the flag in SharedPreferences
+      prefs.setBool('tutorialShowndishes', true);
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final noteDatabase = context.watch<database>();
@@ -448,19 +554,36 @@ class _dishesListState extends State<dishesList> {
 
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
-      appBar: AppBar(
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(
+            100.0), // Increase the height to fit the content
+        child: AppBar(
+          toolbarHeight: 100,
           elevation: 0,
+          backgroundColor: Colors.transparent,
+          foregroundColor: Theme.of(context).colorScheme.inversePrimary,
           leading: Padding(
-                padding: const EdgeInsets.only(top: 20.0),
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back),
-                  onPressed: () {
-                    Navigator.pop(context); // Navigate back when pressed
-                  },
-                ),
+            padding: const EdgeInsets.only(top: 25.0, left: 10),
+            child: IconButton(
+              icon: const Icon(FontAwesomeIcons.anglesLeft, size: 40),
+              onPressed: () {
+                Navigator.pop(context); // Navigate back when pressed
+              },
+            ),
+          ),
+          title: Padding(
+            padding: const EdgeInsets.only(
+                top: 20.0), // Add bottom padding to push content down
+            child: Text(
+              widget.title!,
+              style: GoogleFonts.dmSerifDisplay(
+                fontSize: 50,
+                color: Theme.of(context).colorScheme.inversePrimary,
               ),
-          backgroundColor: Colors.blue.shade50,
-          foregroundColor: Theme.of(context).colorScheme.inversePrimary),
+            ),
+          ),
+        ),
+      ),
 /*       drawer: Drawer(
         surfaceTintColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 230, 228, 228),
@@ -645,44 +768,49 @@ class _dishesListState extends State<dishesList> {
           ],
         ),
       ), */
+
       floatingActionButton: FloatingActionButton(
-          onPressed: createNote,
-          backgroundColor: Theme.of(context).colorScheme.primary,
-          child: Icon(Icons.add,
-              color: Theme.of(context).colorScheme.inversePrimary)),
+        key: _floatingButtonKey,
+        onPressed: createDish,
+        backgroundColor: Theme.of(context).colorScheme.primary,
+        child: Icon(Icons.add,
+            color: Theme.of(context).colorScheme.inversePrimary),
+      ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Padding(
+          /* Padding(
             padding: const EdgeInsets.only(left: 25, top: 20),
             child: Text(widget.title!,
                 style: GoogleFonts.dmSerifDisplay(
                     fontSize: 48,
                     color: Theme.of(context).colorScheme.inversePrimary)),
-          ),
+          ), */
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 25.0, top: 10),
                 child: AnimatedToggleSwitch<int>.size(
+                  key: _categoryButtonKey,
                   textDirection: TextDirection.rtl,
                   current: _currentIndex,
                   values: const [2, 1, 0],
-                  iconOpacity: 0.2,
-                  height: 40,
+                  iconOpacity: 0.50,
+                  height: 50,
                   indicatorSize: const Size.fromWidth(40),
+                  spacing: 0,
                   iconBuilder: iconBuilder,
-                  borderWidth: 2.0,
+                  borderWidth: 7.0,
                   iconAnimationType: AnimationType.onHover,
                   style: ToggleStyle(
                     borderColor: Colors.transparent,
-                    borderRadius: BorderRadius.circular(10.0),
+                    borderRadius: BorderRadius.circular(15.0),
                     boxShadow: [
                       const BoxShadow(
                         color: Colors.black26,
                         spreadRadius: 0,
-                        blurRadius: 0.5,
+                        blurRadius: 2,
                       ),
                     ],
                   ),
@@ -716,6 +844,7 @@ class _dishesListState extends State<dishesList> {
                     padding: const EdgeInsets.only(left: 10.0),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
+                        key: _sortButtonKey,
                         menuWidth: 125,
                         borderRadius: BorderRadius.circular(20.0),
                         value: dropdownValue,
@@ -731,23 +860,23 @@ class _dishesListState extends State<dishesList> {
                           switch (value) {
                             case 'A-Z':
                               trailingIcon = const Icon(
-                                CupertinoIcons.arrow_up_to_line,
+                                CupertinoIcons.sort_up,
                                 size: 17,
                               );
                               break;
                             case 'Z-A':
                               trailingIcon = const Icon(
-                                CupertinoIcons.arrow_down_to_line,
+                                CupertinoIcons.sort_down,
                                 size: 17,
                               );
                               break;
                             case 'Shortest':
                               trailingIcon = const Icon(
-                                  CupertinoIcons.hourglass_bottomhalf_fill);
+                                  CupertinoIcons.timer_fill);
                               break;
                             case 'Longest':
                               trailingIcon = const Icon(
-                                  CupertinoIcons.hourglass_tophalf_fill);
+                                  CupertinoIcons.timer_fill);
                               break;
                             case 'Newest':
                               trailingIcon = const Icon(CupertinoIcons.today);
@@ -785,13 +914,13 @@ class _dishesListState extends State<dishesList> {
               )
             ],
           ),
+          const SizedBox(height: 10),
           Expanded(
             child: GestureDetector(
               child: ListView.builder(
                 itemCount: _sortededNotes.length,
                 itemBuilder: (context, index) {
                   final note = _sortededNotes[index];
-                  
 
                   return GestureDetector(
                     onLongPress: () {
@@ -802,6 +931,7 @@ class _dishesListState extends State<dishesList> {
                       setState(() {
                         Navigator.of(context).push(MaterialPageRoute(
                             builder: (context) => recipe(
+                                  serial: note.serial,
                                   type: widget.type,
                                   dish: note.name,
                                 )));
@@ -809,7 +939,7 @@ class _dishesListState extends State<dishesList> {
                     },
                     child: DishTile(
                       duration: note.duration,
-                      which: note.which,
+                      category: note.category,
                       dish: note.name,
                       type: widget.type,
                       text: note.name,
