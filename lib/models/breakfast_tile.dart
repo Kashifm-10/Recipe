@@ -24,14 +24,12 @@ class DishTile extends StatelessWidget {
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
 
-
-
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Container(
-        height: 150,
+        height: MediaQuery.of(context).size.height * 0.1,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
@@ -53,7 +51,7 @@ class DishTile extends StatelessWidget {
                 backgroundColor: Colors.white.withOpacity(0.0),
                 child: category == "1"
                     ? Icon(Icons.circle_rounded, color: Colors.red, size: 15)
-                    : Icon(Icons.circle_rounded, color: Colors.green,size: 15),
+                    : Icon(Icons.circle_rounded, color: Colors.green, size: 15),
               ),
             ),
             Padding(
@@ -64,8 +62,8 @@ class DishTile extends StatelessWidget {
                 children: [
                   Text(
                     text,
-                    style:  TextStyle(
-                      color:  Colors.black,
+                    style: TextStyle(
+                      color: Colors.black,
                       fontSize: 24,
                       fontWeight: FontWeight.bold,
                     ),
@@ -73,17 +71,17 @@ class DishTile extends StatelessWidget {
                   Row(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(bottom:  4.0),
+                        padding: const EdgeInsets.only(bottom: 4.0),
                         child: Icon(Icons.timer, color: Colors.grey.shade400),
                       ),
                       SizedBox(width: 5),
                       Text(
                         '$duration hours',
-                        style: TextStyle(color: Colors.grey.shade400, fontSize: 16),
+                        style: TextStyle(
+                            color: Colors.grey.shade400, fontSize: 16),
                       ),
                     ],
                   ),
-                 
                 ],
               ),
             ),
@@ -93,5 +91,3 @@ class DishTile extends StatelessWidget {
     );
   }
 }
-
-

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:recipe/pages/home.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -11,6 +12,14 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
+    
+    // Extend content to the edges (under status bar)
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
+    
+    // Hide the navigation bar but keep the status bar stretched
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
+
+    // Navigate to the home page after 3 seconds
     Timer(const Duration(seconds: 3), () {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const MyHomePage(title: 'Recipes'),
@@ -29,9 +38,8 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Center(
         child: Image.asset(
           'assets/images/splash_screen.png',
-          // Make the image responsive to screen size
-          width: screenWidth, // Scale width to 70% of screen width
-          height: screenHeight , // Scale height to 40% of screen height
+          width: screenWidth, // Make the image responsive to screen size
+          height: screenHeight, // Scale height to 100% of screen height
           fit: BoxFit.contain, // Ensures the image maintains aspect ratio
         ),
       ),

@@ -26,12 +26,12 @@ class _MyHomePageState extends State<MyHomePage> {
     '4': 'Gravy',
     '5': 'Sweets',
     '6': 'Starters',
-    '7': '234',
-    '8': '',
-    '9': '',
-    '10': '',
-    '11': '',
-    '12': '',
+    '7': 'Add',
+    '8': 'Add',
+    '9': 'Add',
+    '10': 'Add',
+    '11': 'Add',
+    '12': 'Add',
   };
 
   late Future<void> _initFuture;
@@ -39,6 +39,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
+    
     _initFuture = _initializeCategoryLabels();
   }
 

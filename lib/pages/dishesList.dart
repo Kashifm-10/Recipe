@@ -19,6 +19,7 @@ import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class dishesList extends StatefulWidget {
   dishesList({super.key, required this.type, required this.title});
@@ -42,6 +43,11 @@ class _dishesListState extends State<dishesList> {
   List<bool> _isSelected = [true, false, false]; // Default to filter by all
   int _currentIndex = 0;
   String? dishName;
+  TextEditingController _searchController = TextEditingController();
+  String searchQuery = '';
+
+  stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
 
   @override
   void initState() {
@@ -51,6 +57,35 @@ class _dishesListState extends State<dishesList> {
     readNotes(widget.type!);
     readTitles(widget.type!);
     loadSerila();
+    _speech = stt.SpeechToText();
+  }
+
+  void _startListening() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize();
+      if (available) {
+        setState(() => _isListening = true);
+        print("Listening started..."); // Debugging statement
+        _speech.listen(
+          onResult: (result) {
+            print(
+                "Result received: ${result.recognizedWords}"); // Debugging statement
+            setState(() {
+              searchQuery = result.recognizedWords.toLowerCase();
+              _searchController.text = searchQuery; // Update TextField
+              _filterAndSortNotes(); // Filter notes based on voice input
+            });
+          },
+        );
+
+        await Future.delayed(Duration(seconds: 7)); // Minimum wait time
+        await _speech.stop(); // Stop the speech recognition
+        setState(() => _isListening = false); // Update state
+        print("Listening stopped..."); // Debugging statement
+      } else {
+        print("Speech recognition is not available.");
+      }
+    }
   }
 
   Future<void> loadSerila() async {
@@ -158,7 +193,6 @@ class _dishesListState extends State<dishesList> {
             actions: [
               // Create button
               MaterialButton(
-             
                 textColor: Colors.white,
                 onPressed: () {
                   serial;
@@ -385,12 +419,17 @@ class _dishesListState extends State<dishesList> {
 
     // Apply filtering
     _filteredNotes = noteDatabase.currentNames.where((note) {
+      final matchesSearch =
+          note.name.toLowerCase().contains(searchQuery.toLowerCase());
+
       if (_currentIndex == 0) {
-        return true; // Show all items
+        return matchesSearch; // Show all items that match the search
       } else if (_currentIndex == 1) {
-        return note.category == '1'; // Filter by `category == 1`
+        return note.category == '1' &&
+            matchesSearch; // Filter by `category == 1` and search
       } else if (_currentIndex == 2) {
-        return note.category == '0'; // Filter by `category == 0`
+        return note.category == '0' &&
+            matchesSearch; // Filter by `category == 0` and search
       }
       return false; // Default case
     }).toList();
@@ -549,14 +588,13 @@ class _dishesListState extends State<dishesList> {
   Widget build(BuildContext context) {
     final noteDatabase = context.watch<database>();
 
-    // Update notes based on selected filter and sort
+    // Update notes based on selected filter, sort, and search
     _filterAndSortNotes();
 
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(
-            100.0), // Increase the height to fit the content
+        preferredSize: const Size.fromHeight(100.0),
         child: AppBar(
           toolbarHeight: 100,
           elevation: 0,
@@ -567,13 +605,12 @@ class _dishesListState extends State<dishesList> {
             child: IconButton(
               icon: const Icon(FontAwesomeIcons.anglesLeft, size: 40),
               onPressed: () {
-                Navigator.pop(context); // Navigate back when pressed
+                Navigator.pop(context);
               },
             ),
           ),
           title: Padding(
-            padding: const EdgeInsets.only(
-                top: 20.0), // Add bottom padding to push content down
+            padding: const EdgeInsets.only(top: 20.0),
             child: Text(
               widget.title!,
               style: GoogleFonts.dmSerifDisplay(
@@ -584,6 +621,7 @@ class _dishesListState extends State<dishesList> {
           ),
         ),
       ),
+
 /*       drawer: Drawer(
         surfaceTintColor: Colors.white,
         backgroundColor: const Color.fromARGB(255, 230, 228, 228),
@@ -776,147 +814,485 @@ class _dishesListState extends State<dishesList> {
         child: Icon(Icons.add,
             color: Theme.of(context).colorScheme.inversePrimary),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          /* Padding(
-            padding: const EdgeInsets.only(left: 25, top: 20),
-            child: Text(widget.title!,
-                style: GoogleFonts.dmSerifDisplay(
-                    fontSize: 48,
-                    color: Theme.of(context).colorScheme.inversePrimary)),
-          ), */
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0, top: 10),
-                child: AnimatedToggleSwitch<int>.size(
-                  key: _categoryButtonKey,
-                  textDirection: TextDirection.rtl,
-                  current: _currentIndex,
-                  values: const [2, 1, 0],
-                  iconOpacity: 0.50,
-                  height: 50,
-                  indicatorSize: const Size.fromWidth(40),
-                  spacing: 0,
-                  iconBuilder: iconBuilder,
-                  borderWidth: 7.0,
-                  iconAnimationType: AnimationType.onHover,
-                  style: ToggleStyle(
-                    borderColor: Colors.transparent,
-                    borderRadius: BorderRadius.circular(15.0),
-                    boxShadow: [
-                      const BoxShadow(
-                        color: Colors.black26,
-                        spreadRadius: 0,
-                        blurRadius: 2,
-                      ),
-                    ],
-                  ),
-                  styleBuilder: (i) => ToggleStyle(
-                    indicatorColor: colorBuilder(i),
-                  ),
-                  onChanged: (i) {
-                    setState(() {
-                      _currentIndex = i;
-                      _filterAndSortNotes(); // Apply filter and sort
-                      print(i); // Debug print
-                    });
-                  },
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 25.0, top: 10),
-                child: Container(
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(15.0),
-                    color: Colors.white,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 1,
-                      ),
-                    ],
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.only(left: 10.0),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton<String>(
-                        key: _sortButtonKey,
-                        menuWidth: 125,
-                        borderRadius: BorderRadius.circular(20.0),
-                        value: dropdownValue,
-                        items: <String>[
-                          'A-Z',
-                          'Z-A',
-                          'Shortest',
-                          'Longest',
-                          'Newest',
-                          'Oldest'
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          Icon trailingIcon;
-                          switch (value) {
-                            case 'A-Z':
-                              trailingIcon = const Icon(
-                                CupertinoIcons.sort_up,
-                                size: 17,
-                              );
-                              break;
-                            case 'Z-A':
-                              trailingIcon = const Icon(
-                                CupertinoIcons.sort_down,
-                                size: 17,
-                              );
-                              break;
-                            case 'Shortest':
-                              trailingIcon = const Icon(
-                                  CupertinoIcons.timer_fill);
-                              break;
-                            case 'Longest':
-                              trailingIcon = const Icon(
-                                  CupertinoIcons.timer_fill);
-                              break;
-                            case 'Newest':
-                              trailingIcon = const Icon(CupertinoIcons.today);
-                              break;
-                            case 'Oldest':
-                              trailingIcon = const Icon(
-                                Icons.date_range,
-                              );
-                              break;
-                            default:
-                              trailingIcon = const Icon(Icons.label);
-                          }
+      body: GestureDetector(
+        onTap: () {
+          FocusScope.of(context)
+              .unfocus(); // Dismiss the keyboard and unfocus the search bar
+        },
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Add a search bar at the top of the screen
 
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(value),
-                                trailingIcon,
-                              ],
+            Padding(
+              padding: const EdgeInsets.only(left: 0.0, right: 0  ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Check for screen width condition
+                  if (MediaQuery.of(context).size.width > 600) ...[
+                    // Layout for larger screens (e.g., tablets, desktop)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 18.0, right: 17),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 9.0, left: 0),
+                            child: Container(
+                              margin: const EdgeInsets.all(0),
+                              width: MediaQuery.of(context).size.width *
+                                  0.585, // 90% of screen width
+                              height: MediaQuery.of(context).size.height *
+                                  0.04, // 7% of screen height
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .white, // Set the background color to white
+                                borderRadius: BorderRadius.circular(15.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    spreadRadius: 0,
+                                    blurRadius:
+                                        2, // Set the desired blur radius
+                                  ),
+                                ],
+                              ),
+                              child: SearchBar(
+                                hintText: 'Search ',
+                                controller: _searchController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    searchQuery = value.toLowerCase();
+                                    _filterAndSortNotes(); // Call your filtering method
+                                  });
+                                },
+                                backgroundColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.white,
+                                ),
+                                shadowColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.transparent,
+                                ),
+                                leading: Container(
+                                  margin: const EdgeInsets.all(8),
+                                  child: const Icon(Icons.search),
+                                ),
+                                trailing: <Widget>[
+                                  // Use <Widget>[] to define the list of trailing widgets
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      color: Colors.grey,
+                                    ), // Change the icon as needed
+                                    onPressed: () {
+                                      // Clear the search field
+                                      _searchController.clear();
+                                      setState(() {
+                                        searchQuery =
+                                            ''; // Reset the search query
+                                        _filterAndSortNotes(); // Call your filtering method
+                                      });
+                                    },
+                                  ),
+                                  IconButton(
+                                    onPressed:
+                                        _startListening, // Start voice search
+                                    icon: Icon(
+                                      _isListening
+                                          ? Icons.mic
+                                          : Icons
+                                              .mic_none, // Change icon based on listening state
+                                      color: _isListening
+                                          ? Colors.red
+                                          : Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                                elevation: MaterialStateProperty.all(0),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                ),
+                              ),
                             ),
-                          );
-                        }).toList(),
-                        onChanged: (String? newValue) {
-                          setState(() {
-                            dropdownValue = newValue!;
-                            _filterAndSortNotes(); // Apply filter and sort
-                          });
-                        },
+                          ),
+                          SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02),
+                          // Your existing toggle switch
+                          Padding(
+                            padding: const EdgeInsets.only(left: 0.0, top: 10),
+                            child: AnimatedToggleSwitch<int>.size(
+                              key: _categoryButtonKey,
+                              textDirection: TextDirection.rtl,
+                              current: _currentIndex,
+                              values: const [2, 1, 0],
+                              iconOpacity: 0.50,
+                              height: MediaQuery.of(context).size.height * 0.04,
+                              indicatorSize: const Size.fromWidth(40),
+                              spacing: 0,
+                              iconBuilder: iconBuilder,
+                              borderWidth: 7.0,
+                              iconAnimationType: AnimationType.onHover,
+                              style: ToggleStyle(
+                                borderColor: Colors.transparent,
+                                borderRadius: BorderRadius.circular(15.0),
+                                boxShadow: [
+                                  const BoxShadow(
+                                    color: Colors.black26,
+                                    spreadRadius: 0,
+                                    blurRadius: 2,
+                                  ),
+                                ],
+                              ),
+                              styleBuilder: (i) => ToggleStyle(
+                                indicatorColor: colorBuilder(i),
+                              ),
+                              onChanged: (i) {
+                                setState(() {
+                                  _currentIndex = i;
+                                  _filterAndSortNotes(); // Apply filter and sort
+                                  print(i); // Debug print
+                                });
+                              },
+                            ),
+                          ),
+                          SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.02),
+                          // Your existing dropdown for sorting
+                          Padding(
+                            padding: const EdgeInsets.only(right: 0.0, top: 10),
+                            child: Container(
+                              width: MediaQuery.of(context).size.width *
+                                  0.16, // 90% of screen width
+                              height: MediaQuery.of(context).size.height * 0.04,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15.0),
+                                color: Colors.white,
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 1,
+                                  ),
+                                ],
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.only(left: 10.0),
+                                child: DropdownButtonHideUnderline(
+                                  child: DropdownButton<String>(
+                                    key: _sortButtonKey,
+                                    menuWidth: 125,
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    value: dropdownValue,
+                                    items: <String>[
+                                      'A-Z',
+                                      'Z-A',
+                                      'Shortest',
+                                      'Longest',
+                                      'Newest',
+                                      'Oldest'
+                                    ].map<DropdownMenuItem<String>>(
+                                        (String value) {
+                                      Icon trailingIcon;
+                                      switch (value) {
+                                        case 'A-Z':
+                                          trailingIcon = const Icon(
+                                            CupertinoIcons.sort_up,
+                                            size: 17,
+                                          );
+                                          break;
+                                        case 'Z-A':
+                                          trailingIcon = const Icon(
+                                            CupertinoIcons.sort_down,
+                                            size: 17,
+                                          );
+                                          break;
+                                        case 'Shortest':
+                                          trailingIcon = const Icon(
+                                              CupertinoIcons.timer_fill);
+                                          break;
+                                        case 'Longest':
+                                          trailingIcon = const Icon(
+                                              CupertinoIcons.timer_fill);
+                                          break;
+                                        case 'Newest':
+                                          trailingIcon =
+                                              const Icon(CupertinoIcons.today);
+                                          break;
+                                        case 'Oldest':
+                                          trailingIcon = const Icon(
+                                            Icons.date_range,
+                                          );
+                                          break;
+                                        default:
+                                          trailingIcon =
+                                              const Icon(Icons.label);
+                                      }
+
+                                      return DropdownMenuItem<String>(
+                                        value: value,
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(value),
+                                            trailingIcon,
+                                          ],
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (String? newValue) {
+                                      setState(() {
+                                        dropdownValue = newValue!;
+                                        _filterAndSortNotes(); // Apply filter and sort
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
                       ),
                     ),
-                  ),
-                ),
-              )
-            ],
-          ),
-          const SizedBox(height: 10),
-          Expanded(
-            child: GestureDetector(
+                  ] else ...[
+                    // Layout for smaller screens (e.g., mobile)
+                    Padding(
+                      padding: const EdgeInsets.only(left: 15.0),
+                      child: Column(
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(top: 9.0, left: 0),
+                            child: Container(
+                              margin: const EdgeInsets.all(0),
+                              width: MediaQuery.of(context).size.width *
+                                  0.935, // 90% of screen width
+                              height: MediaQuery.of(context).size.height *
+                                  0.04, // 7% of screen height
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .white, // Set the background color to white
+                                borderRadius: BorderRadius.circular(15.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    spreadRadius: 0,
+                                    blurRadius: 2, // Set the desired blur radius
+                                  ),
+                                ],
+                              ),
+                              child: SearchBar(
+                                hintText: 'Search ',
+                                controller: _searchController,
+                                onChanged: (value) {
+                                  setState(() {
+                                    searchQuery = value.toLowerCase();
+                                    _filterAndSortNotes(); // Call your filtering method
+                                  });
+                                },
+                                backgroundColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.white,
+                                ),
+                                shadowColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.transparent,
+                                ),
+                                leading: Container(
+                                  margin: const EdgeInsets.all(8),
+                                  child: const Icon(Icons.search),
+                                ),
+                                trailing: <Widget>[
+                                  // Use <Widget>[] to define the list of trailing widgets
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      color: Colors.grey,
+                                    ), // Change the icon as needed
+                                    onPressed: () {
+                                      // Clear the search field
+                                      _searchController.clear();
+                                      setState(() {
+                                        searchQuery =
+                                            ''; // Reset the search query
+                                        _filterAndSortNotes(); // Call your filtering method
+                                      });
+                                    },
+                                  ),
+                                  IconButton(
+                                    onPressed:
+                                        _startListening, // Start voice search
+                                    icon: Icon(
+                                      _isListening
+                                          ? Icons.mic
+                                          : Icons
+                                              .mic_none, // Change icon based on listening state
+                                      color:
+                                          _isListening ? Colors.red : Colors.grey,
+                                    ),
+                                  ),
+                                ],
+                                elevation: MaterialStateProperty.all(0),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          // Toggle switch and dropdown for small screens
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(left: 0.0, top: 10),
+                                child: AnimatedToggleSwitch<int>.size(
+                                  key: _categoryButtonKey,
+                                  textDirection: TextDirection.rtl,
+                                  current: _currentIndex,
+                                  values: const [2, 1, 0],
+                                  iconOpacity: 0.50,
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.045,
+                                  indicatorSize: const Size.fromWidth(40),
+                                  spacing: 0,
+                                  iconBuilder: iconBuilder,
+                                  borderWidth: 7.0,
+                                  iconAnimationType: AnimationType.onHover,
+                                  style: ToggleStyle(
+                                    borderColor: Colors.transparent,
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    boxShadow: [
+                                      const BoxShadow(
+                                        color: Colors.black26,
+                                        spreadRadius: 0,
+                                        blurRadius: 2,
+                                      ),
+                                    ],
+                                  ),
+                                  styleBuilder: (i) => ToggleStyle(
+                                    indicatorColor: colorBuilder(i),
+                                  ),
+                                  onChanged: (i) {
+                                    setState(() {
+                                      _currentIndex = i;
+                                      _filterAndSortNotes(); // Apply filter and sort
+                                      print(i); // Debug print
+                                    });
+                                  },
+                                ),
+                              ),
+                              SizedBox(
+                                width: MediaQuery.of(context).size.width * 0.35,
+                              ),
+                              Padding(
+                                padding:
+                                    const EdgeInsets.only(right: 0.0, top: 10),
+                                child: Container(
+                                  width: MediaQuery.of(context).size.width *
+                                      0.3, // 90% of screen width
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.046,
+                                  decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                    color: Colors.white,
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.grey.withOpacity(0.2),
+                                        spreadRadius: 1,
+                                        blurRadius: 1,
+                                      ),
+                                    ],
+                                  ),
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 10.0),
+                                    child: DropdownButtonHideUnderline(
+                                      child: DropdownButton<String>(
+                                        key: _sortButtonKey,
+                                        menuWidth: 125,
+                                        borderRadius: BorderRadius.circular(20.0),
+                                        value: dropdownValue,
+                                        items: <String>[
+                                          'A-Z',
+                                          'Z-A',
+                                          'Shortest',
+                                          'Longest',
+                                          'Newest',
+                                          'Oldest'
+                                        ].map<DropdownMenuItem<String>>(
+                                            (String value) {
+                                          Icon trailingIcon;
+                                          switch (value) {
+                                            case 'A-Z':
+                                              trailingIcon = const Icon(
+                                                CupertinoIcons.sort_up,
+                                                size: 17,
+                                              );
+                                              break;
+                                            case 'Z-A':
+                                              trailingIcon = const Icon(
+                                                CupertinoIcons.sort_down,
+                                                size: 17,
+                                              );
+                                              break;
+                                            case 'Shortest':
+                                              trailingIcon = const Icon(
+                                                  CupertinoIcons.timer_fill);
+                                              break;
+                                            case 'Longest':
+                                              trailingIcon = const Icon(
+                                                  CupertinoIcons.timer_fill);
+                                              break;
+                                            case 'Newest':
+                                              trailingIcon = const Icon(
+                                                  CupertinoIcons.today);
+                                              break;
+                                            case 'Oldest':
+                                              trailingIcon = const Icon(
+                                                Icons.date_range,
+                                              );
+                                              break;
+                                            default:
+                                              trailingIcon =
+                                                  const Icon(Icons.label);
+                                          }
+                      
+                                          return DropdownMenuItem<String>(
+                                            value: value,
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.spaceBetween,
+                                              children: [
+                                                Text(value),
+                                                trailingIcon,
+                                              ],
+                                            ),
+                                          );
+                                        }).toList(),
+                                        onChanged: (String? newValue) {
+                                          setState(() {
+                                            dropdownValue = newValue!;
+                                            _filterAndSortNotes(); // Apply filter and sort
+                                          });
+                                        },
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ]
+                ],
+              ),
+            ),
+            const SizedBox(height: 10),
+            // The ListView to display the filtered notes
+            Expanded(
               child: ListView.builder(
                 itemCount: _sortededNotes.length,
                 itemBuilder: (context, index) {
@@ -950,8 +1326,8 @@ class _dishesListState extends State<dishesList> {
                 },
               ),
             ),
-          )
-        ],
+          ],
+        ),
       ),
     );
   }
