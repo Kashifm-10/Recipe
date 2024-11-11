@@ -17,8 +17,10 @@ import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/models/recipeList.dart';
 import 'package:linkable/linkable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'dart:async'; // For using Timer
 
 class recipe extends StatefulWidget {
   recipe(
@@ -47,11 +49,17 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   List<String>? fetchedlink;
   List<String>? fetchedTitle;
   List<int>? fetchedlinkid;
+  bool _isLoading = true; // Manage loading state
 
   @override
   void initState() {
     super.initState();
     _createTutorial();
+    Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
     // on app startup, fetch the existing notes
     readIngeadints(widget.dish!, widget.serial!);
     readRecipe(widget.dish!, widget.type!, widget.serial!);
@@ -185,8 +193,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                           icon: const Icon(Icons.delete,
                                               color: Colors.red),
                                           onPressed: () async {
-                                            int linkId = fetchedLinksId[index];
-                                            await deleteLink(linkId);
+                                            String linkName = title[index];
+                                            await deleteLink(linkName);
 
                                             setState(() {
                                               fetchedLinks.removeAt(index);
@@ -293,13 +301,11 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
 
   //function to create a note
   void createIngredient() {
-    // Additional TextEditingController for the second input
     TextEditingController quantityController = TextEditingController();
     TextEditingController textController = TextEditingController();
 
-    // Dropdown selection options
     String? selectedUnit;
-    List<String> unitOptions = ['gm', 'Kg', 'ltr', 'Cup(s)', 'Spoon(s)'];
+    List<String> unitOptions = ['gm', 'kg', 'ltr', 'nos', 'pc', 'cup', 'spoon'];
 
     showDialog(
       context: context,
@@ -310,7 +316,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // First text field for the ingredient name
+                // Text field for the ingredient name
                 TextField(
                   controller: textController,
                   decoration: const InputDecoration(
@@ -319,14 +325,13 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 ),
                 const SizedBox(height: 10),
 
-                // Second text field for quantity
+                // Text field for quantity
                 TextField(
                   controller: quantityController,
                   decoration: const InputDecoration(
                     hintText: 'Quantity',
                   ),
-                  keyboardType:
-                      TextInputType.number, // Only allow numeric input
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
 
@@ -355,14 +360,34 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   if (textController.text.isNotEmpty &&
                       quantityController.text.isNotEmpty &&
                       selectedUnit != null) {
-                    // Assuming addIng method is modified to accept the quantity and unit
-                    await context.read<database>().addIng(
+                    int quantity = int.tryParse(quantityController.text) ?? 1;
+                    String adjustedUnit = selectedUnit!;
+
+                    // Adjust unit to plural if quantity is more than 1
+                    if (quantity > 1) {
+                      if (adjustedUnit == 'cup') {
+                        adjustedUnit = 'cups';
+                      } else if (adjustedUnit == 'spoon') {
+                        adjustedUnit = 'spoons';
+                      } else if (adjustedUnit == 'pc') {
+                        adjustedUnit = 'pcs';
+                      } else if (adjustedUnit == 'gm') {
+                        adjustedUnit = 'gms';
+                      } else if (adjustedUnit == 'kg') {
+                        adjustedUnit = 'kgs';
+                      } else if (adjustedUnit == 'ltr') {
+                        adjustedUnit = 'ltrs';
+                      }
+                    }
+
+                    // Assuming addIngredient method is modified to accept quantity and unit
+                    await context.read<database>().addIngredient(
                           widget.serial!,
                           textController.text,
                           widget.type!,
                           widget.dish!,
                           quantityController.text,
-                          selectedUnit!,
+                          adjustedUnit,
                         );
 
                     Navigator.pop(context);
@@ -374,9 +399,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 child: Text(
                   'Create',
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary),
+                    color: Theme.of(context).colorScheme.inversePrimary,
+                  ),
                 ),
-              )
+              ),
             ],
           );
         },
@@ -386,32 +412,90 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
 
   //read notes
   void readIngeadints(String dish, String? serial) {
-    context.read<database>().fetchIng(dish, serial);
+    context.read<database>().fetchIngredients(dish, serial);
   }
 
   //update note
-  void updateIng(Ingredients ingredient) async {
+  void updateIng(Ingredients ingredient, String rec) async {
+    final response = await Supabase.instance.client
+        .from('ingredients')
+        .select('id') // Specify the field to fetch
+        .eq('name', rec); // Filter by serial
+
+// Convert the response to a list of maps
+    final data = List<Map<String, dynamic>>.from(response);
+
+// Clear the previous data if necessary
+
+// Store the id in a string
+    int ingredientId = data.isNotEmpty ? data[0]['id'] : '';
     // Create controllers for the text fields and unit selection
     TextEditingController textController =
         TextEditingController(text: ingredient.name);
     TextEditingController quantityController =
         TextEditingController(text: ingredient.quantity);
-    String? selectedUnit =
-        ingredient.uom; // Assuming Ingredients has a unit field
+    // Define a map of plural to singular units
+    final unitMap = {
+      'gms': 'gm',
+      'kgs': 'kg',
+      'ltrs': 'ltr',
+      'nos': 'nos', // Assuming 'nos' is already in singular form
+      'pcs': 'pc',
+      'cups': 'cup',
+      'spoons': 'spoon',
+    };
+
+// Set selectedUnit based on the map
+    String? selectedUnit = unitMap[ingredient.uom] ?? ingredient.uom;
+
+    /*  String? selectedUnit =
+        ingredient.uom; // Assuming Ingredients has a unit field */
 
     // Dropdown selection options
-    List<String> unitOptions = ['gm', 'kg', 'ltr', 'cups'];
+    List<String> unitOptions = ['nos', 'pc', 'gm', 'kg', 'ltr', 'cup', 'spoon'];
 
     await showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (BuildContext context, StateSetter setState) {
           return AlertDialog(
-            title: const Text('Edit Ingredient'),
+            title: Row(
+              children: [
+                const Text('Edit Ingredient'),
+                IconButton(
+                  onPressed: () {
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        title: const Text("Confirm Deletion"),
+                        content: const Text(
+                            "Are you sure you want to delete this ingredient?"),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              deleteIng(rec);
+                              Navigator.pop(context);
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Yes, Delete"),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text("Cancel"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
+                ),
+              ],
+            ),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Text field for the ingredient name
                 TextField(
                   controller: textController,
                   decoration: const InputDecoration(
@@ -419,19 +503,14 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   ),
                 ),
                 const SizedBox(height: 10),
-
-                // Text field for quantity
                 TextField(
                   controller: quantityController,
                   decoration: const InputDecoration(
                     hintText: 'Quantity',
                   ),
-                  keyboardType:
-                      TextInputType.number, // Only allow numeric input
+                  keyboardType: TextInputType.number,
                 ),
                 const SizedBox(height: 10),
-
-                // Dropdown button for selecting a unit
                 DropdownButton<String>(
                   hint: const Text('Select Unit'),
                   isExpanded: true,
@@ -449,28 +528,45 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               ],
             ),
             actions: [
-              // Update button
               MaterialButton(
                 textColor: Colors.white,
                 onPressed: () async {
                   if (textController.text.isNotEmpty &&
                       quantityController.text.isNotEmpty &&
                       selectedUnit != null) {
+                    int quantity = int.tryParse(quantityController.text) ?? 1;
+                    String adjustedUnit = selectedUnit!;
+
+                    // Adjust unit to plural if quantity is more than 1
+                    if (quantity > 1) {
+                      if (adjustedUnit == 'cup') {
+                        adjustedUnit = 'cups';
+                      } else if (adjustedUnit == 'spoon') {
+                        adjustedUnit = 'spoons';
+                      } else if (adjustedUnit == 'pc') {
+                        adjustedUnit = 'pcs';
+                      } else if (adjustedUnit == 'gm') {
+                        adjustedUnit = 'gms';
+                      } else if (adjustedUnit == 'kg') {
+                        adjustedUnit = 'kgs';
+                      } else if (adjustedUnit == 'ltr') {
+                        adjustedUnit = 'ltrs';
+                      }
+                    }
+
                     // Update the ingredient in the database
-                    await context.read<database>().updateIng(
-                          ingredient.id,
+                    await context.read<database>().updateIngredient(
+                          ingredientId,
                           textController.text,
                           widget.type!,
                           quantityController.text,
-                          selectedUnit!,
+                          adjustedUnit,
                         );
 
-                    // Clear the controllers and refresh the list
                     textController.clear();
                     quantityController.clear();
                     readIngeadints(widget.dish!, widget.serial!);
 
-                    // Pop the dialog box
                     Navigator.pop(context);
                   }
                 },
@@ -489,12 +585,24 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   }
 
   //delete a note
-  void deleteIng(int id) async {
-    await context.read<database>().deleteIng(id, widget.type!);
+  void deleteIng(String rec) async {
+    final response = await Supabase.instance.client
+        .from('ingredients')
+        .select('id') // Specify the field to fetch
+        .eq('name', rec); // Filter by serial
+
+// Convert the response to a list of maps
+    final data = List<Map<String, dynamic>>.from(response);
+
+// Clear the previous data if necessary
+
+// Store the id in a string
+    int id = data.isNotEmpty ? data[0]['id'] : '';
+    await context.read<database>().deleteIngredient(id, widget.type!);
     readIngeadints(widget.dish!, widget.serial!);
   }
 
-  void createRecipe() {
+  /* void createRecipe() {
     showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -528,7 +636,52 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   .colorScheme
                                   .inversePrimary)))
                 ]));
-  }
+  } */
+  void createRecipe() {
+  showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: const Text('Add Recipe'),
+      content: SizedBox(
+        width: MediaQuery.of(context).size.width * 0.8, // 80% of screen width
+        child: TextField(
+          controller: textController,
+          maxLines: null, // Allows the TextField to expand as needed
+          keyboardType: TextInputType.multiline, // Supports multi-line input
+          textInputAction: TextInputAction.newline, // Pressing Enter will add a new line
+          decoration: const InputDecoration(
+            hintText: 'Enter your recipe here...',
+          ),
+        ),
+      ),
+      actions: [
+        // Create button
+        MaterialButton(
+          textColor: Colors.white,
+          onPressed: () async {
+            if (textController.text.isNotEmpty) {
+              await context.read<database>().addRecipe(
+                  widget.serial!,
+                  textController.text,
+                  widget.type!,
+                  widget.dish!);
+              Navigator.pop(context);
+              readRecipe(widget.dish!, widget.type!, widget.serial!);
+              textController.clear();
+            }
+          },
+          child: Text(
+            'Create',
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inversePrimary,
+            ),
+          ),
+        ),
+      ],
+    ),
+  );
+}
+
 
   //read notes
   void readRecipe(String dish, String type, String serial) {
@@ -536,8 +689,26 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   }
 
   //update note
-  void updateRecipe(Recipe name) async {
+  void updateRecipe(Recipe name, String rec) async {
     //pre-fill the current note text into our controller
+    final response = await Supabase.instance.client
+        .from('recipes')
+        .select('id') // Specify the field to fetch
+        .eq('name', rec); // Filter by serial
+
+// Convert the response to a list of maps
+    final data = List<Map<String, dynamic>>.from(response);
+
+// Clear the previous data if necessary
+
+// Store the id in a string
+    int recipeId = data.isNotEmpty
+        ? data[0]['id']
+        : ''; // Store the first id or an empty string if no data
+
+// Optionally, you can print the id to verify
+    print(recipeId);
+
     textController.text = name.name!;
     await showDialog(
         context: context,
@@ -554,7 +725,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         //update note in db
                         await context.read<database>().updateRecipe(
                             widget.serial!,
-                            name.id,
+                            recipeId,
                             textController.text,
                             widget.type!,
                             widget.dish!);
@@ -575,7 +746,19 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   }
 
   //delete a note
-  void deleteRecipe(int id) async {
+  void deleteRecipe(String rec) async {
+    final response = await Supabase.instance.client
+        .from('recipes')
+        .select('id') // Specify the field to fetch
+        .eq('name', rec); // Filter by serial
+
+// Convert the response to a list of maps
+    final data = List<Map<String, dynamic>>.from(response);
+
+// Clear the previous data if necessary
+
+// Store the id in a string
+    int id = data.isNotEmpty ? data[0]['id'] : '';
     await context
         .read<database>()
         .deleteRecipe(widget.serial!, id, widget.type!, widget.dish!);
@@ -668,7 +851,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Update Link'),
+        title: const Text('Add New Link'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
@@ -711,7 +894,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               }
             },
             child: Text(
-              'Update',
+              'Add',
               style: TextStyle(
                   color: Theme.of(context).colorScheme.inversePrimary),
             ),
@@ -756,7 +939,19 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   } */
 
   //delete a note
-  Future<void> deleteLink(int id) async {
+  Future<void> deleteLink(String rec) async {
+    final response = await Supabase.instance.client
+        .from('links')
+        .select('id') // Specify the field to fetch
+        .eq('linkname', rec); // Filter by serial
+
+// Convert the response to a list of maps
+    final data = List<Map<String, dynamic>>.from(response);
+
+// Clear the previous data if necessary
+
+// Store the id in a string
+    int id = data.isNotEmpty ? data[0]['id'] : '';
     await context.read<database>().deleteLink(id, widget.serial!);
     readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
@@ -828,7 +1023,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   } */
 
   final List<String> items = [
-    '0.5',
+    '1/4',
+    '1/2',
     '1',
     '2',
     '3',
@@ -864,9 +1060,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               backgroundColor: Colors.transparent,
               foregroundColor: Theme.of(context).colorScheme.inversePrimary,
               leading: Padding(
-                padding: const EdgeInsets.only(top: 25.0, left: 10),
+                padding: const EdgeInsets.only(top: 15.0, left: 10),
                 child: IconButton(
-                  icon: const Icon(FontAwesomeIcons.anglesLeft, size: 40),
+                  icon: const Icon(FontAwesomeIcons.arrowLeft, size: 40),
                   onPressed: () {
                     Navigator.pop(context); // Navigate back when pressed
                   },
@@ -881,9 +1077,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   children: [
                     Text(
                       widget.dish!,
-                      style: GoogleFonts.dmSerifDisplay(
-                        fontSize: 50,
+                      style: GoogleFonts.poppins(
+                        fontSize: 40,
                         color: Theme.of(context).colorScheme.inversePrimary,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     Row(
@@ -948,12 +1145,12 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   Tab(text: 'Ingredients'),
                   Tab(text: 'Instructions'),
                 ],
-                labelStyle: GoogleFonts.dmSerifDisplay(
+                labelStyle: GoogleFonts.montserrat(
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.inversePrimary,
                 ),
-                unselectedLabelStyle: GoogleFonts.dmSerifDisplay(
+                unselectedLabelStyle: GoogleFonts.montserrat(
                   fontSize: 25.0,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey,
@@ -974,118 +1171,148 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 children: [
                   Padding(
                     padding:
-                        const EdgeInsets.only(top: 10, right: 40.0, bottom: 10),
-                    child: DropdownButtonHideUnderline(
-                      child: DropdownButton2<String>(
-                        isExpanded: true,
-                        hint: const Row(
-                          children: [
-                            Icon(
-                              Icons.list,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                            SizedBox(
-                              width: 4,
-                            ),
-                            Expanded(
-                              child: Text(
-                                '1',
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                ),
-                                overflow: TextOverflow.ellipsis,
-                              ),
-                            ),
-                          ],
+                        const EdgeInsets.only(top: 10, right: 30.0, bottom: 10),
+                    child: 
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        if(currentRecipe.isNotEmpty)
+                        const Text(
+                          "Calculator : ",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black38,
+                          ),
                         ),
-                        items: items
-                            .map((String item) => DropdownMenuItem<String>(
-                                  value: item,
+                        if(currentRecipe.isNotEmpty)
+                        DropdownButtonHideUnderline(
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            hint: const Row(
+                              children: [
+                                Icon(
+                                  Icons.list,
+                                  size: 16,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                Expanded(
                                   child: Text(
-                                    item,
-                                    style: const TextStyle(
+                                    '1',
+                                    style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.black,
                                     ),
                                     overflow: TextOverflow.ellipsis,
                                   ),
-                                ))
-                            .toList(),
-                        value: selectedValue,
-                        onChanged: (String? value) {
-                          setState(() {
-                            selectedValue = value;
-                          });
-                        },
-                        buttonStyleData: ButtonStyleData(
-                          height: 50,
-                          width: 70,
-                          padding: const EdgeInsets.only(left: 14, right: 14),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            /* border: Border.all(
-                              color: Colors.black26,
-                            ), */
-                            color: Colors.white,
+                                ),
+                              ],
+                            ),
+                            items: items
+                                .map((String item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ))
+                                .toList(),
+                            value: selectedValue,
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedValue = value;
+                              });
+                            },
+                            buttonStyleData: ButtonStyleData(
+                              height: 30,
+                              width: 60,
+                              padding:
+                                  const EdgeInsets.only(left: 14, right: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                /* border: Border.all(
+                                  color: Colors.black26,
+                                ), */
+                                color: Colors.white,
+                              ),
+                              elevation: 0,
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.keyboard_arrow_down,
+                              ),
+                              iconSize: 14,
+                              iconEnabledColor: Colors.black,
+                              iconDisabledColor: Colors.grey,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: Colors.white,
+                              ),
+                              offset: const Offset(0, 0),
+                              scrollbarTheme: ScrollbarThemeData(
+                                radius: const Radius.circular(40),
+                                thickness: MaterialStateProperty.all<double>(6),
+                                thumbVisibility:
+                                    MaterialStateProperty.all<bool>(true),
+                              ),
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              height: 40,
+                              padding: EdgeInsets.only(left: 14, right: 14),
+                            ),
                           ),
-                          elevation: 0,
                         ),
-                        iconStyleData: const IconStyleData(
-                          icon: Icon(
-                            Icons.keyboard_arrow_down,
-                          ),
-                          iconSize: 14,
-                          iconEnabledColor: Colors.black,
-                          iconDisabledColor: Colors.grey,
-                        ),
-                        dropdownStyleData: DropdownStyleData(
-                          maxHeight: 200,
-                          width: 70,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(14),
-                            color: Colors.white,
-                          ),
-                          offset: const Offset(0, 0),
-                          scrollbarTheme: ScrollbarThemeData(
-                            radius: const Radius.circular(40),
-                            thickness: MaterialStateProperty.all<double>(6),
-                            thumbVisibility:
-                                MaterialStateProperty.all<bool>(true),
-                          ),
-                        ),
-                        menuItemStyleData: const MenuItemStyleData(
-                          height: 40,
-                          padding: EdgeInsets.only(left: 14, right: 14),
-                        ),
-                      ),
+                      ],
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
-                    child: ListView.builder(
-                      physics:
-                          const NeverScrollableScrollPhysics(), // Disable individual scrolling
-                      shrinkWrap:
-                          true, // Ensures the ListView takes minimal height
-                      itemCount: currentNotes.length,
-                      itemBuilder: (context, index) {
-                        final note = currentNotes[index];
-                        return ingredientList(
-                          count: double.parse(selectedValue!),
-                          dish: widget.dish,
-                          type: widget.type!,
-                          text: note.name!,
-                          quantity: int.parse(note.quantity!),
-                          uom: note.uom,
-                          onEditPressed: () => updateIng(note),
-                          onDeletePressed: () => deleteIng(note.id),
-                        );
-                      },
-                    ),
+                    child: _isLoading
+                        ? const Center(
+                            child: CircularProgressIndicator(),
+                          ) // Show loading indicator
+                        : currentNotes.isEmpty
+                            ? const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 300.0),
+                                  child: Text('Add ingredients using +'),
+                                ), // Show this if list is empty
+                              )
+                            : ListView.builder(
+                                physics:
+                                    const NeverScrollableScrollPhysics(), // Disable individual scrolling
+                                shrinkWrap:
+                                    true, // Ensures the ListView takes minimal height
+                                itemCount: currentNotes.length,
+                                itemBuilder: (context, index) {
+                                  final note = currentNotes[index];
+                                  return ingredientList(
+                                    count: selectedValue!,
+                                    dish: widget.dish,
+                                    type: widget.type!,
+                                    text: note.name!,
+                                    quantity: double.parse(note.quantity!),
+                                    uom: note.uom,
+                                    onEditPressed: () =>
+                                        updateIng(note, note.name!),
+                                    onDeletePressed: () =>
+                                        deleteIng(note.name!),
+                                  );
+                                },
+                              ),
                   ),
                 ],
               ),
@@ -1093,35 +1320,49 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             // Instructions Tab
 
             SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  /*  IconButton(
-                    onPressed: createRecipe,
-                    icon: Icon(
-                      Icons.add,
-                      color: Theme.of(context).colorScheme.inversePrimary,
+              child: _isLoading
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator()) // Show loading indicator
+                  : currentRecipe.isEmpty
+                            ? const Center(
+                                child: Padding(
+                                  padding: EdgeInsets.only(top: 300.0),
+                                  child: Text('Add recipe using +'),
+                                ), // Show this if list is empty
+                              ): Column(
+                      children: [
+                        const Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: Text(
+                            "How to Cook",
+                            style: TextStyle(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                        ),
+                        ListView.builder(
+                          physics:
+                              const NeverScrollableScrollPhysics(), // Disable individual scrolling
+                          shrinkWrap:
+                              true, // Ensures the ListView takes minimal height
+                          itemCount: currentRecipe.length,
+                          itemBuilder: (context, index) {
+                            final note = currentRecipe[index];
+                            return RecipeList(
+                              dish: widget.dish,
+                              type: widget.type!,
+                              text: note.name!,
+                              onEditPressed: () =>
+                                  updateRecipe(note, note.name!),
+                              onDeletePressed: () => deleteRecipe(note.name!),
+                            );
+                          },
+                        ),
+                      ],
                     ),
-                  ), */
-                  ListView.builder(
-                    physics:
-                        const NeverScrollableScrollPhysics(), // Disable individual scrolling
-                    shrinkWrap:
-                        true, // Ensures the ListView takes minimal height
-                    itemCount: currentRecipe.length,
-                    itemBuilder: (context, index) {
-                      final note = currentRecipe[index];
-                      return recipeList(
-                        dish: widget.dish,
-                        type: widget.type!,
-                        text: note.name!,
-                        onEditPressed: () => updateRecipe(note),
-                        onDeletePressed: () => deleteRecipe(note.id),
-                      );
-                    },
-                  ),
-                ],
-              ),
             ),
           ],
         ),

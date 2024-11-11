@@ -17,10 +17,10 @@ class ingredientList extends StatelessWidget {
     this.onEditPressed,
     this.onDeletePressed,
   });
-  double? count;
+  String? count;
   final String? dish;
   final String? type;
-  final int? quantity;
+  final double? quantity;
   final String? uom;
   final String text;
   final void Function()? onEditPressed;
@@ -28,13 +28,25 @@ class ingredientList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    String convertFractionToDecimal(String count) {
+      if (count == '1/2') {
+        return '0.5';
+      } else if (count == '1/4') {
+        return '0.25';
+      }
+      // Return the original value if it's not a fraction.
+      return count;
+    }
+
+    String quantityCount =
+        (double.parse(convertFractionToDecimal(count!))).toString();
     // Sample data for demonstration
     final List<Map<String, String>> items = [
       {
         'text': text,
         'quantity': quantity!.toString(),
         'uom': uom!,
-        'quantityCal': (quantity! * count!).toString(),
+        'quantityCal': (quantity! * double.parse(quantityCount!)).toString(),
       },
     ];
 
@@ -59,8 +71,10 @@ class ingredientList extends StatelessWidget {
                       // border: TableBorder.all(),
                       columnWidths: const {
                         0: FlexColumnWidth(2),
-                        1: FlexColumnWidth(1),
+                        1: FlexColumnWidth(.4),
                         2: FlexColumnWidth(1),
+                        3: FlexColumnWidth(.4),
+                        4: FlexColumnWidth(1),
                       },
                       children: [
                         TableRow(
@@ -80,52 +94,92 @@ class ingredientList extends StatelessWidget {
                             TableCell(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      item['quantity']!,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(
-                                        item['uom']!,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  (() {
+                                    // Parse and trim quantity value
+                                    String quantityStr =
+                                        item['quantity']!.trim();
+                                    double? quantity =
+                                        double.tryParse(quantityStr);
+
+                                    if (quantity == null) {
+                                      return quantityStr; // Fallback if parsing fails
+                                    } else if (quantity == 0.5) {
+                                      return '1/2';
+                                    } else if (quantity == 0.25) {
+                                      return '1/4';
+                                    } else if (quantity % 1 == 0) {
+                                      return quantity
+                                          .toInt()
+                                          .toString(); // Display integer if no decimal part
+                                    } else {
+                                      return quantity
+                                          .toString(); // Display full decimal if needed
+                                    }
+                                  })(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.right,
                                 ),
                               ),
                             ),
                             TableCell(
                               child: Padding(
                                 padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      item['quantityCal']!,
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.only(left: 8.0),
-                                      child: Text(
-                                        item['uom']!,
-                                        style: const TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                                child: Text(
+                                  item['uom']!,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  (() {
+                                    // Parse and trim quantityCal value
+                                    String quantityCal =
+                                        item['quantityCal']!.trim();
+                                    double? quantity =
+                                        double.tryParse(quantityCal);
+
+                                    if (quantity == null) {
+                                      return quantityCal; // Fallback if parsing fails
+                                    } else if (quantity == 0.5) {
+                                      return '1/2';
+                                    } else if (quantity == 0.25) {
+                                      return '1/4';
+                                    } else if (quantity % 1 == 0) {
+                                      return quantity
+                                          .toInt()
+                                          .toString(); // Display integer if no decimal part
+                                    } else {
+                                      return quantity
+                                          .toString(); // Display full decimal if needed
+                                    }
+                                  })(),
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
+                                  textAlign: TextAlign.right,
+                                ),
+                              ),
+                            ),
+                            TableCell(
+                              child: Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: Text(
+                                  item['uom']!,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
                                 ),
                               ),
                             ),

@@ -1,8 +1,22 @@
 buildscript {
     ext {
+        // Set Kotlin version to a compatible version (such as 1.7.1 or 1.8.0 based on your needs)
+        kotlin_version = '1.9.0'  // Update to a version compatible with your dependencies
         agp_version = '7.2.1'  // Android Gradle Plugin version
     }
+
+    repositories {
+        google()  // Google's Maven repository
+        mavenCentral()  // Maven Central repository
+    }
+
+    dependencies {
+        classpath "com.android.tools.build:gradle:$agp_version"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"  // Add Kotlin Gradle Plugin
+        classpath 'com.google.gms:google-services:4.4.2'  // Add this line for Google services
+    }
 }
+
 allprojects {
     repositories {
         google()  // Google's Maven repository
@@ -14,6 +28,7 @@ rootProject.buildDir = '../build'  // Custom build directory for root project
 subprojects {
     project.buildDir = "${rootProject.buildDir}/${project.name}"  // Custom build directory for subprojects
 }
+
 subprojects {
     afterEvaluate { project ->
         if (project.hasProperty("android")) {  // Applies only to Android projects

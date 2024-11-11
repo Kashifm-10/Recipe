@@ -14,12 +14,14 @@ import 'package:recipe/models/breakfast_tile.dart';
 import 'package:recipe/pages/home.dart';
 import 'package:animated_switch/animated_switch.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:cupertino_icons/cupertino_icons.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
+import 'dart:async'; // For using Timer
 
 class dishesList extends StatefulWidget {
   dishesList({super.key, required this.type, required this.title});
@@ -48,15 +50,20 @@ class _dishesListState extends State<dishesList> {
 
   stt.SpeechToText _speech = stt.SpeechToText();
   bool _isListening = false;
+  bool _isLoading = true; // Manage loading state
 
   @override
   void initState() {
     super.initState();
+
     _createTutorial();
-    // on app startup, fetch the existing notes
-    readNotes(widget.type!);
-    readTitles(widget.type!);
-    loadSerila();
+    Timer(const Duration(seconds: 1), () {
+      setState(() {
+        _isLoading = false;
+      });
+    });
+    readDishes(widget.type!);
+    loadSerial();
     _speech = stt.SpeechToText();
   }
 
@@ -88,18 +95,30 @@ class _dishesListState extends State<dishesList> {
     }
   }
 
-  Future<void> loadSerila() async {
-    prefs = await SharedPreferences.getInstance();
+  final SupabaseClient supabase = Supabase.instance.client;
+
+  // Load serial from Supabase
+  Future<void> loadSerial() async {
+    final response = await supabase
+        .from('serial') // Replace with your table name
+        .select(
+            'serial') // Replace with the column name where the serial is stored
+        .single();
+
     setState(() {
-      serial = prefs.getInt('serial') ?? 0;
+      serial = response['serial'] ?? 0;
     });
+    print(serial);
   }
 
+  // Save serial to Supabase
   Future<void> saveSerial(int num) async {
-    setState(() {
-      serial = num;
-    });
-    await prefs.setInt('serial', num);
+    // Assume `id` is the unique identifier for the row you want to update
+    final response = await supabase
+        .from('serial')
+        .update({'serial': num}) // Update the serial column
+        .eq('id',
+            1); // Specify the unique identifier (replace '1' with the actual row id)
   }
 
   //function to create a note
@@ -205,7 +224,7 @@ class _dishesListState extends State<dishesList> {
                     final time =
                         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-                    context.read<database>().addType(
+                    context.read<database>().addDish(
                           serial.toString(),
                           textController.text,
                           widget.type!,
@@ -234,17 +253,20 @@ class _dishesListState extends State<dishesList> {
   }
 
   //read notes
-  void readNotes(String type) {
-    context.read<database>().fetchNotes(type);
+  void readDishes(String type) async {
+    await context.read<database>().fetchDishes(type);
   }
 
-  Future<void> readTitles(String type) async {
-    final header = await context.read<database>().fetchtitlesFromIsar(type);
-    print("object::::: $header");
-  }
+  void updateDish(Dish name, String type, String dish) async {
+    final response = await Supabase.instance.client
+        .from('dishes')
+        .select('id') // Specify the field to fetch
+        .eq('type', type) // First filter
+        .eq('name',
+            dish); // Second filter (example) // Third filter (example, for minimum rating)
+    final data = List<Map<String, dynamic>>.from(response);
 
-  //update note
-  void updateNote(Dish name, String type) {
+    int dishId = data.isNotEmpty ? data[0]['id'] : '';
     String category = name.category!; // Default value
     String selectedDurationHours = name.duration!; // Default duration
 
@@ -272,7 +294,7 @@ class _dishesListState extends State<dishesList> {
                         actions: [
                           TextButton(
                             onPressed: () {
-                              deleteNote(name.id, widget.type!);
+                              deleteNote(name.id, widget.type!, name.name);
                               Navigator.pop(
                                   context); // Close confirmation dialog
                               Navigator.pop(context); // Close update dialog
@@ -372,8 +394,8 @@ class _dishesListState extends State<dishesList> {
                   final time =
                       '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
                   if (textController.text.isNotEmpty) {
-                    context.read<database>().updateNote(
-                        name.id,
+                    context.read<database>().updateDish(
+                        dishId,
                         textController.text,
                         type,
                         selectedDurationHours,
@@ -410,8 +432,24 @@ class _dishesListState extends State<dishesList> {
   }
 
   //delete a note
-  void deleteNote(int id, String type) {
-    context.read<database>().deleteNote(id, widget.type!);
+  void deleteNote(int id, String type, String dish) async {
+    final response = await Supabase.instance.client
+        .from('dishes')
+        .select('id, serial') // Specify both fields to fetch (id and serial)
+        .eq('type', type) // Filter by type
+        .eq('name', dish); // Filter by dish name
+
+    // Convert the response to a list of maps
+    final data = List<Map<String, dynamic>>.from(response);
+
+    // Clear the previous data if necessary
+
+    // Extract the id and serial from the response
+    int dishId = data.isNotEmpty ? data[0]['id'] : 0;
+    String serial = data.isNotEmpty ? data[0]['serial'] : '';
+
+    // Call the deleteDish method with both id and serial (if necessary)
+    context.read<database>().deleteDish(dishId, widget.type!, serial);
   }
 
   void _filterAndSortNotes() {
@@ -590,6 +628,7 @@ class _dishesListState extends State<dishesList> {
 
     // Update notes based on selected filter, sort, and search
     _filterAndSortNotes();
+    readDishes(widget.type!);
 
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
@@ -601,9 +640,9 @@ class _dishesListState extends State<dishesList> {
           backgroundColor: Colors.transparent,
           foregroundColor: Theme.of(context).colorScheme.inversePrimary,
           leading: Padding(
-            padding: const EdgeInsets.only(top: 25.0, left: 10),
+            padding: const EdgeInsets.only(top: 20.0, left: 10),
             child: IconButton(
-              icon: const Icon(FontAwesomeIcons.anglesLeft, size: 40),
+              icon: const Icon(FontAwesomeIcons.arrowLeft, size: 40),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -613,200 +652,15 @@ class _dishesListState extends State<dishesList> {
             padding: const EdgeInsets.only(top: 20.0),
             child: Text(
               widget.title!,
-              style: GoogleFonts.dmSerifDisplay(
+              style: GoogleFonts.poppins(
                 fontSize: 50,
                 color: Theme.of(context).colorScheme.inversePrimary,
+                fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
       ),
-
-/*       drawer: Drawer(
-        surfaceTintColor: Colors.white,
-        backgroundColor: const Color.fromARGB(255, 230, 228, 228),
-        shadowColor: Colors.white,
-        elevation: 50,
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            SizedBox(
-              height: 100, // Set the height you want
-              child: DrawerHeader(
-                padding: EdgeInsets.only(top: 30, left: 20),
-                decoration: BoxDecoration(
-                  color: Colors.lightBlue.shade50,
-                ),
-                child: Text('Menu',
-                    style: GoogleFonts.dmSerifDisplay(
-                        fontSize: 40,
-                        color: Theme.of(context).colorScheme.inversePrimary)),
-              ),
-            ),
-
-            // Breakfast Card
-            SimpleGestureDetector(
-              onTap: () {
-                setState(() {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => dishesList(type: '1',title: ''),
-                    
-                  ));
-                });
-              },
-              swipeConfig: const SimpleSwipeConfig(
-                verticalThreshold: 40.0,
-                horizontalThreshold: 40.0,
-                swipeDetectionBehavior:
-                    SwipeDetectionBehavior.continuousDistinct,
-              ),
-              child: Card(
-                color: const Color.fromARGB(255, 242, 203, 160),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: const BorderSide(
-                    color: Colors.transparent,
-                    width: 2.0,
-                  ),
-                ),
-                child: const SizedBox(
-                  width: 170,
-                  height: 80,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                        child: Text(
-                          "Breakfast",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 16.0),
-                        child: Icon(
-                          Ionicons.fast_food_outline,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Lunch Card
-            SimpleGestureDetector(
-              onTap: () {
-                setState(() {
-                  Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => dishesList(type: '2', title: widget.title,),
-                  ));
-                });
-              },
-              swipeConfig: const SimpleSwipeConfig(
-                verticalThreshold: 40.0,
-                horizontalThreshold: 40.0,
-                swipeDetectionBehavior:
-                    SwipeDetectionBehavior.continuousDistinct,
-              ),
-              child: Card(
-                color: Color.fromARGB(255, 217, 212, 182),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: BorderSide(
-                    color: Colors.transparent,
-                    width: 2.0,
-                  ),
-                ),
-                child: const SizedBox(
-                  width: 170,
-                  height: 80,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                        child: Text(
-                          "Lunch",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 16.0),
-                        child: Icon(
-                          Ionicons.bag_outline,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-            // Dinner Card
-            SimpleGestureDetector(
-              onTap: () {
-                setState(() {
-                   Navigator.pop(context);
-                  Navigator.pop(context);
-                  Navigator.of(context).push(MaterialPageRoute(
-                    builder: (context) => dishesList(type: '3',title: widget.title),
-                    
-                  ));
-                 
-                });
-              },
-              swipeConfig: const SimpleSwipeConfig(
-                verticalThreshold: 40.0,
-                horizontalThreshold: 40.0,
-                swipeDetectionBehavior:
-                    SwipeDetectionBehavior.continuousDistinct,
-              ),
-              child: Card(
-                color: Color.fromARGB(255, 240, 184, 213),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(15),
-                  side: const BorderSide(
-                    color: Colors.transparent,
-                    width: 2.0,
-                  ),
-                ),
-                child: const SizedBox(
-                  width: 170,
-                  height: 80,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Padding(
-                        padding: EdgeInsets.only(left: 16.0),
-                        child: Text(
-                          "Dinner",
-                          style: TextStyle(fontSize: 18, color: Colors.white),
-                        ),
-                      ),
-                      Padding(
-                        padding: EdgeInsets.only(right: 16.0),
-                        child: FaIcon(
-                          FontAwesomeIcons.bowlFood,
-                          color: Colors.white,
-                          size: 50,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ), */
-
       floatingActionButton: FloatingActionButton(
         key: _floatingButtonKey,
         onPressed: createDish,
@@ -825,7 +679,7 @@ class _dishesListState extends State<dishesList> {
             // Add a search bar at the top of the screen
 
             Padding(
-              padding: const EdgeInsets.only(left: 0.0, right: 0  ),
+              padding: const EdgeInsets.only(left: 0.0, right: 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -1078,7 +932,8 @@ class _dishesListState extends State<dishesList> {
                                   BoxShadow(
                                     color: Colors.black26,
                                     spreadRadius: 0,
-                                    blurRadius: 2, // Set the desired blur radius
+                                    blurRadius:
+                                        2, // Set the desired blur radius
                                   ),
                                 ],
                               ),
@@ -1126,8 +981,9 @@ class _dishesListState extends State<dishesList> {
                                           ? Icons.mic
                                           : Icons
                                               .mic_none, // Change icon based on listening state
-                                      color:
-                                          _isListening ? Colors.red : Colors.grey,
+                                      color: _isListening
+                                          ? Colors.red
+                                          : Colors.grey,
                                     ),
                                   ),
                                 ],
@@ -1153,8 +1009,8 @@ class _dishesListState extends State<dishesList> {
                                   current: _currentIndex,
                                   values: const [2, 1, 0],
                                   iconOpacity: 0.50,
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.045,
+                                  height: MediaQuery.of(context).size.height *
+                                      0.045,
                                   indicatorSize: const Size.fromWidth(40),
                                   spacing: 0,
                                   iconBuilder: iconBuilder,
@@ -1192,8 +1048,8 @@ class _dishesListState extends State<dishesList> {
                                 child: Container(
                                   width: MediaQuery.of(context).size.width *
                                       0.3, // 90% of screen width
-                                  height:
-                                      MediaQuery.of(context).size.height * 0.046,
+                                  height: MediaQuery.of(context).size.height *
+                                      0.046,
                                   decoration: BoxDecoration(
                                     borderRadius: BorderRadius.circular(15.0),
                                     color: Colors.white,
@@ -1211,7 +1067,8 @@ class _dishesListState extends State<dishesList> {
                                       child: DropdownButton<String>(
                                         key: _sortButtonKey,
                                         menuWidth: 125,
-                                        borderRadius: BorderRadius.circular(20.0),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
                                         value: dropdownValue,
                                         items: <String>[
                                           'A-Z',
@@ -1257,12 +1114,13 @@ class _dishesListState extends State<dishesList> {
                                               trailingIcon =
                                                   const Icon(Icons.label);
                                           }
-                      
+
                                           return DropdownMenuItem<String>(
                                             value: value,
                                             child: Row(
                                               mainAxisAlignment:
-                                                  MainAxisAlignment.spaceBetween,
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
                                               children: [
                                                 Text(value),
                                                 trailingIcon,
@@ -1293,38 +1151,44 @@ class _dishesListState extends State<dishesList> {
             const SizedBox(height: 10),
             // The ListView to display the filtered notes
             Expanded(
-              child: ListView.builder(
-                itemCount: _sortededNotes.length,
-                itemBuilder: (context, index) {
-                  final note = _sortededNotes[index];
+              child: _isLoading
+                  ? const Center(
+                      child:
+                          CircularProgressIndicator()) // Show loading indicator
+                  : ListView.builder(
+                      itemCount: _sortededNotes.length,
+                      itemBuilder: (context, index) {
+                        final note = _sortededNotes[index];
 
-                  return GestureDetector(
-                    onLongPress: () {
-                      // Call your update function when a long press is detected
-                      updateNote(note, widget.type!);
-                    },
-                    onTap: () {
-                      setState(() {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => recipe(
-                                  serial: note.serial,
-                                  type: widget.type,
-                                  dish: note.name,
-                                )));
-                      });
-                    },
-                    child: DishTile(
-                      duration: note.duration,
-                      category: note.category,
-                      dish: note.name,
-                      type: widget.type,
-                      text: note.name,
-                      onEditPressed: () => updateNote(note, widget.type!),
-                      onDeletePressed: () => deleteNote(note.id, widget.type!),
+                        return GestureDetector(
+                          onLongPress: () {
+                            // Call your update function when a long press is detected
+                            updateDish(note, widget.type!, note.name);
+                          },
+                          onTap: () {
+                            setState(() {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => recipe(
+                                        serial: note.serial,
+                                        type: widget.type,
+                                        dish: note.name,
+                                      )));
+                            });
+                          },
+                          child: DishTile(
+                            duration: note.duration,
+                            category: note.category,
+                            dish: note.name,
+                            type: widget.type,
+                            text: note.name,
+                            onEditPressed: () =>
+                                updateDish(note, widget.type!, note.name!),
+                            onDeletePressed: () =>
+                                deleteNote(note.id, widget.type!, note.name),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
