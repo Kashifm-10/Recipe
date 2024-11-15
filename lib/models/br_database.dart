@@ -41,6 +41,9 @@ class database extends ChangeNotifier {
   } */
 
   final List<Ingredients> currentIng = [];
+  final List<Ingredients> currentAllIng = [];
+  final List<Ingredients> currentRawAllIng = [];
+
   final List<Recipe> currentRecipe = [];
   final List<Links> currentLink = [];
   final List<Title> currentTitle = [];
@@ -273,11 +276,34 @@ class database extends ChangeNotifier {
   Future<void> fetchDishes(String type) async {
     final prefs = await SharedPreferences.getInstance();
     String? mail = prefs.getString('email');
-    final response = await Supabase.instance.client
-        .from('dishes')
-        .select()
-        .eq('type', type);
-       //S .eq('mail', mail!);
+    final response =
+        await Supabase.instance.client.from('dishes').select().eq('type', type);
+    //S .eq('mail', mail!);
+    final data = List<Map<String, dynamic>>.from(response);
+
+    dishes.clear();
+    dishes.addAll(data.map((item) => Dish(
+          name: item['name'],
+          serial: item['serial'],
+          type: item['type'],
+          duration: item['duration'],
+          category: item['category'],
+          date: item['date'],
+          time: item['time'],
+        )));
+
+    print(response);
+
+    currentNames.clear();
+    currentNames.addAll(dishes);
+    notifyListeners();
+  }
+
+  Future<void> fetchAllDishes() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? mail = prefs.getString('email');
+    final response = await Supabase.instance.client.from('dishes').select();
+    //S .eq('mail', mail!);
     final data = List<Map<String, dynamic>>.from(response);
 
     dishes.clear();
@@ -334,8 +360,7 @@ class database extends ChangeNotifier {
         .from('recipes')
         .delete()
         .eq('serial', serial);
-/*     await fetchRecipe(serial);
- */
+    await fetchRecipe(serial);
   }
 
   Future<void> deleteIngredientsBySerial(String serial) async {
@@ -378,7 +403,10 @@ class database extends ChangeNotifier {
     final response = await Supabase.instance.client
         .from('recipes')
         .select()
-        .eq('serial', serial);
+        .eq('serial', serial)
+        .order(
+            'id'); // Add this line to order by 'id' on the server side, if supported
+
     final data = List<Map<String, dynamic>>.from(response);
     recipes.clear();
     recipes.addAll(data.map((item) => Recipe(
@@ -386,6 +414,10 @@ class database extends ChangeNotifier {
           serial: item['serial'],
           type: item['type'],
         )));
+
+    // Sort by 'id' if the server-side ordering is not available or reliable
+    recipes.sort((a, b) => a.id.compareTo(b.id));
+
     print(response);
 
     currentRecipe.clear();
@@ -419,7 +451,7 @@ class database extends ChangeNotifier {
   }
 
   Future<void> addIngredient(String? serial, String textFromUser, String type,
-      String dish, String quantity, String uom) async {
+      String dish, String quantity, String uom, String category) async {
     final newIng = {
       'name': textFromUser,
       'serial': serial,
@@ -427,6 +459,7 @@ class database extends ChangeNotifier {
       'dish': dish,
       'quantity': quantity,
       'uom': uom,
+      'category': category
     };
 
     final response =
@@ -436,24 +469,79 @@ class database extends ChangeNotifier {
   }
 
   Future<void> fetchIngredients(String dish, String? serial) async {
-    // Fetch ingredients from Supabase using the serial as a filter
+    // Fetch ingredients from Supabase using the serial as a filter and sort by 'id'
     final response = await Supabase.instance.client
         .from('ingredients')
         .select()
-        .eq('serial', serial!);
+        .eq('serial', serial!)
+        .order(
+            'id'); // Add this line to order by 'id' on the server side, if supported
+
     final data = List<Map<String, dynamic>>.from(response);
 
     currentIng.clear();
     currentIng.addAll(data.map((item) => Ingredients(
-          name: item['name'],
-          serial: item['serial'],
-          quantity: item['quantity'],
-          uom: item['uom'],
-        )));
+        name: item['name'],
+        serial: item['serial'],
+        quantity: item['quantity'],
+        uom: item['uom'],
+        category: item['category'])));
+
+    // Sort by 'id' if server-side ordering is not available or reliable
+    currentIng.sort((a, b) => a.id.compareTo(b.id));
 
     print(data);
 
     notifyListeners();
+  }
+
+  Future<void> fetchAllIngredients() async {
+    final response =
+        await Supabase.instance.client.from('ingredients').select().order('id');
+    final data = List<Map<String, dynamic>>.from(response);
+
+    currentAllIng.clear();
+    currentRawAllIng.addAll(data.map((item) => Ingredients(
+        name: item['name'],
+        serial: item['serial'],
+        quantity: item['quantity'],
+        uom: item['uom'],
+        category: item['category'])));
+    for (var item in data) {
+      final newIngredient = Ingredients(
+          name: item['name'],
+          serial: item['serial'],
+          quantity: item['quantity'],
+          uom: item['uom'],
+          category: item['category']);
+
+      // Normalize name for comparison: trim whitespace and convert to lowercase
+      final normalizedNewName = newIngredient.name!.trim().toLowerCase();
+      // Check if a normalized name match already exists
+      if (!currentAllIng.any((ingredient) =>
+          ingredient.name!.trim().toLowerCase() == normalizedNewName)) {
+        currentAllIng.add(newIngredient);
+      }
+    }
+
+    currentAllIng.sort((a, b) => a.id.compareTo(b.id));
+    notifyListeners();
+  }
+
+  Future<List<String>> fetchSerialsByIngredientName(
+      String ingredientName) async {
+    // Normalize the ingredient name
+    final normalizedIngredientName = ingredientName.trim().toLowerCase();
+
+    // Fetch all ingredients matching the normalized name
+    final matchingIngredients = currentRawAllIng
+        .where(
+          (ing) => ing.name!.trim().toLowerCase() == normalizedIngredientName,
+        )
+        .toList();
+
+    // Extract serials from the matching ingredients
+    return matchingIngredients.map((ing) => ing.serial!).toList();
   }
 
   Future<void> updateIngredient(
@@ -491,7 +579,10 @@ class database extends ChangeNotifier {
     final response = await Supabase.instance.client
         .from('links')
         .select()
-        .eq('serial', serial);
+        .eq('serial', serial)
+        .order(
+            'id'); // Add this line to order by 'id' on the server side, if supported
+
     final data = List<Map<String, dynamic>>.from(response);
 
     currentLink.clear();
@@ -502,6 +593,9 @@ class database extends ChangeNotifier {
           type: item['type'],
           dish: item['dish'],
         )));
+
+    // Sort by 'id' if server-side ordering is not available or reliable
+    currentLink.sort((a, b) => a.id.compareTo(b.id));
 
     notifyListeners();
 

@@ -12,11 +12,11 @@ class DishTile extends StatelessWidget {
     required this.duration,
     required this.category,
     required this.text,
-    required this.type,
+    //  required this.type,
     this.onEditPressed,
     this.onDeletePressed,
   });
-  String? type;
+//  String? type;
   String? dish;
   String? duration;
   String? category;
@@ -70,16 +70,36 @@ class DishTile extends StatelessWidget {
                   ),
                   Row(
                     children: [
-                      Padding(
+                      /*  Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
                         child: Icon(Icons.timer, color: Colors.grey.shade400),
                       ),
-                      SizedBox(width: 5),
+                      SizedBox(width: 5), */
                       Text(
-                        '$duration hours',
+                        duration != null
+                            ? (() {
+                                double durations =
+                                    double.tryParse(duration!) ?? 0.0;
+                                int hours = durations.toInt();
+                                int minutes =
+                                    ((durations - hours) * 60).toInt();
+
+                                if (hours > 0 && minutes > 0) {
+                                  return '$hours hour ${minutes} minutes';
+                                } else if (hours > 0) {
+                                  return '$hours hour';
+                                } else if (minutes > 0) {
+                                  return '$minutes minutes';
+                                } else {
+                                  return '0 minutes';
+                                }
+                              }())
+                            : 'Invalid duration',
                         style: TextStyle(
-                            color: Colors.grey.shade400, fontSize: 16),
-                      ),
+                          color: Colors.grey.shade900,
+                          fontSize: 16,
+                        ),
+                      )
                     ],
                   ),
                 ],

@@ -21,51 +21,30 @@ class _LoginScreenState extends State<LoginScreen> {
     // Query the 'users' table to find the matching email and password
     final response = await Supabase.instance.client
         .from('users')
-        .select('email, password, name') // Select email and password fields
-        .eq('email', _emailController.text.toLowerCase()) // Match the email
+        .select('email, password, name')
+        .eq('email', _emailController.text.toLowerCase())
         .eq('password', _passwordController.text);
 
-    // Convert the response to a list of maps
     final data = List<Map<String, dynamic>>.from(response);
 
-    // Check if any data is returned
     if (data.isNotEmpty) {
-      // If there's a match, print success
       print('Success: User authenticated');
-      // Extract the email from the response
       String email = data.first['email'];
       String username = data.first['name'];
 
-      // Optionally, print or use the email
-      print('Authenticated user email: $email');
-      print('Authenticated user name: $username');
-
-      // Save the email to SharedPreferences
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('email', email); // Save the email
-      await prefs.setString('name', username); // Save the email
+      await prefs.setString('email', email);
+      await prefs.setString('name', username);
       await prefs.setBool("isLoggedIn", true);
 
-      // Navigate to the next screen
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => MyHomePage()),
       );
     } else {
-      // If no match is found, print error
       print('Error: Invalid email or password');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid email or password')),
-      );
-    }
-
-    // Handle errors during query or authentication
-    try {
-      // Additional error handling can be done here, such as checking network errors
-    } catch (e) {
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
       );
     }
   }
@@ -89,62 +68,56 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Curved background image section
             ClipPath(
-              clipper: CurvedClipper(), // Custom clipper for curved effect
+              clipper: CurvedClipper(),
               child: Container(
-                height: 500,
+                height: screenHeight * 0.4, // Responsive height
                 width: double.infinity,
                 decoration: const BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage(
-                        'assets/images/login_bg.jpg'), // Replace with your image path
+                    image: AssetImage('assets/images/login_bg.jpg'),
                     fit: BoxFit.cover,
                   ),
                 ),
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Hello again!',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple, // Purple color for title
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Hello again!',
+                    style: TextStyle(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.deepPurple,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                  child: _buildTextField(
+                  SizedBox(height: screenHeight * 0.05),
+                  _buildTextField(
                     controller: _emailController,
                     label: 'Email',
                     hintText: 'Enter your email',
                     keyboardType: TextInputType.emailAddress,
                   ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                  child: _buildTextField(
+                  SizedBox(height: screenHeight * 0.02),
+                  _buildTextField(
                     controller: _passwordController,
                     label: 'Password',
                     hintText: 'Enter your password',
                     obscureText: true,
                   ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 90.0),
-                  child: Align(
+                  SizedBox(height: screenHeight * 0.02),
+                  Align(
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
@@ -156,30 +129,23 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 200.0),
-                  child: ElevatedButton(
+                  SizedBox(height: screenHeight * 0.02),
+                  ElevatedButton(
                     onPressed: _signInWithEmailPassword,
                     style: ElevatedButton.styleFrom(
                       foregroundColor: Colors.white,
-                      backgroundColor: Colors.deepPurple, // Purple button color
-                      minimumSize: const Size(double.infinity, 50),
+                      backgroundColor: Colors.deepPurple,
+                      minimumSize: Size(double.infinity, screenHeight * 0.04),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      elevation: 5,
                     ),
                     child: const Text('Login'),
                   ),
-                ),
-                const SizedBox(height: 20),
-                const Text('- OR -', style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 200.0),
-                  child: ElevatedButton.icon(
+                  SizedBox(height: screenHeight * 0.03),
+                  const Text('- OR -', style: TextStyle(color: Colors.grey)),
+                  SizedBox(height: screenHeight * 0.03),
+                  ElevatedButton.icon(
                     onPressed: _signInWithGoogle,
                     icon: _isGoogleSignInInProgress
                         ? LoadingAnimationWidget.inkDrop(
@@ -192,30 +158,30 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(color: Colors.white),
                     ),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent, // Google button color
-                      minimumSize: const Size(double.infinity, 50),
+                      backgroundColor: Colors.redAccent,
+                      minimumSize: Size(double.infinity, screenHeight * 0.04),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(8),
                       ),
-                      elevation: 5,
                     ),
                   ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
-                    ); // Navigate to sign-up page
-                  },
-                  child: const Text(
-                    "Don't have an account? Sign up",
-                    style: TextStyle(color: Colors.purple),
+                  SizedBox(height: screenHeight * 0.03),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => RegisterScreen()),
+                      );
+                    },
+                    child: const Text(
+                      "Don't have an account? Sign up",
+                      style: TextStyle(color: Colors.purple),
+                    ),
                   ),
-                ),
-                const SizedBox(height: 30), // Additional spacing at the bottom
-              ],
+                  SizedBox(height: screenHeight * 0.05),
+                ],
+              ),
             ),
           ],
         ),
@@ -258,12 +224,12 @@ class CurvedClipper extends CustomClipper<Path> {
   @override
   Path getClip(Size size) {
     var path = Path();
-    path.lineTo(0, size.height - 150); // Start point for the curve
+    path.lineTo(0, size.height - 120);
     path.quadraticBezierTo(
-      size.width / 2, size.height, // Control point
-      size.width, size.height - 150, // End point for the curve
+      size.width / 2, size.height,
+      size.width, size.height - 130,
     );
-    path.lineTo(size.width, 0); // Top-right corner
+    path.lineTo(size.width, 0);
     path.close();
     return path;
   }

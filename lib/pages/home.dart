@@ -6,6 +6,7 @@ import 'package:frino_icons/frino_icons.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/models/br_database.dart';
+import 'package:recipe/pages/all/allDishes.dart';
 import 'package:recipe/pages/dishesList.dart';
 import 'package:recipe/pages/profile.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -13,6 +14,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart'
     as hsv_picker;
+import 'package:heroicons_flutter/heroicons_flutter.dart';
 
 class CategoryService {
   // Fetch categories from the 'categories' table in Supabase
@@ -155,7 +157,7 @@ class CategoryService {
     }
   }
 
-   Future<List<Color>> fetchColors() async {
+  Future<List<Color>> fetchColors() async {
     final response = await Supabase.instance.client
         .from(
             'titles') // Replace 'titles' with the correct table name in your database
@@ -173,7 +175,7 @@ class CategoryService {
     }).toList();
 
     return colors;
-  } 
+  }
 
   Color _colorFromHex(String hex) {
     final hexCode = hex.replaceAll('#', '');
@@ -187,51 +189,51 @@ class CategoryService {
       case '1':
         return colors.isNotEmpty
             ? colors[0]
-            : Color.fromARGB(255, 242, 203, 160);
+            : const Color.fromARGB(255, 242, 203, 160);
       case '2':
         return colors.isNotEmpty
             ? colors[1]
-            : Color.fromARGB(255, 217, 212, 182);
+            : const Color.fromARGB(255, 217, 212, 182);
       case '3':
         return colors.isNotEmpty
             ? colors[2]
-            : Color.fromARGB(255, 240, 184, 213);
+            : const Color.fromARGB(255, 240, 184, 213);
       case '4':
         return colors.isNotEmpty
             ? colors[3]
-            : Color.fromARGB(255, 242, 203, 160);
+            : const Color.fromARGB(255, 242, 203, 160);
       case '5':
         return colors.isNotEmpty
             ? colors[4]
-            : Color.fromARGB(255, 217, 212, 182);
+            : const Color.fromARGB(255, 217, 212, 182);
       case '6':
         return colors.isNotEmpty
             ? colors[5]
-            : Color.fromARGB(255, 240, 184, 213);
+            : const Color.fromARGB(255, 240, 184, 213);
       case '7':
         return colors.isNotEmpty
             ? colors[6]
-            : Color.fromARGB(255, 242, 203, 160);
+            : const Color.fromARGB(255, 242, 203, 160);
       case '8':
         return colors.isNotEmpty
             ? colors[7]
-            : Color.fromARGB(255, 217, 212, 182);
+            : const Color.fromARGB(255, 217, 212, 182);
       case '9':
         return colors.isNotEmpty
             ? colors[8]
-            : Color.fromARGB(255, 240, 184, 213);
+            : const Color.fromARGB(255, 240, 184, 213);
       case '10':
         return colors.isNotEmpty
             ? colors[9]
-            : Color.fromARGB(255, 242, 203, 160);
+            : const Color.fromARGB(255, 242, 203, 160);
       case '11':
         return colors.isNotEmpty
             ? colors[10]
-            : Color.fromARGB(255, 217, 212, 182);
+            : const Color.fromARGB(255, 217, 212, 182);
       case '12':
         return colors.isNotEmpty
             ? colors[11]
-            : Color.fromARGB(255, 240, 184, 213);
+            : const Color.fromARGB(255, 240, 184, 213);
       default:
         return Colors.grey;
     }
@@ -266,6 +268,15 @@ class _MyHomePageState extends State<MyHomePage> {
     // Get screen dimensions
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
+    bool _isEditing = false;
+    late TextEditingController _labelController;
+    String _currentLabel = "All"; // Default label
+    const Color _cardColor =
+        Color.fromARGB(255, 240, 189, 197); // Default color
+    const IconData _cardIcon = HeroiconsOutline.squaresPlus; // Default icon
+    const double cardWidth = 600;
+    const double cardHeight = 170;
+    const double iconSize = 80;
 
     return Scaffold(
       body: Stack(
@@ -279,19 +290,16 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Positioned(
-            top: 20, // Adjust the position from the top
+            top: 30, // Adjust the position from the top
             right: 20, // Adjust the position from the right
             child: IconButton(
-              icon: Icon(Icons.account_circle, size: 30), // Profile icon
+              icon: const Icon(HeroiconsSolid.user, size: 30, color: Color.fromARGB(255, 238, 160, 160),), // Profile icon
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
-                // Define the action to take when the button is pressed
-                print('Profile button pressed');
-                // You can navigate to a profile screen or show a dialog
-              },
+                },
             ),
           ),
           FutureBuilder<List<Map<String, dynamic>>>(
@@ -313,6 +321,69 @@ class _MyHomePageState extends State<MyHomePage> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           ..._buildCategoryRows(snapshot.data ?? []),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => alldishesList(
+                                    title: _currentLabel,
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(13.0),
+                              child: Card(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15),
+                                  side: const BorderSide(
+                                    color: _cardColor,
+                                    width: 2.0,
+                                  ),
+                                ),
+                                child: SizedBox(
+                                  width: cardWidth,
+                                  height: cardHeight,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      const Icon(_cardIcon,
+                                          size: iconSize), // Default icon
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 15.0),
+                                        child: Container(
+                                          height: cardHeight * 0.3,
+                                          width: cardWidth,
+                                          child: ClipRRect(
+                                            borderRadius: const BorderRadius.only(
+                                              bottomLeft: Radius.circular(15.0),
+                                              bottomRight: Radius.circular(15.0),
+                                            ),
+                                            child: Container(
+                                              color: _cardColor,
+                                              padding: const EdgeInsets.all(6.0),
+                                              child: Text(
+                                                _currentLabel,
+                                                style: TextStyle(
+                                                  fontSize: MediaQuery.of(context)
+                                                          .size
+                                                          .height *
+                                                      0.017,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                                textAlign: TextAlign.center,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -423,11 +494,14 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text('Select an Icon',style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: Colors.black87,
-      ),),
+          title: const Text(
+            'Select an Icon',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -526,17 +600,20 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                       .toList(),
                 ),
               ),
-              SizedBox(height: 8.0), // Space between icons and close button
+              const SizedBox(height: 8.0), // Space between icons and close button
               Align(
                 alignment: Alignment.bottomRight,
                 child: TextButton(
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text('Close', style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFFFE9A8B), // Peach color
-              ),),
+                  child: const Text(
+                    'Close',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Color(0xFFFE9A8B), // Peach color
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -649,11 +726,14 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
       builder: (context) {
         Color tempColor = Color(widget.color.value);
         return AlertDialog(
-          title: const Text('Select a Color',style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: Colors.black87,
-      ),),
+          title: const Text(
+            'Select a Color',
+            style: TextStyle(
+              fontSize: 22,
+              fontWeight: FontWeight.w600,
+              color: Colors.black87,
+            ),
+          ),
           content: SizedBox(
             width: 500, // Specify a width
             height: 500,
@@ -675,19 +755,25 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 Navigator.of(context)
                     .pop(tempColor); // Return the selected color
               },
-              child: const Text('Select', style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFFFE9A8B), // Peach color
-              ),),
+              child: const Text(
+                'Select',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFFFE9A8B), // Peach color
+                ),
+              ),
             ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss without selecting
               },
-              child: const Text('Cancel', style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFFFE9A8B), // Peach color
-              ),),
+              child: const Text(
+                'Cancel',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Color(0xFFFE9A8B), // Peach color
+                ),
+              ),
             ),
           ],
         );
@@ -707,14 +793,13 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
   Future<void> _updateColorInSupabase(Color color) async {
     final prefs = await SharedPreferences.getInstance();
     String? mail = prefs.getString('email');
-    String iconName =
-        _getIconNameFromIconData(_currentIcon);
+    String iconName = _getIconNameFromIconData(_currentIcon);
     // Check if an entry with the specified type and mail exists
     final existingRecord = await Supabase.instance.client
         .from('titles')
         .select()
         .eq('type', widget.type)
-        .eq('mail', mail!)
+        //.eq('mail', mail!)
         .maybeSingle();
 
     if (existingRecord != null) {
@@ -725,12 +810,12 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
             'color':
                 '#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase().substring(2)}'
           })
-          .eq('type', widget.type)
-          .eq('mail', mail);
+          .eq('type', widget.type);
+          //.eq('mail', mail);
     } else {
       // If it doesn't exist, insert a new record
       final response = await Supabase.instance.client.from('titles').insert({
-        'title': widget.initialLabel, 
+        'title': widget.initialLabel,
         'icon': iconName,
         'type': widget.type,
         'mail': mail,
@@ -760,127 +845,137 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                     TextEditingController(text: _currentLabel);
 
                 return AlertDialog(
-  shape: RoundedRectangleBorder(
-    borderRadius: BorderRadius.circular(20),
-  ),
-  title: Center(
-    child: Text(
-      "Edit Icon or Text",
-      style: TextStyle(
-        fontSize: 22,
-        fontWeight: FontWeight.w600,
-        color: Colors.black87,
-      ),
-    ),
-  ),
-  content: SizedBox(
-    width: 400,  // Increase the width of the dialog
-    child: Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        TextField(
-          controller: dialogTextController,
-          decoration: InputDecoration(
-            labelText: "Edit Text",
-            labelStyle: TextStyle(color: Colors.grey[700]),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.grey[400]!),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.blueAccent),
-            ),
-            contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          ),
-          style: const TextStyle(fontSize: 16),
-        ),
-        const SizedBox(height: 20),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _chooseIcon,
-                icon: Icon(Icons.edit, color: Colors.white),
-                label: const Text("Choose Icon"),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-                  side: BorderSide(color: Color(0xFFFE9A8B)), // Peach color
-                  backgroundColor: Color(0xFFFE9A8B), // Peach color
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(20),
                   ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 10), // Space between the two buttons
-            Expanded(
-              child: OutlinedButton.icon(
-                onPressed: _chooseColor,
-                icon: Icon(Icons.color_lens, color: Colors.white),
-                label: const Text("Choose Color"),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 18, horizontal: 20),
-                  side: BorderSide(color: Color(0xFFFE9A8B)), // Peach color
-                  backgroundColor: Color(0xFFFE9A8B), // Peach color
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                  title: const Center(
+                    child: Text(
+                      "Edit Icon or Text",
+                      style: TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    ),
-  ),
-  actions: [
-    Padding(
-      padding: const EdgeInsets.only(bottom: 10, right: 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          TextButton(
-            onPressed: () async {
-              setState(() {
-                _currentLabel = dialogTextController.text;
-              });
-              await Supabase.instance.client
-                  .from('titles')
-                  .update({'title': _currentLabel})
-                  .eq('type', widget.type);
-              CategoryService().fetchCategories();
-              Navigator.of(context).pop();
-            },
-            child: const Text(
-              "Save",
-              style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFFFE9A8B), // Peach color
-              ),
-            ),
-          ),
-          const SizedBox(width: 10), // Space between buttons
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-            child: const Text(
-              "Cancel",
-              style: TextStyle(
-                fontSize: 18,
-                color: Color(0xFFFE9A8B), // Peach color
-              ),
-            ),
-          ),
-        ],
-      ),
-    ),
-  ],
-);
-
+                  content: SizedBox(
+                    width: 400, // Increase the width of the dialog
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        TextField(
+                          controller: dialogTextController,
+                          decoration: InputDecoration(
+                            labelText: "Edit Text",
+                            labelStyle: TextStyle(color: Colors.grey[700]),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: BorderSide(color: Colors.grey[400]!),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                              borderSide: const BorderSide(color: Colors.blueAccent),
+                            ),
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 16, horizontal: 12),
+                          ),
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                        const SizedBox(height: 20),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _chooseIcon,
+                                icon: const Icon(Icons.edit, color: Colors.white),
+                                label: const Text("Choose Icon"),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 18, horizontal: 20),
+                                  side: const BorderSide(
+                                      color: Color(0xFFFE9A8B)), // Peach color
+                                  backgroundColor:
+                                      const Color(0xFFFE9A8B), // Peach color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(
+                                width: 10), // Space between the two buttons
+                            Expanded(
+                              child: OutlinedButton.icon(
+                                onPressed: _chooseColor,
+                                icon:
+                                    const Icon(Icons.color_lens, color: Colors.white),
+                                label: const Text("Choose Color"),
+                                style: OutlinedButton.styleFrom(
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 18, horizontal: 20),
+                                  side: const BorderSide(
+                                      color: Color(0xFFFE9A8B)), // Peach color
+                                  backgroundColor:
+                                      const Color(0xFFFE9A8B), // Peach color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  actions: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10, right: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          TextButton(
+                            onPressed: () async {
+                              setState(() {
+                                _currentLabel = dialogTextController.text;
+                              });
+                              await Supabase.instance.client
+                                  .from('titles')
+                                  .update({'title': _currentLabel}).eq(
+                                      'type', widget.type);
+                              CategoryService().fetchCategories();
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              "Save",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Color(0xFFFE9A8B), // Peach color
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10), // Space between buttons
+                          TextButton(
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                            },
+                            child: const Text(
+                              "Cancel",
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Color(0xFFFE9A8B), // Peach color
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                );
               },
             );
           },
@@ -909,7 +1004,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 children: [
                   Icon(_currentIcon, size: iconSize),
                   Padding(
-                    padding: const EdgeInsets.only(top: 10.0),
+                    padding: const EdgeInsets.only(top: 15.0),
                     child: Container(
                       height: cardHeight * 0.3,
                       width: cardWidth,
@@ -922,7 +1017,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                           color: Color(
                             (widget.color.value),
                           ), // Convert hex string to color
-                          padding: const EdgeInsets.all(6.0),
+                          padding: const EdgeInsets.all(9.0),
                           child: _isEditing
                               ? TextField(
                                   controller: _labelController,

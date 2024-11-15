@@ -6,9 +6,12 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe/collections/ingredients.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/models/isar_instance.dart';
+import 'package:recipe/pages/all/allDishTitle.dart';
+import 'package:recipe/pages/all/allDishesRecipes.dart';
 import 'package:recipe/pages/recipe.dart';
 import 'package:recipe/models/dish_tile.dart';
 import 'package:recipe/pages/home.dart';
@@ -23,21 +26,25 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'dart:async'; // For using Timer
 
-class dishesList extends StatefulWidget {
-  dishesList({super.key, required this.type, required this.title});
-  String? type;
+class alldishesList extends StatefulWidget {
+  alldishesList({super.key, required this.title});
   String? title;
 
-  State<dishesList> createState() => _dishesListState();
+  State<alldishesList> createState() => _alldishesListState();
 }
 
-class _dishesListState extends State<dishesList> {
+class _alldishesListState extends State<alldishesList> {
   //text controller to access what the user typed
   TextEditingController textController = TextEditingController();
   final isar = IsarInstance().isar;
   List<Dish> _filteredNotes = [];
+  List<Ingredients> _filteredByIng = [];
   List<Dish> _sortededNotes = [];
-  List<Title> currentTitles = [];
+  List<Title> sortedTitles = [];
+  Set<String> selectedIngredients = <String>{};
+  List<String> selectedSerials = []; // Change to a List instead of Set
+  List<String> finalSerials = [];
+
   late SharedPreferences prefs;
 
   String dropdownValue = 'A-Z'; // Class-level variable
@@ -62,7 +69,7 @@ class _dishesListState extends State<dishesList> {
         _isLoading = false;
       });
     });
-    readDishes(widget.type!);
+    readDishes();
     loadSerial();
     _speech = stt.SpeechToText();
   }
@@ -122,25 +129,23 @@ class _dishesListState extends State<dishesList> {
   }
 
   //function to create a note
-void createDish() {
-  String? selectedOption;
-  double selectedDurationHours = 1.0; // Start with 1 hour
-  bool isSwitched = false;
-  String category = '0';
-  String? duration;
+/*   void createDish() {
+    String? selectedOption;
+    double selectedDurationHours = 1.0; // Start with 1 hour
+    bool isSwitched = false;
+    String category = '0';
+    String? duration;
 
-  showDialog(
-    context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) {
-        return AlertDialog(
-          title: const Text(
-            "New Dish",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Container(
-            width: 400, // Set the width here
-            child: Column(
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text(
+              "New Dish",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 // First TextField
@@ -157,14 +162,15 @@ void createDish() {
                 const SizedBox(height: 25),
                 // Slider for Duration Selector
                 const Padding(
-                  padding: EdgeInsets.only(right: 0),
+                  padding: EdgeInsets.only(right: 115),
                   child: Text("Select Duration",
                       style:
                           TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
                 ),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
+                    // SizedBox(width: 8,),
+
                     Slider(
                       value: selectedDurationHours,
                       min: 0.5,
@@ -180,30 +186,12 @@ void createDish() {
                     Padding(
                       padding: const EdgeInsets.only(right: 20.0),
                       child: Text(
-                        () {
-                          int hours = selectedDurationHours.toInt();
-                          int minutes =
-                              ((selectedDurationHours - hours) * 60).toInt();
-
-                          if (hours > 0 && minutes > 0) {
-                            return '$hours hour ${minutes} minutes';
-                          } else if (hours > 0) {
-                            return '$hours hour';
-                          } else if (minutes > 0) {
-                            return '$minutes minutes';
-                          } else {
-                            return '0 minutes';
-                          }
-                        }(),
-                        style: TextStyle(
-                          color: Colors.grey.shade900,
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
+                          '${selectedDurationHours.toStringAsFixed(1)} hrs'),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 10),
+
                 Padding(
                   padding: const EdgeInsets.all(10.0),
                   child: ToggleSwitch(
@@ -215,6 +203,7 @@ void createDish() {
                     inactiveFgColor: Colors.white,
                     totalSwitches: 2,
                     labels: ['Veg', 'Non-Veg'],
+                    //icons: [I.mars, FontAwesomeIcons.venus],
                     activeBgColors: [
                       [Colors.green],
                       [Colors.red]
@@ -227,55 +216,55 @@ void createDish() {
                 ),
               ],
             ),
-          ),
-          actions: [
-            MaterialButton(
-              textColor: Colors.white,
-              onPressed: () {
-                serial;
-                int incrementedSearial = (serial! + 1);
-                saveSerial(incrementedSearial);
-                if (textController.text.isNotEmpty) {
-                  final now = DateTime.now();
-                  final date =
-                      '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-                  final time =
-                      '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+            actions: [
+              // Create button
+              MaterialButton(
+                textColor: Colors.white,
+                onPressed: () {
+                  serial;
+                  int incrementedSearial = (serial! + 1);
+                  saveSerial(incrementedSearial);
+                  if (textController.text.isNotEmpty) {
+                    final now = DateTime.now();
+                    final date =
+                        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+                    final time =
+                        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-                  context.read<database>().addDish(
-                        serial.toString(),
-                        textController.text,
-                        widget.type!,
-                        selectedDurationHours.toStringAsFixed(1),
-                        category,
-                        date,
-                        time,
-                      );
+                    context.read<database>().addDish(
+                          serial.toString(),
+                          textController.text,
+                          widget.type!,
+                          selectedDurationHours.toStringAsFixed(1),
+                          category,
+                          date,
+                          time,
+                        );
 
-                  duration = selectedDurationHours.toStringAsFixed(1);
-                  // Use selectedDurationHours and selectedOption as needed
+                    duration = selectedDurationHours.toStringAsFixed(1);
+                    // Use selectedDurationHours and selectedOption as needed
 
-                  Navigator.pop(context);
-                  textController.clear();
-                }
-              },
-              child: Text('Create',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary)),
-            )
-          ],
-        );
-      },
-    ),
-  );
-}
-
+                    Navigator.pop(context);
+                    textController.clear();
+                  }
+                },
+                child: Text('Create',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.inversePrimary)),
+              )
+            ],
+          );
+        },
+      ),
+    );
+  }
+ */
   //read notes
-  void readDishes(String type) async {
-    await context.read<database>().fetchDishes(type);
+  void readDishes() async {
+    await context.read<database>().fetchAllDishes();
   }
 
-  void updateDish(Dish name, String type, String dish) async {
+/*   void updateDish(Dish name, String type, String dish) async {
     final response = await Supabase.instance.client
         .from('dishes')
         .select('id') // Specify the field to fetch
@@ -359,42 +348,19 @@ void createDish() {
                 Row(
                   children: [
                     Slider(
-                      value: double.parse(
-                          selectedDurationHours), // Parse string to double for slider
+                      value: double.parse(selectedDurationHours),
                       min: 0.5,
                       max: 5,
                       divisions: 9, // Allow 30-minute intervals
                       onChanged: (value) {
                         setState(() {
-                          selectedDurationHours =
-                              value.toStringAsFixed(1); // Store value as string
+                          selectedDurationHours = value.toStringAsFixed(1);
                         });
                       },
                     ),
                     Padding(
                       padding: const EdgeInsets.only(right: 20.0),
-                      child: Text(
-                        () {
-                          double duration = double.parse(
-                              selectedDurationHours); // Parse string to double
-                          int hours = duration.toInt();
-                          int minutes = ((duration - hours) * 60).toInt();
-
-                          if (hours > 0 && minutes > 0) {
-                            return '$hours hour ${minutes} minutes';
-                          } else if (hours > 0) {
-                            return '$hours hour';
-                          } else if (minutes > 0) {
-                            return '$minutes minutes';
-                          } else {
-                            return '0 minutes';
-                          }
-                        }(),
-                        style: TextStyle(
-                          color: Colors.grey.shade900,
-                          fontSize: 16,
-                        ),
-                      ),
+                      child: Text('${selectedDurationHours} hrs'),
                     ),
                   ],
                 ),
@@ -471,9 +437,9 @@ void createDish() {
       ),
     );
   }
-
+ */
   //delete a note
-  void deleteNote(int id, String type, String dish) async {
+  /*  void deleteNote(int id, String type, String dish) async {
     final response = await Supabase.instance.client
         .from('dishes')
         .select('id, serial') // Specify both fields to fetch (id and serial)
@@ -491,6 +457,28 @@ void createDish() {
 
     // Call the deleteDish method with both id and serial (if necessary)
     context.read<database>().deleteDish(dishId, widget.type!, serial);
+  } */
+  void _filterbying() {
+    final noteDatabase = context.read<database>();
+
+    _filteredByIng = noteDatabase.currentAllIng.where((note) {
+      final matchesSearch =
+          note.name!.toLowerCase().contains(searchQuery.toLowerCase());
+
+      final matchesSerial =
+          selectedSerials.isEmpty || selectedSerials.contains(note.serial);
+
+      if (_currentIndex == 0) {
+        return matchesSearch; // Show all items that match search and serial
+      } else if (_currentIndex == 1) {
+        return note.category == '1' &&
+            matchesSearch; // Filter by category == 1, search, and serial
+      } else if (_currentIndex == 2) {
+        return note.category == '0' &&
+            matchesSearch; // Filter by category == 0, search, and serial
+      }
+      return false; // Default case
+    }).toList();
   }
 
   void _filterAndSortNotes() {
@@ -501,17 +489,28 @@ void createDish() {
       final matchesSearch =
           note.name.toLowerCase().contains(searchQuery.toLowerCase());
 
+      // Check if note.serial contains any of the selected serials
+      final matchesSerial = finalSerials.isEmpty ||
+          finalSerials.any((serial) => note.serial!.contains(serial));
+
       if (_currentIndex == 0) {
-        return matchesSearch; // Show all items that match the search
+        return matchesSearch &&
+            matchesSerial; // Show all items that match search and serial
       } else if (_currentIndex == 1) {
         return note.category == '1' &&
-            matchesSearch; // Filter by `category == 1` and search
+            matchesSearch &&
+            matchesSerial; // Filter by category == 1, search, and serial
       } else if (_currentIndex == 2) {
         return note.category == '0' &&
-            matchesSearch; // Filter by `category == 0` and search
+            matchesSearch &&
+            matchesSerial; // Filter by category == 0, search, and serial
       }
       return false; // Default case
     }).toList();
+
+    //
+
+    //
 
     // Apply sorting
     _sortededNotes = List.from(_filteredNotes);
@@ -663,13 +662,134 @@ void createDish() {
     });
   }
 
+  Future<void> _loadData() async {
+    final noteDatabase = context.watch<database>();
+    await noteDatabase.fetchAllIngredients();
+    //setState(() {
+    // _isLoading = false;
+    //});
+  }
+
+// Function to handle selection/deselection of ingredients
+  Future<void> _onIngredientSelected(
+      bool? selected, String ingredient, String serial) async {
+    // Fetch data from Supabase
+    final response = await Supabase.instance.client
+        .from('ingredients')
+        .select()
+        .eq('name', ingredient);
+
+    final data = List<Map<String, dynamic>>.from(response);
+
+    setState(() {
+      if (selected == true) {
+        _addIngredientAndSerials(ingredient, data);
+      } else {
+        _removeIngredientAndSerials(ingredient, data, serial);
+      }
+
+      // Always update finalSerials after any operation
+      _updateFinalSerialsForCycle();
+    });
+  }
+
+  void _addIngredientAndSerials(
+      String ingredient, List<Map<String, dynamic>> data) {
+    if (data.isNotEmpty) {
+      for (var item in data) {
+        String fetchedSerial = item['serial'] ?? '';
+        if (fetchedSerial.isNotEmpty &&
+            !selectedSerials.contains(fetchedSerial)) {
+          selectedSerials.add(fetchedSerial);
+        }
+      }
+
+      if (!selectedIngredients.contains(ingredient)) {
+        selectedIngredients.add(ingredient);
+      }
+    }
+    print('Added serials: ${selectedSerials.join(', ')}');
+    print('Selected ingredients: ${selectedIngredients.join(', ')}');
+  }
+
+  void _removeIngredientAndSerials(
+      String ingredient, List<Map<String, dynamic>> data, String serial) {
+    if (data.isNotEmpty) {
+      for (var item in data) {
+        String fetchedSerial = item['serial'] ?? '';
+        if (fetchedSerial.isNotEmpty) {
+          selectedSerials.remove(fetchedSerial);
+        }
+      }
+    }
+
+    selectedIngredients.remove(ingredient);
+    selectedSerials.remove(serial);
+
+    print('Remaining serials after removal: ${selectedSerials.join(', ')}');
+    print('Remaining selected ingredients: ${selectedIngredients.join(', ')}');
+  }
+
+  void _updateFinalSerialsForCycle() {
+    setState(() {
+      if (selectedIngredients.isEmpty) {
+        // Clear finalSerials if no ingredients are selected
+        finalSerials.clear();
+      } else {
+        // Compute matching serials
+        final matchingSerials = selectedSerials
+            .where((serial) {
+              int serialCount =
+                  selectedSerials.where((item) => item == serial).length;
+              return serialCount == selectedIngredients.length;
+            })
+            .toSet()
+            .toList();
+
+        // Update finalSerials
+        if (matchingSerials.isNotEmpty) {
+          finalSerials = matchingSerials;
+        } else {
+          finalSerials = ['00']; // Add '00' if no matches exist
+        }
+      }
+    });
+
+    print('Final serials after update: ${finalSerials.join(', ')}');
+  }
+
+// Function to display selected ingredients or 'All' if none selected
+  String _getSelectedIngredientsText() {
+    if (selectedIngredients.isEmpty) {
+      return 'All ingredients';
+    } else {
+      return selectedIngredients.join(', ');
+    }
+  }
+
+  void _resetAll() {
+    setState(() {
+      selectedIngredients.clear();
+      selectedSerials.clear();
+      finalSerials.clear();
+    });
+    print('All data has been reset.');
+    print('Selected ingredients: ${selectedIngredients.join(', ')}');
+    print('Selected serials: ${selectedSerials.join(', ')}');
+    print('Final serials: ${finalSerials.join(', ')}');
+  }
+
   @override
   Widget build(BuildContext context) {
     final noteDatabase = context.watch<database>();
+    final currentAllIng = noteDatabase.currentAllIng;
 
     // Update notes based on selected filter, sort, and search
     _filterAndSortNotes();
-    readDishes(widget.type!);
+    _filterbying();
+
+    readDishes();
+    _loadData();
 
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
@@ -702,13 +822,14 @@ void createDish() {
           ),
         ),
       ),
-      floatingActionButton: FloatingActionButton(
+/*       floatingActionButton: FloatingActionButton(
         key: _floatingButtonKey,
         onPressed: createDish,
         backgroundColor: Theme.of(context).colorScheme.primary,
         child: Icon(Icons.add,
             color: Theme.of(context).colorScheme.inversePrimary),
       ),
+ */
       body: GestureDetector(
         onTap: () {
           FocusScope.of(context)
@@ -1194,42 +1315,94 @@ void createDish() {
             Expanded(
               child: _isLoading
                   ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Show loading indicator
-                  : ListView.builder(
-                      itemCount: _sortededNotes.length,
-                      itemBuilder: (context, index) {
-                        final note = _sortededNotes[index];
+                      child: CircularProgressIndicator(),
+                    )
+                  : Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(8.0),
+                              child: ElevatedButton(
+                                onPressed: _resetAll,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red, // Button background color
+                                  foregroundColor: Colors.white, // Text color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                                  ),
+                                  padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Smaller padding
+                                  minimumSize: Size(50, 30), // Ensures the button has a small size
+                                ),
+                                child: Text(
+                                  'Reset All',
+                                  style: TextStyle(fontSize: 12), // Smaller font size
+                                ),
+                              ),
+                            ),
 
-                        return GestureDetector(
-                          onLongPress: () {
-                            // Call your update function when a long press is detected
-                            updateDish(note, widget.type!, note.name);
-                          },
-                          onTap: () {
-                            setState(() {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => recipe(
+                            Container(
+                              width: 250,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: _filteredByIng.length,
+                                itemBuilder: (context, index) {
+                                  final ingredient = _filteredByIng[index].name;
+                                  final serials = _filteredByIng
+                                      .where((item) => item.name == ingredient)
+                                      .map((item) => item.serial)
+                                      .toList();
+                            
+                                  return CheckboxListTile(
+                                    title: Text(ingredient!),
+                                    value: selectedIngredients.contains(ingredient),
+                                    onChanged: (bool? selected) async {
+                                      for (int i = 0; i < serials.length; i++) {
+                                        selectedSerials.add(serials[i]!);
+                                        await _onIngredientSelected(
+                                            selected, ingredient, serials[i]!);
+                                      }
+                                      _filterbying();
+                                      print(
+                                        'Selected Ingredients: ${_getSelectedIngredientsText()}',
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
+                          child: ListView.builder(
+                            itemCount: _sortededNotes.length,
+                            itemBuilder: (context, index) {
+                              final note = _sortededNotes[index];
+                              return GestureDetector(
+                                onTap: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) => allrecipe(
                                         serial: note.serial,
-                                        type: widget.type,
                                         dish: note.name,
-                                        category: note.category,
-                                      )));
-                            });
-                          },
-                          child: DishTile(
-                            duration: note.duration,
-                            category: note.category,
-                            dish: note.name,
-                            // type: widget.type,
-                            text: note.name,
-                            onEditPressed: () =>
-                                updateDish(note, widget.type!, note.name!),
-                            onDeletePressed: () =>
-                                deleteNote(note.id, widget.type!, note.name),
+                                      ),
+                                    ),
+                                  );
+                                },
+                                child: allDishTile(
+                                  duration: note.duration,
+                                  category: note.category,
+                                  dish: note.name,
+                                  type: note.type,
+                                  text: note.name,
+                                ),
+                              );
+                            },
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
             ),
           ],

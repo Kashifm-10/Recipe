@@ -7,14 +7,12 @@ class RecipeList extends StatelessWidget {
   RecipeList({
     super.key,
     required this.dish,
-    required this.type,
     required this.text,
     this.onEditPressed,
     this.onDeletePressed,
   });
 
   final String? dish;
-  final String? type;
   final String text;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;

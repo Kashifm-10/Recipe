@@ -22,25 +22,23 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'dart:async'; // For using Timer
 
-class recipe extends StatefulWidget {
-  recipe(
+class allrecipe extends StatefulWidget {
+  allrecipe(
       {super.key,
       required this.serial,
-      required this.type,
-      required this.dish,
-      required this.category});
+   //   required this.type,
+      required this.dish});
   String? serial;
-  String? type;
+ // String? type;
   String? dish;
-  String? category;
 
   @override
-  State<recipe> createState() => _recipeState();
+  State<allrecipe> createState() => _recipeState();
 }
 
 final isar = IsarInstance().isar;
 
-class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
+class _recipeState extends State<allrecipe> with SingleTickerProviderStateMixin {
   //text controller to access what the user typed
   TextEditingController textController = TextEditingController();
   List<Map<String, String>> linkData = [];
@@ -64,7 +62,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     });
     // on app startup, fetch the existing notes
     readIngeadints(widget.dish!, widget.serial!);
-    readRecipe(widget.dish!, widget.type!, widget.serial!);
+    readRecipe(widget.dish!, widget.serial!);
     readLink(widget.serial!);
     _tabController = TabController(length: 2, vsync: this);
     _tabController.addListener(() {
@@ -191,7 +189,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                           style: const TextStyle(fontSize: 16),
                                         ),
                                         // const Divider(endIndent: 30,),
-                                        IconButton(
+                                       /*  IconButton(
                                           icon: const Icon(Icons.delete,
                                               color: Colors.red),
                                           onPressed: () async {
@@ -203,7 +201,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                               fetchedLinksId.removeAt(index);
                                             });
                                           },
-                                        ),
+                                        ), */
                                       ],
                                     ),
                                     /*  trailing: Padding(
@@ -302,7 +300,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   } */
 
   //function to create a note
-  void createIngredient() {
+/*   void createIngredient() {
     TextEditingController quantityController = TextEditingController();
     TextEditingController textController = TextEditingController();
 
@@ -390,7 +388,6 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                           widget.dish!,
                           quantityController.text,
                           adjustedUnit,
-                          widget.category!,
                         );
 
                     Navigator.pop(context);
@@ -412,14 +409,14 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
+ */
   //read notes
   void readIngeadints(String dish, String? serial) {
     context.read<database>().fetchIngredients(dish, serial);
   }
 
   //update note
-  void updateIng(Ingredients ingredient, String rec) async {
+/*   void updateIng(Ingredients ingredient, String rec) async {
     final response = await Supabase.instance.client
         .from('ingredients')
         .select('id') // Specify the field to fetch
@@ -586,9 +583,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
+ */
   //delete a note
-  void deleteIng(String rec) async {
+/*   void deleteIng(String rec) async {
     final response = await Supabase.instance.client
         .from('ingredients')
         .select('id') // Specify the field to fetch
@@ -603,7 +600,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     int id = data.isNotEmpty ? data[0]['id'] : '';
     await context.read<database>().deleteIngredient(id, widget.type!);
     readIngeadints(widget.dish!, widget.serial!);
-  }
+  } */
 
   /* void createRecipe() {
     showDialog(
@@ -640,7 +637,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   .inversePrimary)))
                 ]));
   } */
-  void createRecipe() {
+/*   void createRecipe() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
@@ -682,13 +679,13 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
+ */
   //read notes
-  void readRecipe(String dish, String type, String serial) {
+  void readRecipe(String dish, String serial) {
     context.read<database>().fetchRecipe(serial);
   }
 
-  //update note
+/*   //update note
   void updateRecipe(Recipe name, String rec) async {
     //pre-fill the current note text into our controller
     final response = await Supabase.instance.client
@@ -743,10 +740,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   .inversePrimary)))
                 ]));
     readRecipe(widget.dish!, widget.type!, widget.serial!);
-  }
+  } */
 
   //delete a note
-  void deleteRecipe(String rec) async {
+/*   void deleteRecipe(String rec) async {
     final response = await Supabase.instance.client
         .from('recipes')
         .select('id') // Specify the field to fetch
@@ -764,8 +761,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
         .deleteRecipe(widget.serial!, id, widget.type!, widget.dish!);
     readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
-
-  void createLink() async {
+ */
+/*   void createLink() async {
     TextEditingController titleController = TextEditingController();
 
     await showDialog(
@@ -821,7 +818,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
+ */
   //read notes
   void readLink(String serial) async {
     // Await the result of fetchLink to get the actual list of Links
@@ -845,7 +842,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     }
   }
 
-  void updateLink() {
+/*   void updateLink() {
     TextEditingController titleController = TextEditingController();
 
     showDialog(
@@ -903,7 +900,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
+ */
   //update note
   /* void updateLink(Recipe name) async {
     //pre-fill the current note text into our controller
@@ -939,7 +936,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   } */
 
   //delete a note
-  Future<void> deleteLink(String rec) async {
+/*   Future<void> deleteLink(String rec) async {
     final response = await Supabase.instance.client
         .from('links')
         .select('id') // Specify the field to fetch
@@ -955,8 +952,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     await context.read<database>().deleteLink(id, widget.serial!);
     readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
-
-  SpeedDial floatingActionButtonMenu(BuildContext context) {
+ */
+  /* SpeedDial floatingActionButtonMenu(BuildContext context) {
     return SpeedDial(
       animatedIcon: AnimatedIcons.menu_close,
       backgroundColor: Theme.of(context).colorScheme.primary,
@@ -984,15 +981,15 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
         ),
       ],
     );
-  }
+  } */
 
-  Future<void> add(int index) async {
+  /* Future<void> add(int index) async {
     if (index == 0) {
       createIngredient();
     } else {
       createRecipe();
     }
-  }
+  } */
 
   /* void add() {
     showDialog(
@@ -1085,7 +1082,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     ),
                     Row(
                       children: [
-                        Padding(
+                        /* Padding(
                           padding: const EdgeInsets.only(top: 5.0, right: 20),
                           child: IconButton(
                             key: _add,
@@ -1097,15 +1094,15 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               size: 35,
                             ),
                           ),
-                        ),
+                        ), */
                         Padding(
                           padding: const EdgeInsets.only(top: 10.0, right: 30),
                           child: GestureDetector(
                             key: _link,
                             onTap: () {
-                              if (fetchedlink == null) {
+                              /* if (fetchedlink == null) {
                                 createLink();
-                              } else {
+                              } else { */
                                 final List<int> fetchedLinksId =
                                     fetchedlinkid is List<int>
                                         ? fetchedlinkid as List<int>
@@ -1125,9 +1122,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
 
                                 _launchUrl(fetchedLinks, fetchedLinksId,
                                     fetchedlinknames); // Pass the list of links
-                              }
+                              //}
                             },
-                            onLongPress: updateLink,
+                           // onLongPress: updateLink,
                             child: const Icon(
                               Icons.link,
                               size: 40,
@@ -1295,8 +1292,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             : Column(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 15),
+                                    padding: const EdgeInsets.only(left: 10, right: 15),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -1312,8 +1308,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                           ),
                                         ),
                                         Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 140.0),
+                                          padding: const EdgeInsets.only(left: 140.0),
                                           child: Text("Quantity",
                                               style: GoogleFonts.montserrat(
                                                 fontSize: 25.0,
@@ -1349,10 +1344,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                         text: note.name!,
                                         quantity: double.parse(note.quantity!),
                                         uom: note.uom,
-                                        onEditPressed: () =>
+                                      /*   onEditPressed: () =>
                                             updateIng(note, note.name!),
                                         onDeletePressed: () =>
-                                            deleteIng(note.name!),
+                                            deleteIng(note.name!), */
                                       );
                                     },
                                   ),
@@ -1399,12 +1394,12 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                 final note = currentRecipe[index];
                                 return RecipeList(
                                   dish: widget.dish,
-                                  //  type: widget.type!,
+                                //  type: widget.type!,
                                   text: note.name!,
-                                  onEditPressed: () =>
+                                 /*  onEditPressed: () =>
                                       updateRecipe(note, note.name!),
                                   onDeletePressed: () =>
-                                      deleteRecipe(note.name!),
+                                      deleteRecipe(note.name!), */
                                 );
                               },
                             ),

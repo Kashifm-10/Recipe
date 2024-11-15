@@ -9,7 +9,6 @@ class ingredientList extends StatelessWidget {
   ingredientList({
     super.key,
     required this.dish,
-    required this.type,
     required this.text,
     required this.quantity,
     required this.count,
@@ -19,7 +18,6 @@ class ingredientList extends StatelessWidget {
   });
   String? count;
   final String? dish;
-  final String? type;
   final double? quantity;
   final String? uom;
   final String text;
