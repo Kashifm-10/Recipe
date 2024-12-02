@@ -20,8 +20,11 @@ class RecipeList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListTile(
-      contentPadding: const EdgeInsets.symmetric(
-          vertical: 8, horizontal: 20), // Padding around the list item
+      contentPadding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.width > 600 ? 8 : 0,
+          horizontal: MediaQuery.of(context).size.width > 600
+              ? 20
+              : 15), // Padding around the list item
       leading: Icon(Icons.circle,
           size: 7,
           color:
@@ -40,7 +43,9 @@ class RecipeList extends StatelessWidget {
         child: Text(
           text,
           style: TextStyle(
-            fontSize: 25,
+            fontSize: MediaQuery.of(context).size.width > 600
+                ? 25
+                : MediaQuery.of(context).size.width * 0.04,
             color: Theme.of(context).colorScheme.onBackground,
           ),
           textAlign:

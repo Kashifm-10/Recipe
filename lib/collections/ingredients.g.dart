@@ -17,33 +17,38 @@ const IngredientsSchema = CollectionSchema(
   name: r'Ingredients',
   id: 4245765106127853944,
   properties: {
-    r'dish': PropertySchema(
+    r'category': PropertySchema(
       id: 0,
+      name: r'category',
+      type: IsarType.string,
+    ),
+    r'dish': PropertySchema(
+      id: 1,
       name: r'dish',
       type: IsarType.string,
     ),
     r'name': PropertySchema(
-      id: 1,
+      id: 2,
       name: r'name',
       type: IsarType.string,
     ),
     r'quantity': PropertySchema(
-      id: 2,
+      id: 3,
       name: r'quantity',
       type: IsarType.string,
     ),
     r'serial': PropertySchema(
-      id: 3,
+      id: 4,
       name: r'serial',
       type: IsarType.string,
     ),
     r'type': PropertySchema(
-      id: 4,
+      id: 5,
       name: r'type',
       type: IsarType.string,
     ),
     r'uom': PropertySchema(
-      id: 5,
+      id: 6,
       name: r'uom',
       type: IsarType.string,
     )
@@ -68,6 +73,12 @@ int _ingredientsEstimateSize(
   Map<Type, List<int>> allOffsets,
 ) {
   var bytesCount = offsets.last;
+  {
+    final value = object.category;
+    if (value != null) {
+      bytesCount += 3 + value.length * 3;
+    }
+  }
   {
     final value = object.dish;
     if (value != null) {
@@ -113,12 +124,13 @@ void _ingredientsSerialize(
   List<int> offsets,
   Map<Type, List<int>> allOffsets,
 ) {
-  writer.writeString(offsets[0], object.dish);
-  writer.writeString(offsets[1], object.name);
-  writer.writeString(offsets[2], object.quantity);
-  writer.writeString(offsets[3], object.serial);
-  writer.writeString(offsets[4], object.type);
-  writer.writeString(offsets[5], object.uom);
+  writer.writeString(offsets[0], object.category);
+  writer.writeString(offsets[1], object.dish);
+  writer.writeString(offsets[2], object.name);
+  writer.writeString(offsets[3], object.quantity);
+  writer.writeString(offsets[4], object.serial);
+  writer.writeString(offsets[5], object.type);
+  writer.writeString(offsets[6], object.uom);
 }
 
 Ingredients _ingredientsDeserialize(
@@ -128,12 +140,13 @@ Ingredients _ingredientsDeserialize(
   Map<Type, List<int>> allOffsets,
 ) {
   final object = Ingredients(
-    dish: reader.readStringOrNull(offsets[0]),
-    name: reader.readStringOrNull(offsets[1]),
-    quantity: reader.readStringOrNull(offsets[2]),
-    serial: reader.readStringOrNull(offsets[3]),
-    type: reader.readStringOrNull(offsets[4]),
-    uom: reader.readStringOrNull(offsets[5]),
+    category: reader.readStringOrNull(offsets[0]),
+    dish: reader.readStringOrNull(offsets[1]),
+    name: reader.readStringOrNull(offsets[2]),
+    quantity: reader.readStringOrNull(offsets[3]),
+    serial: reader.readStringOrNull(offsets[4]),
+    type: reader.readStringOrNull(offsets[5]),
+    uom: reader.readStringOrNull(offsets[6]),
   );
   object.id = id;
   return object;
@@ -157,6 +170,8 @@ P _ingredientsDeserializeProp<P>(
     case 4:
       return (reader.readStringOrNull(offset)) as P;
     case 5:
+      return (reader.readStringOrNull(offset)) as P;
+    case 6:
       return (reader.readStringOrNull(offset)) as P;
     default:
       throw IsarError('Unknown property with id $propertyId');
@@ -256,6 +271,159 @@ extension IngredientsQueryWhere
 
 extension IngredientsQueryFilter
     on QueryBuilder<Ingredients, Ingredients, QFilterCondition> {
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryIsNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNull(
+        property: r'category',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryIsNotNull() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(const FilterCondition.isNotNull(
+        property: r'category',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> categoryEqualTo(
+    String? value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryGreaterThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        include: include,
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryLessThan(
+    String? value, {
+    bool include = false,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.lessThan(
+        include: include,
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> categoryBetween(
+    String? lower,
+    String? upper, {
+    bool includeLower = true,
+    bool includeUpper = true,
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.between(
+        property: r'category',
+        lower: lower,
+        includeLower: includeLower,
+        upper: upper,
+        includeUpper: includeUpper,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryStartsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.startsWith(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryEndsWith(
+    String value, {
+    bool caseSensitive = true,
+  }) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.endsWith(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryContains(String value, {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.contains(
+        property: r'category',
+        value: value,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> categoryMatches(
+      String pattern,
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.matches(
+        property: r'category',
+        wildcard: pattern,
+        caseSensitive: caseSensitive,
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryIsEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.equalTo(
+        property: r'category',
+        value: '',
+      ));
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition>
+      categoryIsNotEmpty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addFilterCondition(FilterCondition.greaterThan(
+        property: r'category',
+        value: '',
+      ));
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QAfterFilterCondition> dishIsNull() {
     return QueryBuilder.apply(this, (query) {
       return query.addFilterCondition(const FilterCondition.isNull(
@@ -1213,6 +1381,18 @@ extension IngredientsQueryLinks
 
 extension IngredientsQuerySortBy
     on QueryBuilder<Ingredients, Ingredients, QSortBy> {
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortByCategory() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortByCategoryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.desc);
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QAfterSortBy> sortByDish() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dish', Sort.asc);
@@ -1288,6 +1468,18 @@ extension IngredientsQuerySortBy
 
 extension IngredientsQuerySortThenBy
     on QueryBuilder<Ingredients, Ingredients, QSortThenBy> {
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenByCategory() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.asc);
+    });
+  }
+
+  QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenByCategoryDesc() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addSortBy(r'category', Sort.desc);
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QAfterSortBy> thenByDish() {
     return QueryBuilder.apply(this, (query) {
       return query.addSortBy(r'dish', Sort.asc);
@@ -1375,6 +1567,13 @@ extension IngredientsQuerySortThenBy
 
 extension IngredientsQueryWhereDistinct
     on QueryBuilder<Ingredients, Ingredients, QDistinct> {
+  QueryBuilder<Ingredients, Ingredients, QDistinct> distinctByCategory(
+      {bool caseSensitive = true}) {
+    return QueryBuilder.apply(this, (query) {
+      return query.addDistinctBy(r'category', caseSensitive: caseSensitive);
+    });
+  }
+
   QueryBuilder<Ingredients, Ingredients, QDistinct> distinctByDish(
       {bool caseSensitive = true}) {
     return QueryBuilder.apply(this, (query) {
@@ -1423,6 +1622,12 @@ extension IngredientsQueryProperty
   QueryBuilder<Ingredients, int, QQueryOperations> idProperty() {
     return QueryBuilder.apply(this, (query) {
       return query.addPropertyName(r'id');
+    });
+  }
+
+  QueryBuilder<Ingredients, String?, QQueryOperations> categoryProperty() {
+    return QueryBuilder.apply(this, (query) {
+      return query.addPropertyName(r'category');
     });
   }
 

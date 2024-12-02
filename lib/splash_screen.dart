@@ -57,10 +57,10 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.white, // Set background color to white
       body: Center(
         child: Image.asset(
-          'assets/images/splash_screen.png',
+          'assets/images/splash.png',
           width: screenWidth, // Make the image responsive to screen size
           height: screenHeight, // Scale height to 100% of screen height
-          fit: BoxFit.contain, // Ensures the image maintains aspect ratio
+          fit: BoxFit.fitWidth, // Ensures the image maintains aspect ratio
         ),
       ),
     );

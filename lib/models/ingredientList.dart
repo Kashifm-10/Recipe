@@ -26,6 +26,15 @@ class ingredientList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    double screenWidth = MediaQuery.of(context).size.width;
+    double screenHeight = MediaQuery.of(context).size.height;
+
+    // Set responsive font size and padding based on screen width
+    double fontSize =
+        screenWidth * 0.04; // Adjust font size based on screen width
+    double paddingValue =
+        screenWidth * 0.02; // Adjust padding based on screen width
+    double cellPadding = screenWidth * 0.01; // Padding for table cells
     String convertFractionToDecimal(String count) {
       if (count == '1/2') {
         return '0.5';
@@ -53,143 +62,295 @@ class ingredientList extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 50.0, // Limit the height of the whole list
-            child: ListView.builder(
-              itemCount: items.length,
-              itemBuilder: (context, index) {
-                final item = items[index];
-                return GestureDetector(
-                  onLongPress: () {
-                    onEditPressed!();
-                  },
-                  child: Container(
-                    // margin: const EdgeInsets.only(bottom: 8.0),
-                    child: Table(
-                      // border: TableBorder.all(),
-                      columnWidths: const {
-                        0: FlexColumnWidth(2),
-                        1: FlexColumnWidth(.4),
-                        2: FlexColumnWidth(1),
-                        3: FlexColumnWidth(.4),
-                        4: FlexColumnWidth(1),
-                      },
-                      children: [
-                        TableRow(
-                          children: [
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  item['text']!,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.black,
+          if (MediaQuery.of(context).size.width > 600) ...[
+            Container(
+              height: 50.0, // Limit the height of the whole list
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return GestureDetector(
+                    onLongPress: () {
+                      onEditPressed!();
+                    },
+                    child: Container(
+                      // margin: const EdgeInsets.only(bottom: 8.0),
+                      child: Table(
+                        // border: TableBorder.all(),
+                        columnWidths: const {
+                          0: FlexColumnWidth(2),
+                          1: FlexColumnWidth(.4),
+                          2: FlexColumnWidth(1),
+                          3: FlexColumnWidth(.4),
+                          4: FlexColumnWidth(1),
+                        },
+                        children: [
+                          TableRow(
+                            children: [
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    item['text']!,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.black,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  (() {
-                                    // Parse and trim quantity value
-                                    String quantityStr =
-                                        item['quantity']!.trim();
-                                    double? quantity =
-                                        double.tryParse(quantityStr);
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    (() {
+                                      // Parse and trim quantity value
+                                      String quantityStr =
+                                          item['quantity']!.trim();
+                                      double? quantity =
+                                          double.tryParse(quantityStr);
 
-                                    if (quantity == null) {
-                                      return quantityStr; // Fallback if parsing fails
-                                    } else if (quantity == 0.5) {
-                                      return '1/2';
-                                    } else if (quantity == 0.25) {
-                                      return '1/4';
-                                    } else if (quantity % 1 == 0) {
-                                      return quantity
-                                          .toInt()
-                                          .toString(); // Display integer if no decimal part
-                                    } else {
-                                      return quantity
-                                          .toString(); // Display full decimal if needed
-                                    }
-                                  })(),
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.grey,
-                                  ),
-                                  textAlign: TextAlign.right,
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  item['uom']!,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.grey,
+                                      if (quantity == null) {
+                                        return quantityStr; // Fallback if parsing fails
+                                      } else if (quantity == 0.5) {
+                                        return '1/2';
+                                      } else if (quantity == 0.25) {
+                                        return '1/4';
+                                      } else if (quantity % 1 == 0) {
+                                        return quantity
+                                            .toInt()
+                                            .toString(); // Display integer if no decimal part
+                                      } else {
+                                        return quantity
+                                            .toString(); // Display full decimal if needed
+                                      }
+                                    })(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.right,
                                   ),
                                 ),
                               ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  (() {
-                                    // Parse and trim quantityCal value
-                                    String quantityCal =
-                                        item['quantityCal']!.trim();
-                                    double? quantity =
-                                        double.tryParse(quantityCal);
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    item['uom']!,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    (() {
+                                      // Parse and trim quantityCal value
+                                      String quantityCal =
+                                          item['quantityCal']!.trim();
+                                      double? quantity =
+                                          double.tryParse(quantityCal);
 
-                                    if (quantity == null) {
-                                      return quantityCal; // Fallback if parsing fails
-                                    } else if (quantity == 0.5) {
-                                      return '1/2';
-                                    } else if (quantity == 0.25) {
-                                      return '1/4';
-                                    } else if (quantity % 1 == 0) {
-                                      return quantity
-                                          .toInt()
-                                          .toString(); // Display integer if no decimal part
-                                    } else {
-                                      return quantity
-                                          .toString(); // Display full decimal if needed
-                                    }
-                                  })(),
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.grey,
-                                  ),
-                                  textAlign: TextAlign.right,
-                                ),
-                              ),
-                            ),
-                            TableCell(
-                              child: Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Text(
-                                  item['uom']!,
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                    color: Colors.grey,
+                                      if (quantity == null) {
+                                        return quantityCal; // Fallback if parsing fails
+                                      } else if (quantity == 0.5) {
+                                        return '1/2';
+                                      } else if (quantity == 0.25) {
+                                        return '1/4';
+                                      } else if (quantity % 1 == 0) {
+                                        return quantity
+                                            .toInt()
+                                            .toString(); // Display integer if no decimal part
+                                      } else {
+                                        return quantity
+                                            .toString(); // Display full decimal if needed
+                                      }
+                                    })(),
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.right,
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ],
+                              TableCell(
+                                child: Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    item['uom']!,
+                                    style: const TextStyle(
+                                      fontSize: 20,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
-          ),
+          ] else ...[
+            Container(
+              height: 50.0, // Limit the height of the whole list
+              child: ListView.builder(
+                itemCount: items.length,
+                itemBuilder: (context, index) {
+                  final item = items[index];
+                  return GestureDetector(
+                    onLongPress: () {
+                      onEditPressed!();
+                    },
+                    child: Container(
+                      child: Table(
+                        columnWidths: const {
+                          0: FlexColumnWidth(1.2),
+                          1: FlexColumnWidth(.7),
+                          2: FlexColumnWidth(0.4),
+                          3: FlexColumnWidth(1),
+                          4: FlexColumnWidth(.1),
+                        },
+                        children: [
+                          TableRow(
+                            children: [
+                              TableCell(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      right: cellPadding, top: cellPadding),
+                                  child: Text(
+                                    item['text']!,
+                                    style: TextStyle(
+                                      fontSize: fontSize,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              TableCell(
+                                child: Padding(
+                                  padding: EdgeInsets.all(cellPadding),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        (() {
+                                          // Parse and trim quantity value
+                                          String quantityStr =
+                                              item['quantity']!.trim();
+                                          double? quantity =
+                                              double.tryParse(quantityStr);
+
+                                          if (quantity == null) {
+                                            return quantityStr; // Fallback if parsing fails
+                                          } else if (quantity == 0.5) {
+                                            return '1/2';
+                                          } else if (quantity == 0.25) {
+                                            return '1/4';
+                                          } else if (quantity % 1 == 0) {
+                                            return quantity
+                                                .toInt()
+                                                .toString(); // Display integer if no decimal part
+                                          } else {
+                                            return quantity
+                                                .toString(); // Display full decimal if needed
+                                          }
+                                        })(),
+                                        style: TextStyle(
+                                          fontSize: fontSize,
+                                          color: Colors.grey,
+                                        ),
+                                        //  textAlign: TextAlign.left,
+                                      ),
+                                      Text(
+                                        " ${item['uom']!}",
+                                        style: TextStyle(
+                                          fontSize: fontSize,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                                 TableCell(
+                                child: Padding(
+                                  padding: EdgeInsets.only(
+                                      right: cellPadding, top: cellPadding),
+                                  child: const Text("")
+                                ),
+                              ), 
+                              TableCell(
+                                child: Padding(
+                                  padding: EdgeInsets.all(cellPadding),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        (() {
+                                          // Parse and trim quantityCal value
+                                          String quantityCal =
+                                              item['quantityCal']!.trim();
+                                          double? quantity =
+                                              double.tryParse(quantityCal);
+
+                                          if (quantity == null) {
+                                            return quantityCal; // Fallback if parsing fails
+                                          } else if (quantity == 0.5) {
+                                            return '1/2';
+                                          } else if (quantity == 0.25) {
+                                            return '1/4';
+                                          } else if (quantity % 1 == 0) {
+                                            return quantity
+                                                .toInt()
+                                                .toString(); // Display integer if no decimal part
+                                          } else {
+                                            return quantity
+                                                .toString(); // Display full decimal if needed
+                                          }
+                                        })(),
+                                        style: TextStyle(
+                                          fontSize: fontSize,
+                                          color: Colors.grey,
+                                        ),
+                                        textAlign: TextAlign.right,
+                                      ),
+                                      Text(
+                                        " ${item['uom']!}",
+                                        style: TextStyle(
+                                          fontSize: fontSize,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                                 TableCell(
+                                child: Padding(
+                                  padding: EdgeInsets.all(cellPadding),
+                                  child: const Text('')
+                                ),
+                              ), 
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ]
         ],
       ),
     );

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:recipe/models/auth_service.dart';
 import 'package:recipe/pages/home.dart';
@@ -18,7 +19,6 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isGoogleSignInInProgress = false;
 
   Future<void> _signInWithEmailPassword() async {
-    // Query the 'users' table to find the matching email and password
     final response = await Supabase.instance.client
         .from('users')
         .select('email, password, name')
@@ -28,7 +28,6 @@ class _LoginScreenState extends State<LoginScreen> {
     final data = List<Map<String, dynamic>>.from(response);
 
     if (data.isNotEmpty) {
-      print('Success: User authenticated');
       String email = data.first['email'];
       String username = data.first['name'];
 
@@ -39,10 +38,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
+        MaterialPageRoute(builder: (context) => const MyHomePage()),
       );
     } else {
-      print('Error: Invalid email or password');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Invalid email or password')),
       );
@@ -71,116 +69,192 @@ class _LoginScreenState extends State<LoginScreen> {
     final screenHeight = MediaQuery.of(context).size.height;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
+    return GestureDetector(
+      onTap: () {
+        // Dismiss the keyboard when tapping outside a text field
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset:
+            false, // Disable screen resizing when keyboard appears
+        body: Stack(
           children: [
-            // Curved background image section
-            ClipPath(
-              clipper: CurvedClipper(),
-              child: Container(
-                height: screenHeight * 0.4, // Responsive height
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/login_bg.jpg'),
-                    fit: BoxFit.cover,
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/log_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(top: screenHeight * 0.03),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(screenWidth * 0.03),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF59E9E),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Icon(
+                        Icons.restaurant_menu,
+                        size: screenWidth * 0.06,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    Text(
+                      'Ready to Cook',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5C2C2C),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                child: Container(
+                  padding: EdgeInsets.all(screenWidth * 0.06),
+                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.8),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 8,
+                        offset: Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SizedBox(height: screenHeight * 0.01),
+                      Text(
+                        'Login',
+                        style: TextStyle(
+                          fontSize: screenWidth * 0.06,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF5C2C2C),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      _buildTextField(
+                        controller: _emailController,
+                        label: 'Email Address',
+                        hintText: 'Enter your email',
+                        keyboardType: TextInputType.emailAddress,
+                        icon: Icons.email,
+                        screenWidth: screenWidth,
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      _buildTextField(
+                        controller: _passwordController,
+                        label: 'Password',
+                        hintText: 'Enter your password',
+                        obscureText: true,
+                        icon: Icons.lock,
+                        screenWidth: screenWidth,
+                      ),
+                      SizedBox(height: screenHeight * 0.03),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _signInWithEmailPassword,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Color(0xFFF59E9E),
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.01),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: Text(
+                            'Login',
+                            style: TextStyle(
+                              fontSize: screenWidth * 0.02,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      GestureDetector(
+                        onTap: () {
+                          // Forgot password logic
+                        },
+                        child: Text(
+                          'Forgot Password?',
+                          style: TextStyle(
+                            color: Color(0xFFF59E9E),
+                            fontSize: screenWidth * 0.02,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: screenHeight * 0.02),
+                      ElevatedButton.icon(
+                        onPressed: _signInWithGoogle,
+                        icon: _isGoogleSignInInProgress
+                            ? LoadingAnimationWidget.inkDrop(
+                                size: screenWidth * 0.04,
+                                color: Colors.white,
+                              )
+                            : SvgPicture.asset(
+                                'assets/icons/google_icon.svg', // Make sure to use your correct asset path
+                                height: screenWidth *
+                                    0.04, // Adjust the size as needed
+                                width: 100.0,
+                              ),
+                        label: Text(
+                          'Continue with Google',
+                          style: TextStyle(
+                              color: Colors.white,
+                              fontSize: screenWidth * 0.02),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.redAccent,
+                          minimumSize:
+                              Size(double.infinity, screenHeight * 0.04),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    'Hello again!',
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: screenHeight * 0.05),
+                child: TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                    );
+                  },
+                  child: Text(
+                    "Don't have an account? Sign up",
                     style: TextStyle(
-                      fontSize: 28,
+                      color: Colors.white,
+                      fontSize: screenWidth * 0.02,
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepPurple,
                     ),
                   ),
-                  SizedBox(height: screenHeight * 0.05),
-                  _buildTextField(
-                    controller: _emailController,
-                    label: 'Email',
-                    hintText: 'Enter your email',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  _buildTextField(
-                    controller: _passwordController,
-                    label: 'Password',
-                    hintText: 'Enter your password',
-                    obscureText: true,
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {
-                        // Forgot password logic
-                      },
-                      child: const Text(
-                        'Forgot your password?',
-                        style: TextStyle(color: Colors.purple),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.02),
-                  ElevatedButton(
-                    onPressed: _signInWithEmailPassword,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.deepPurple,
-                      minimumSize: Size(double.infinity, screenHeight * 0.04),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: const Text('Login'),
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
-                  const Text('- OR -', style: TextStyle(color: Colors.grey)),
-                  SizedBox(height: screenHeight * 0.03),
-                  ElevatedButton.icon(
-                    onPressed: _signInWithGoogle,
-                    icon: _isGoogleSignInInProgress
-                        ? LoadingAnimationWidget.inkDrop(
-                            size: 24,
-                            color: Colors.white,
-                          )
-                        : const Icon(Icons.login, color: Colors.white),
-                    label: const Text(
-                      'Sign in with Google',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent,
-                      minimumSize: Size(double.infinity, screenHeight * 0.04),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.03),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegisterScreen()),
-                      );
-                    },
-                    child: const Text(
-                      "Don't have an account? Sign up",
-                      style: TextStyle(color: Colors.purple),
-                    ),
-                  ),
-                  SizedBox(height: screenHeight * 0.05),
-                ],
+                ),
               ),
             ),
           ],
@@ -195,6 +269,8 @@ class _LoginScreenState extends State<LoginScreen> {
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
+    required IconData icon,
+    required double screenWidth,
   }) {
     return TextField(
       controller: controller,
@@ -203,37 +279,17 @@ class _LoginScreenState extends State<LoginScreen> {
       decoration: InputDecoration(
         labelText: label,
         hintText: hintText,
-        labelStyle: const TextStyle(color: Colors.purple),
+        filled: true,
+        fillColor: Color(0xFFFEE1D5),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.grey),
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide.none,
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.purple),
+        prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)), // Icon color
+        labelStyle: const TextStyle(
+          color: Color(0xFF5C2C2C), // Set label color same as the icon
         ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
       ),
     );
   }
-}
-
-// Custom Clipper for Curved Bottom Edge
-class CurvedClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(0, size.height - 120);
-    path.quadraticBezierTo(
-      size.width / 2, size.height,
-      size.width, size.height - 130,
-    );
-    path.lineTo(size.width, 0);
-    path.close();
-    return path;
-  }
-
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
 }

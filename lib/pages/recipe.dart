@@ -1043,7 +1043,13 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     // note database
     final noteDatabase = context.watch<database>();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
+    // Adjust sizes dynamically
+    final iconSize =
+        screenWidth * 0.08; // Adjust icon size based on screen width
+    final titleFontSize = screenWidth * 0.07;
     // current notes
     List<Ingredients> currentNotes = noteDatabase.currentIng;
     List<Recipe> currentRecipe = noteDatabase.currentRecipe;
@@ -1052,114 +1058,143 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       child: Scaffold(
         backgroundColor: Colors.blue.shade50,
         appBar: PreferredSize(
-          preferredSize: const Size.fromHeight(
-              140.0), // Increase the height to fit the content
+          preferredSize: MediaQuery.of(context).size.width > 600
+              ? const Size.fromHeight(140.0)
+              : const Size.fromHeight(104.0),
           child: AppBar(
-              toolbarHeight: 200,
-              elevation: 0,
-              backgroundColor: Colors.transparent,
-              foregroundColor: Theme.of(context).colorScheme.inversePrimary,
-              leading: Padding(
-                padding: const EdgeInsets.only(top: 15.0, left: 10),
-                child: IconButton(
-                  icon: const Icon(FontAwesomeIcons.arrowLeft, size: 40),
-                  onPressed: () {
-                    Navigator.pop(context); // Navigate back when pressed
-                  },
-                ),
+            toolbarHeight: MediaQuery.of(context).size.width > 600
+                ? 200
+                : 120, // Adjust height based on screen width
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            foregroundColor: Theme.of(context).colorScheme.inversePrimary,
+            leading: Padding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.width > 600 ? 20.0 : 15.0,
+                left: 10,
               ),
-              title: Padding(
-                padding: const EdgeInsets.only(
-                    top: 20.0), // Add bottom padding to push content down
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.dish!,
-                      style: GoogleFonts.poppins(
-                        fontSize: 40,
-                        color: Theme.of(context).colorScheme.inversePrimary,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Row(
+              child: IconButton(
+                icon: Icon(
+                  FontAwesomeIcons.arrowLeft,
+                  size: MediaQuery.of(context).size.width > 600 ? 40 : iconSize,
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Navigate back when pressed
+                },
+              ),
+            ),
+            title: Padding(
+              padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.width > 600 ? 20.0 : 40.0,
+              ),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment
+                    .center, // Ensures items align horizontally
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  // Dish title with icon
+                  Flexible(
+                    child: Row(
+                      crossAxisAlignment:
+                          CrossAxisAlignment.center, // Align text and icon
                       children: [
                         Padding(
-                          padding: const EdgeInsets.only(top: 5.0, right: 20),
-                          child: IconButton(
-                            key: _add,
-                            onPressed: () {
-                              add(selectedTabIndex);
-                            },
-                            icon: const Icon(
-                              Icons.add,
-                              size: 35,
+                          padding: const EdgeInsets.only(bottom: 10.0),
+                          child: Text(
+                            widget.dish != null && widget.dish!.length > 10
+                                ? '${widget.dish!.substring(0, 10)}...'
+                                : widget.dish ?? '',
+                            style: GoogleFonts.poppins(
+                              fontSize: MediaQuery.of(context).size.width > 600
+                                  ? 50
+                                  : titleFontSize,
+                              color:
+                                  Theme.of(context).colorScheme.inversePrimary,
+                              fontWeight: FontWeight.bold,
                             ),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 10.0, right: 30),
-                          child: GestureDetector(
-                            key: _link,
-                            onTap: () {
-                              if (fetchedlink == null) {
-                                createLink();
-                              } else {
-                                final List<int> fetchedLinksId =
-                                    fetchedlinkid is List<int>
-                                        ? fetchedlinkid as List<int>
-                                        : [fetchedlinkid as int];
-                                // Safely cast fetchedlink to List<String> or wrap it in a list if it's a single string
-                                final List<String> fetchedLinks = fetchedlink
-                                        is List<String>
-                                    ? fetchedlink as List<String>
-                                    : [
-                                        fetchedlink as String
-                                      ]; // Forcefully cast to String if it's a single link
-
-                                final List<String> fetchedlinknames =
-                                    fetchedTitle is List<String>
-                                        ? fetchedTitle as List<String>
-                                        : [fetchedTitle as String];
-
-                                _launchUrl(fetchedLinks, fetchedLinksId,
-                                    fetchedlinknames); // Pass the list of links
-                              }
-                            },
-                            onLongPress: updateLink,
-                            child: const Icon(
-                              Icons.link,
-                              size: 40,
-                            ),
+                            overflow: TextOverflow
+                                .ellipsis, // Prevents overflow issues
                           ),
                         ),
                       ],
                     ),
-                  ],
-                ),
-              ),
-              bottom: TabBar(
-                controller: _tabController,
-                tabs: const [
-                  Tab(text: 'Ingredients'),
-                  Tab(text: 'Instructions'),
+                  ),
+
+                  // Action buttons
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 10.0),
+                    child: Row(
+                      children: [
+                        // Add button
+                        IconButton(
+                          key: _add,
+                          onPressed: () => add(selectedTabIndex),
+                          icon: const Icon(
+                            Icons.add,
+                            size: 35,
+                          ),
+                          tooltip: 'Add item',
+                        ),
+
+                        // Link button
+                        GestureDetector(
+                          key: _link,
+                          onTap: () {
+                            if (fetchedlink == null) {
+                              createLink();
+                            } else {
+                              final fetchedLinksId = fetchedlinkid is List<int>
+                                  ? fetchedlinkid as List<int>
+                                  : [fetchedlinkid as int];
+                              final fetchedLinks = fetchedlink is List<String>
+                                  ? fetchedlink as List<String>
+                                  : [fetchedlink as String];
+                              final fetchedlinkNames =
+                                  fetchedTitle is List<String>
+                                      ? fetchedTitle as List<String>
+                                      : [fetchedTitle as String];
+
+                              _launchUrl(fetchedLinks, fetchedLinksId,
+                                  fetchedlinkNames);
+                            }
+                          },
+                          onLongPress: updateLink,
+                          child: const Icon(
+                            Icons.link,
+                            size: 40,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
-                labelStyle: GoogleFonts.montserrat(
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.inversePrimary,
-                ),
-                unselectedLabelStyle: GoogleFonts.montserrat(
-                  fontSize: 25.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.grey,
-                ),
-                indicatorColor: Theme.of(context)
-                    .colorScheme
-                    .inversePrimary, // Set the color of the indicator below the tabs
-              )),
+              ),
+            ),
+            bottom: TabBar(
+              controller: _tabController,
+              tabs: const [
+                Tab(text: 'Ingredients'),
+                Tab(text: 'Instructions'),
+              ],
+              labelStyle: GoogleFonts.montserrat(
+                fontSize: MediaQuery.of(context).size.width > 600
+                    ? 25.0
+                    : MediaQuery.of(context).size.width * 0.04,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.inversePrimary,
+              ),
+              unselectedLabelStyle: GoogleFonts.montserrat(
+                fontSize: MediaQuery.of(context).size.width > 600
+                    ? 25.0
+                    : MediaQuery.of(context).size.width * 0.04,
+                fontWeight: FontWeight.bold,
+                color: Colors.grey,
+              ),
+              indicatorColor: Theme.of(context).colorScheme.inversePrimary,
+            ),
+          ),
         ),
+
         // floatingActionButton: floatingActionButtonMenu(context),
         body: TabBarView(
           controller: _tabController,
@@ -1175,107 +1210,116 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        if (currentRecipe.isNotEmpty)
-                          const Text(
-                            "Calculator : ",
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.black38,
-                            ),
+                        Text(
+                          "Calculator : ",
+                          style: TextStyle(
+                            fontSize: MediaQuery.of(context).size.width > 600
+                                ? 20
+                                : 15,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black38,
                           ),
-                        if (currentRecipe.isNotEmpty)
-                          DropdownButtonHideUnderline(
-                            child: DropdownButton2<String>(
-                              isExpanded: true,
-                              hint: const Row(
-                                children: [
-                                  Icon(
-                                    Icons.list,
-                                    size: 16,
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(
-                                    width: 4,
-                                  ),
-                                  Expanded(
-                                    child: Text(
-                                      '1',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
+                        ),
+                        DropdownButtonHideUnderline(
+                          child: DropdownButton2<String>(
+                            isExpanded: true,
+                            hint: Row(
+                              children: [
+                                Icon(
+                                  Icons.list,
+                                  size: MediaQuery.of(context).size.width > 600
+                                      ? 16
+                                      : 8,
+                                  color: Colors.white,
+                                ),
+                                SizedBox(
+                                  width: 4,
+                                ),
+                                Expanded(
+                                  child: Text(
+                                    '1',
+                                    style: TextStyle(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width >
+                                                  600
+                                              ? 14
+                                              : 10,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
                                     ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
-                                ],
-                              ),
-                              items: items
-                                  .map(
-                                      (String item) => DropdownMenuItem<String>(
-                                            value: item,
-                                            child: Text(
-                                              item,
-                                              style: const TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.black,
-                                              ),
-                                              overflow: TextOverflow.ellipsis,
-                                            ),
-                                          ))
-                                  .toList(),
-                              value: selectedValue,
-                              onChanged: (String? value) {
-                                setState(() {
-                                  selectedValue = value;
-                                });
-                              },
-                              buttonStyleData: ButtonStyleData(
-                                height: 30,
-                                width: 60,
-                                padding:
-                                    const EdgeInsets.only(left: 14, right: 14),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  /* border: Border.all(
+                                ),
+                              ],
+                            ),
+                            items: items
+                                .map((String item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: TextStyle(
+                                          fontSize: MediaQuery.of(context)
+                                                      .size
+                                                      .width >
+                                                  600
+                                              ? 14
+                                              : 10,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                    ))
+                                .toList(),
+                            value: selectedValue,
+                            onChanged: (String? value) {
+                              setState(() {
+                                selectedValue = value;
+                              });
+                            },
+                            buttonStyleData: ButtonStyleData(
+                              height: 30,
+                              width: 60,
+                              padding:
+                                  const EdgeInsets.only(left: 14, right: 14),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                /* border: Border.all(
                                   color: Colors.black26,
                                 ), */
-                                  color: Colors.white,
-                                ),
-                                elevation: 0,
+                                color: Colors.white,
                               ),
-                              iconStyleData: const IconStyleData(
-                                icon: Icon(
-                                  Icons.keyboard_arrow_down,
-                                ),
-                                iconSize: 14,
-                                iconEnabledColor: Colors.black,
-                                iconDisabledColor: Colors.grey,
+                              elevation: 0,
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.keyboard_arrow_down,
                               ),
-                              dropdownStyleData: DropdownStyleData(
-                                maxHeight: 200,
-                                width: 60,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(14),
-                                  color: Colors.white,
-                                ),
-                                offset: const Offset(0, 0),
-                                scrollbarTheme: ScrollbarThemeData(
-                                  radius: const Radius.circular(40),
-                                  thickness:
-                                      MaterialStateProperty.all<double>(6),
-                                  thumbVisibility:
-                                      MaterialStateProperty.all<bool>(true),
-                                ),
+                              iconSize: 14,
+                              iconEnabledColor: Colors.black,
+                              iconDisabledColor: Colors.grey,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              maxHeight: 200,
+                              width: 60,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14),
+                                color: Colors.white,
                               ),
-                              menuItemStyleData: const MenuItemStyleData(
-                                height: 40,
-                                padding: EdgeInsets.only(left: 14, right: 14),
+                              offset: const Offset(0, 0),
+                              scrollbarTheme: ScrollbarThemeData(
+                                radius: const Radius.circular(40),
+                                thickness: MaterialStateProperty.all<double>(6),
+                                thumbVisibility:
+                                    MaterialStateProperty.all<bool>(true),
                               ),
                             ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              height: 40,
+                              padding: EdgeInsets.only(left: 14, right: 14),
+                            ),
                           ),
+                        ),
                       ],
                     ),
                   ),
@@ -1295,26 +1339,42 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             : Column(
                                 children: [
                                   Padding(
-                                    padding: const EdgeInsets.only(
-                                        left: 10, right: 15),
+                                    padding: EdgeInsets.only(
+                                        left:
+                                            MediaQuery.of(context).size.width >
+                                                    600
+                                                ? 10
+                                                : 0,
+                                        right: 15),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
                                       children: [
-                                        Text(
-                                          "Ingredient",
-                                          style: GoogleFonts.montserrat(
-                                            fontSize: 25.0,
-                                            fontWeight: FontWeight.bold,
-                                            color: Theme.of(context)
-                                                .colorScheme
-                                                .inversePrimary,
+                                        if (MediaQuery.of(context).size.width >
+                                            600) ...[
+                                          Text(
+                                            "Ingredient",
+                                            style: GoogleFonts.montserrat(
+                                              fontSize: 25.0,
+                                              fontWeight: FontWeight.bold,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .inversePrimary,
+                                            ),
                                           ),
-                                        ),
-                                        Padding(
-                                          padding: const EdgeInsets.only(
-                                              left: 140.0),
-                                          child: Text("Quantity",
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 100.0),
+                                            child: Text("Quantity",
+                                                style: GoogleFonts.montserrat(
+                                                  fontSize: 25.0,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .inversePrimary,
+                                                )),
+                                          ),
+                                          Text("Calculated Quantity",
                                               style: GoogleFonts.montserrat(
                                                 fontSize: 25.0,
                                                 fontWeight: FontWeight.bold,
@@ -1322,15 +1382,67 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                                     .colorScheme
                                                     .inversePrimary,
                                               )),
-                                        ),
-                                        Text("Calculated Quantity",
-                                            style: GoogleFonts.montserrat(
-                                              fontSize: 25.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: Theme.of(context)
-                                                  .colorScheme
-                                                  .inversePrimary,
-                                            )),
+                                        ] else ...[
+                                          // Ingredient Text
+                                          Flexible(
+                                            flex: 1,
+                                            child: Text(
+                                              "Ingredient",
+                                              style: GoogleFonts.montserrat(
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.04, // Responsive font size
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .inversePrimary,
+                                              ),
+                                            ),
+                                          ),
+                                          // Quantity Text
+                                          Flexible(
+                                            flex: 0,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.155), // Dynamic padding
+                                              child: Text(
+                                                "Qty",
+                                                style: GoogleFonts.montserrat(
+                                                  fontSize: MediaQuery.of(
+                                                              context)
+                                                          .size
+                                                          .width *
+                                                      0.04, // Responsive font size
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .inversePrimary,
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          // Calculated Quantity Text
+                                          Flexible(
+                                            flex: 2,
+                                            child: Text(
+                                              "Calculated Qty",
+                                              style: GoogleFonts.montserrat(
+                                                fontSize: MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.04, // Responsive font size
+                                                fontWeight: FontWeight.bold,
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .inversePrimary,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ],
                                     ),
                                   ),
@@ -1378,12 +1490,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         )
                       : Column(
                           children: [
-                            const Padding(
+                            Padding(
                               padding: EdgeInsets.all(20.0),
                               child: Text(
                                 "How to Cook",
                                 style: TextStyle(
-                                  fontSize: 22,
+                                  fontSize:
+                                      MediaQuery.of(context).size.width > 600
+                                          ? 22
+                                          : MediaQuery.of(context).size.width *
+                                              0.05,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
                                 ),

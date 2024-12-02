@@ -29,14 +29,15 @@ class DishTile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.1,
+        width: MediaQuery.of(context).size.width * 0.1,
+        height: MediaQuery.of(context).size.height * 0.11,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.2),
-              blurRadius: 8,
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 1,
               offset: Offset(0, 4),
             ),
           ],

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:recipe/models/auth_service.dart';
 import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+
+// Make sure AuthService is available
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -15,58 +18,93 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
+  final _formKey = GlobalKey<FormState>(); // FormKey to manage form validation
   bool _isGoogleSignInInProgress = false;
 
-Future<void> _registerWithEmailPassword() async {
-  // Query the 'users' table to check if the email is already taken
-  final response = await Supabase.instance.client
-      .from('users')
-      .select('email') // Only check for the email field
-      .eq('email', _emailController.text);
+  String? _usernameError;
+  String? _emailError;
+  String? _passwordError;
 
-  // Convert the response to a list of maps
-  final data = List<Map<String, dynamic>>.from(response);
+  @override
+  void initState() {
+    super.initState();
+    // Add listeners to check if all fields are filled
+    _usernameController.addListener(_updateButtonState);
+    _emailController.addListener(_updateButtonState);
+    _passwordController.addListener(_updateButtonState);
+  }
 
-  if (data.isEmpty) {
-    // Email is not taken, proceed with registration
-    try {
-      final userResponse = await Supabase.instance.client.from('users').insert([
-        {
-          'name': _usernameController.text,
-          'email': _emailController.text,
-          'password': _passwordController.text,
-        }
-      ]);
+  @override
+  void dispose() {
+    _usernameController.removeListener(_updateButtonState);
+    _emailController.removeListener(_updateButtonState);
+    _passwordController.removeListener(_updateButtonState);
+    super.dispose();
+  }
 
-      // Handle success
-      print('User registered successfully');
+  // Method to update button state based on field inputs
+  void _updateButtonState() {
+    setState(() {});
+  }
+
+  // Method to handle form validation before submission
+  bool _validateFields() {
+    setState(() {
+      _usernameError =
+          _usernameController.text.isEmpty ? 'This field is required' : null;
+      _emailError =
+          _emailController.text.isEmpty ? 'This field is required' : null;
+      _passwordError =
+          _passwordController.text.isEmpty ? 'This field is required' : null;
+    });
+    return _formKey.currentState?.validate() ?? false;
+  }
+
+  Future<void> _registerWithEmailPassword() async {
+    if (!_validateFields()) {
+      return; // If validation fails, do nothing
+    }
+
+    final response = await Supabase.instance.client
+        .from('users')
+        .select('email')
+        .eq('email', _emailController.text.toLowerCase());
+
+    final data = List<Map<String, dynamic>>.from(response);
+
+    if (data.isEmpty) {
+      try {
+        await Supabase.instance.client.from('users').insert([
+          {
+            'name': _usernameController.text,
+            'email': _emailController.text,
+            'password': _passwordController.text,
+          }
+        ]);
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Email is registered successfully')),
+        );
+
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('user_email', _emailController.text);
+        await prefs.setString('user_name', _usernameController.text);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => LoginScreen()),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('An error occurred: $e')),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email is registered Successfully')),
-      );
-
-      // Save user email and username to SharedPreferences
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('user_email', _emailController.text);
-      await prefs.setString('user_name', _usernameController.text);
-
-      // Optionally navigate to login screen or another screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => LoginScreen()),
-      );
-    } catch (e) {
-      print('Error: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('An error occurred: $e')),
+        const SnackBar(content: Text('Email is already registered')),
       );
     }
-  } else {
-    // Email already taken, show error
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Email is already registered')),
-    );
   }
-}
 
   Future<void> _signInWithGoogle() async {
     setState(() {
@@ -87,127 +125,192 @@ Future<void> _registerWithEmailPassword() async {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    // Check if all fields are filled
+    bool isFormFilled = _usernameController.text.isNotEmpty &&
+        _emailController.text.isNotEmpty &&
+        _passwordController.text.isNotEmpty;
+
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        body: Stack(
           children: [
-            // Curved background image section
-            ClipPath(
-              clipper: CurvedClipper(), // Custom clipper for curved effect
-              child: Container(
-                height: 500,
-                width: double.infinity,
-                decoration: const BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage(
-                        'assets/images/login_bg.jpg'), // Replace with your image path
-                    fit: BoxFit.cover,
+            Positioned.fill(
+              child: Image.asset(
+                'assets/images/log_bg.png',
+                fit: BoxFit.cover,
+              ),
+            ),
+            Align(
+              alignment: Alignment.topCenter,
+              child: Padding(
+                padding: EdgeInsets.only(top: screenHeight * 0.03),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      padding: EdgeInsets.all(screenWidth * 0.03),
+                      decoration: BoxDecoration(
+                        color: Color(0xFFF59E9E),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Icon(
+                        Icons.restaurant_menu,
+                        size: screenWidth * 0.06,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: screenHeight * 0.02),
+                    Text(
+                      'Create an Account',
+                      style: TextStyle(
+                        fontSize: screenWidth * 0.05,
+                        fontWeight: FontWeight.bold,
+                        color: Color(0xFF5C2C2C),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            Align(
+              alignment: Alignment.center,
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Container(
+                    padding: EdgeInsets.all(screenWidth * 0.06),
+                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.8),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        SizedBox(height: screenHeight * 0.01),
+                        _buildTextField(
+                          controller: _usernameController,
+                          label: 'Username',
+                          hintText: 'Enter your username',
+                          icon: Icons.person,
+                          errorText: _usernameError,
+                          screenWidth: screenWidth,
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        _buildEmailTextField(
+                          controller: _emailController,
+                          label: 'Email Address',
+                          hintText: 'Enter your email',
+                          keyboardType: TextInputType.emailAddress,
+                          icon: Icons.email,
+                          errorText: _emailError,
+                          screenWidth: screenWidth,
+                        ),
+                        SizedBox(height: screenHeight * 0.02),
+                        _buildPasswordTextField(screenWidth),
+                        SizedBox(height: screenHeight * 0.03),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: isFormFilled
+                                ? _registerWithEmailPassword
+                                : null,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor:
+                                  isFormFilled ? Colors.redAccent : Colors.grey,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: screenHeight * 0.01),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                            ),
+                            child: Text(
+                              'Register',
+                              style: TextStyle(
+                                fontSize: screenWidth * 0.02,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.005),
+                        const Text(
+                          'or',
+                          style: TextStyle(
+                            color: Color(0xFF5C2C2C),
+                          ),
+                        ),
+                        SizedBox(height: screenHeight * 0.005),
+                        ElevatedButton.icon(
+                          onPressed: _signInWithGoogle,
+                          icon: _isGoogleSignInInProgress
+                              ? LoadingAnimationWidget.inkDrop(
+                                  size: screenWidth * 0.04,
+                                  color: Colors.white,
+                                )
+                              : SvgPicture.asset(
+                                  'assets/icons/google_icon.svg', // Make sure to use your correct asset path
+                                  height: screenWidth *
+                                      0.04, // Adjust the size as needed
+                                  width: 100.0,
+                                ),
+                          label: Text(
+                            'Sign up with Google',
+                            style: TextStyle(
+                                color: Colors.white,
+                                fontSize: screenWidth * 0.02),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.redAccent,
+                            minimumSize:
+                                Size(double.infinity, screenHeight * 0.04),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
             ),
-            Column(
-              mainAxisSize: MainAxisSize.min,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text(
-                  'Create an Account',
-                  style: TextStyle(
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.deepPurple, // Purple color for title
-                  ),
-                ),
-                const SizedBox(height: 50),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                  child: _buildTextField(
-                    controller: _usernameController,
-                    label: 'Username',
-                    hintText: 'Enter your username',
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                  child: _buildTextField(
-                    controller: _emailController,
-                    label: 'Email',
-                    hintText: 'Enter your email',
-                    keyboardType: TextInputType.emailAddress,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 100.0),
-                  child: _buildTextField(
-                    controller: _passwordController,
-                    label: 'Password',
-                    hintText: 'Enter your password',
-                    obscureText: true,
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 200.0),
-                  child: ElevatedButton(
-                    onPressed: _registerWithEmailPassword,
-                    style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Colors.deepPurple, // Purple button color
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 5,
-                    ),
-                    child: const Text('Register'),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                const Text('- OR -', style: TextStyle(color: Colors.grey)),
-                const SizedBox(height: 20),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 200.0),
-                  child: ElevatedButton.icon(
-                    onPressed: _signInWithGoogle,
-                    icon: _isGoogleSignInInProgress
-                        ? LoadingAnimationWidget.inkDrop(
-                            size: 24,
-                            color: Colors.white,
-                          )
-                        : const Icon(Icons.login, color: Colors.white),
-                    label: const Text(
-                      'Sign up with Google',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.redAccent, // Google button color
-                      minimumSize: const Size(double.infinity, 50),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      elevation: 5,
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                TextButton(
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: EdgeInsets.only(bottom: screenHeight * 0.05),
+                child: TextButton(
                   onPressed: () {
-                    // Navigate to login page
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => LoginScreen()),
                     );
                   },
-                  child: const Text(
+                  child: Text(
                     "Already have an account? Login",
-                    style: TextStyle(color: Colors.purple),
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: screenWidth * 0.02,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                const SizedBox(height: 30), // Additional spacing at the bottom
-              ],
+              ),
             ),
           ],
         ),
@@ -221,45 +324,146 @@ Future<void> _registerWithEmailPassword() async {
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
+    required IconData icon,
+    required String? errorText,
+    required double screenWidth,
   }) {
-    return TextField(
-      controller: controller,
-      obscureText: obscureText,
-      keyboardType: keyboardType,
-      decoration: InputDecoration(
-        labelText: label,
-        hintText: hintText,
-        labelStyle: const TextStyle(color: Colors.purple),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.grey),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hintText,
+            filled: true,
+            fillColor: Color(0xFFFEE1D5),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
+            labelStyle: const TextStyle(
+              color: Color(0xFF5C2C2C),
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'This field is required';
+            }
+            return null;
+          },
         ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(color: Colors.purple),
-        ),
-        contentPadding:
-            const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-      ),
+      ],
     );
   }
-}
 
-// Custom Clipper for Curved Bottom Edge
-class CurvedClipper extends CustomClipper<Path> {
-  @override
-  Path getClip(Size size) {
-    var path = Path();
-    path.lineTo(0, size.height - 150); // Start point for the curve
-    path.quadraticBezierTo(
-      size.width / 2, size.height, // Control point
-      size.width, size.height - 150, // End point for the curve
+  Widget _buildEmailTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    required IconData icon,
+    required String? errorText,
+    required double screenWidth,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hintText,
+            filled: true,
+            fillColor: Color(0xFFFEE1D5),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
+            labelStyle: const TextStyle(
+              color: Color(0xFF5C2C2C),
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'This field is required';
+            }
+
+            // Email validation using regex pattern
+            final emailRegex =
+                RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+            if (!emailRegex.hasMatch(value)) {
+              return 'Please enter a valid email address';
+            }
+            return null; // Valid email
+          },
+        ),
+      ],
     );
-    path.lineTo(size.width, 0); // Top-right corner
-    path.close();
-    return path;
   }
 
-  @override
-  bool shouldReclip(CustomClipper<Path> oldClipper) => false;
+  Widget _buildPasswordTextField(double screenWidth) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        TextFormField(
+          controller: _passwordController,
+          obscureText: true,
+          decoration: InputDecoration(
+            labelText: 'Password',
+            hintText: 'Enter your password',
+            filled: true,
+            fillColor: Color(0xFFFEE1D5),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            prefixIcon: Icon(Icons.lock, color: Color(0xFF5C2C2C)),
+            labelStyle: const TextStyle(
+              color: Color(0xFF5C2C2C),
+            ),
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return 'Password is required';
+            }
+
+            // At least 8 characters
+            if (value.length < 8) {
+              return 'Password must be at least 8 characters';
+            }
+
+            // Check for at least one uppercase letter, one lowercase letter, one number, and one symbol
+            final regex = RegExp(
+                r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$');
+            if (!regex.hasMatch(value)) {
+              return 'Password requires uppercase, lowercase, number, and symbol';
+            }
+
+            // Check if the password is a simple word (basic example: simple dictionary check)
+            List<String> commonPasswords = [
+              'password',
+              '123456',
+              'qwerty',
+              'abc123',
+              'letmein'
+            ];
+            if (commonPasswords
+                .any((word) => value.toLowerCase().contains(word))) {
+              return 'Password is too common, try something more complex';
+            }
+
+            return null; // Valid password
+          },
+        ),
+      ],
+    );
+  }
 }

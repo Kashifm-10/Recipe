@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:provider/provider.dart';
@@ -85,7 +86,7 @@ class _dishesListState extends State<dishesList> {
           },
         );
 
-        await Future.delayed(Duration(seconds: 7)); // Minimum wait time
+        await Future.delayed(Duration(seconds: 5)); // Minimum wait time
         await _speech.stop(); // Stop the speech recognition
         setState(() => _isListening = false); // Update state
         print("Listening stopped..."); // Debugging statement
@@ -122,153 +123,153 @@ class _dishesListState extends State<dishesList> {
   }
 
   //function to create a note
-void createDish() {
-  String? selectedOption;
-  double selectedDurationHours = 1.0; // Start with 1 hour
-  bool isSwitched = false;
-  String category = '0';
-  String? duration;
+  void createDish() {
+    String? selectedOption;
+    double selectedDurationHours = 1.0; // Start with 1 hour
+    bool isSwitched = false;
+    String category = '0';
+    String? duration;
 
-  showDialog(
-    context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) {
-        return AlertDialog(
-          title: const Text(
-            "New Dish",
-            style: TextStyle(fontWeight: FontWeight.bold),
-          ),
-          content: Container(
-            width: 400, // Set the width here
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // First TextField
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: TextField(
-                    controller: textController,
-                    decoration: const InputDecoration(
-                        hintText: 'Dish name',
-                        hintStyle: TextStyle(
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            title: const Text(
+              "New Dish",
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            content: Container(
+              width: 400, // Set the width here
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // First TextField
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: TextField(
+                      controller: textController,
+                      decoration: const InputDecoration(
+                          hintText: 'Dish name',
+                          hintStyle: TextStyle(
+                              fontSize: 17, fontWeight: FontWeight.w500)),
+                    ),
+                  ),
+                  const SizedBox(height: 25),
+                  // Slider for Duration Selector
+                  const Padding(
+                    padding: EdgeInsets.only(right: 0),
+                    child: Text("Select Duration",
+                        style: TextStyle(
                             fontSize: 17, fontWeight: FontWeight.w500)),
                   ),
-                ),
-                const SizedBox(height: 25),
-                // Slider for Duration Selector
-                const Padding(
-                  padding: EdgeInsets.only(right: 0),
-                  child: Text("Select Duration",
-                      style:
-                          TextStyle(fontSize: 17, fontWeight: FontWeight.w500)),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Slider(
-                      value: selectedDurationHours,
-                      min: 0.5,
-                      max: 5,
-                      divisions: 9, // Allow 30-minute intervals
-                      onChanged: (value) {
-                        // Update the slider's value
-                        setState(() {
-                          selectedDurationHours = value;
-                        });
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Slider(
+                        value: selectedDurationHours,
+                        min: 0.5,
+                        max: 5,
+                        divisions: 9, // Allow 30-minute intervals
+                        onChanged: (value) {
+                          // Update the slider's value
+                          setState(() {
+                            selectedDurationHours = value;
+                          });
+                        },
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(right: 20.0),
+                        child: Text(
+                          () {
+                            int hours = selectedDurationHours.toInt();
+                            int minutes =
+                                ((selectedDurationHours - hours) * 60).toInt();
+
+                            if (hours > 0 && minutes > 0) {
+                              return '$hours hour ${minutes} minutes';
+                            } else if (hours > 0) {
+                              return '$hours hour';
+                            } else if (minutes > 0) {
+                              return '$minutes minutes';
+                            } else {
+                              return '0 minutes';
+                            }
+                          }(),
+                          style: TextStyle(
+                            color: Colors.grey.shade900,
+                            fontSize: 16,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: ToggleSwitch(
+                      minWidth: 110.0,
+                      initialLabelIndex: 0,
+                      cornerRadius: 20.0,
+                      activeFgColor: Colors.white,
+                      inactiveBgColor: Colors.grey,
+                      inactiveFgColor: Colors.white,
+                      totalSwitches: 2,
+                      labels: ['Veg', 'Non-Veg'],
+                      activeBgColors: [
+                        [Colors.green],
+                        [Colors.red]
+                      ],
+                      onToggle: (index) {
+                        print('switched to: $index');
+                        category = index.toString();
                       },
                     ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 20.0),
-                      child: Text(
-                        () {
-                          int hours = selectedDurationHours.toInt();
-                          int minutes =
-                              ((selectedDurationHours - hours) * 60).toInt();
-
-                          if (hours > 0 && minutes > 0) {
-                            return '$hours hour ${minutes} minutes';
-                          } else if (hours > 0) {
-                            return '$hours hour';
-                          } else if (minutes > 0) {
-                            return '$minutes minutes';
-                          } else {
-                            return '0 minutes';
-                          }
-                        }(),
-                        style: TextStyle(
-                          color: Colors.grey.shade900,
-                          fontSize: 16,
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-                const SizedBox(height: 10),
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: ToggleSwitch(
-                    minWidth: 110.0,
-                    initialLabelIndex: 0,
-                    cornerRadius: 20.0,
-                    activeFgColor: Colors.white,
-                    inactiveBgColor: Colors.grey,
-                    inactiveFgColor: Colors.white,
-                    totalSwitches: 2,
-                    labels: ['Veg', 'Non-Veg'],
-                    activeBgColors: [
-                      [Colors.green],
-                      [Colors.red]
-                    ],
-                    onToggle: (index) {
-                      print('switched to: $index');
-                      category = index.toString();
-                    },
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-          actions: [
-            MaterialButton(
-              textColor: Colors.white,
-              onPressed: () {
-                serial;
-                int incrementedSearial = (serial! + 1);
-                saveSerial(incrementedSearial);
-                if (textController.text.isNotEmpty) {
-                  final now = DateTime.now();
-                  final date =
-                      '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-                  final time =
-                      '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
+            actions: [
+              MaterialButton(
+                textColor: Colors.white,
+                onPressed: () {
+                  serial;
+                  int incrementedSearial = (serial! + 1);
+                  saveSerial(incrementedSearial);
+                  if (textController.text.isNotEmpty) {
+                    final now = DateTime.now();
+                    final date =
+                        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+                    final time =
+                        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
-                  context.read<database>().addDish(
-                        serial.toString(),
-                        textController.text,
-                        widget.type!,
-                        selectedDurationHours.toStringAsFixed(1),
-                        category,
-                        date,
-                        time,
-                      );
+                    context.read<database>().addDish(
+                          serial.toString(),
+                          textController.text,
+                          widget.type!,
+                          selectedDurationHours.toStringAsFixed(1),
+                          category,
+                          date,
+                          time,
+                        );
 
-                  duration = selectedDurationHours.toStringAsFixed(1);
-                  // Use selectedDurationHours and selectedOption as needed
+                    duration = selectedDurationHours.toStringAsFixed(1);
+                    // Use selectedDurationHours and selectedOption as needed
 
-                  Navigator.pop(context);
-                  textController.clear();
-                }
-              },
-              child: Text('Create',
-                  style: TextStyle(
-                      color: Theme.of(context).colorScheme.inversePrimary)),
-            )
-          ],
-        );
-      },
-    ),
-  );
-}
+                    Navigator.pop(context);
+                    textController.clear();
+                  }
+                },
+                child: Text('Create',
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.inversePrimary)),
+              )
+            ],
+          );
+        },
+      ),
+    );
+  }
 
   //read notes
   void readDishes(String type) async {
@@ -549,11 +550,17 @@ void createDish() {
   }
 
   Widget rollingIconBuilder(int? value, bool foreground) {
-    return Icon(iconDataByValue(value));
+    return Icon(
+      iconDataByValue(value),
+      size: 18.0, // Set the desired icon size here
+      color: _currentIndex == value
+          ? iconColorBuilder(value!)
+          : Colors.grey, // Change icon color when selected
+    );
   }
 
   IconData iconDataByValue(int? value) => switch (value) {
-        0 => Icons.restaurant_menu,
+        0 => FontAwesomeIcons.bowlRice,
         1 => FrinoIcons.f_meat,
         2 => FrinoIcons.f_leaf,
         _ => Icons.lightbulb_outline_rounded,
@@ -565,20 +572,30 @@ void createDish() {
   }
 
   Color colorBuilder(int value) => switch (value) {
-        0 => const Color.fromARGB(255, 96, 143, 230),
-        1 => Colors.red,
-        2 => Colors.green,
-        _ => Colors.red,
+        0 => Colors.transparent, //const Color.fromARGB(255, 96, 143, 230),
+        1 => Colors.transparent,
+        2 => Colors.transparent,
+        _ => Colors.transparent,
       };
 
-  Widget coloredRollingIconBuilder(int value, bool foreground) {
+  Color iconColorBuilder(int value) => switch (value) {
+        0 => Color(0xFF795548), // Blue for value 0
+        1 => Colors.red, // Red for value 1
+        2 => Colors.green, // Green for value 2
+        _ => Colors.grey, // Default color if value is not matched
+      };
+
+  /*  Widget coloredRollingIconBuilder(int value, bool foreground) {
     final color = foreground ? colorBuilder(value) : null;
     return Icon(
       iconDataByValue(value),
-      color: color,
+      color: _currentIndex == value
+          ? Colors.blue
+          : Colors.grey, // Change icon color when selected
+      size: 17.0, // Adjust icon size here for colored icons
     );
   }
-
+ */
   int value = 0;
 
   final GlobalKey _floatingButtonKey = GlobalKey();
@@ -666,24 +683,37 @@ void createDish() {
   @override
   Widget build(BuildContext context) {
     final noteDatabase = context.watch<database>();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
 
-    // Update notes based on selected filter, sort, and search
+    // Adjust sizes dynamically
+    final iconSize =
+        screenWidth * 0.08; // Adjust icon size based on screen width
+    final titleFontSize = screenWidth * 0.1;
     _filterAndSortNotes();
     readDishes(widget.type!);
 
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       appBar: PreferredSize(
-        preferredSize: const Size.fromHeight(100.0),
+        preferredSize: MediaQuery.of(context).size.width > 600
+            ? const Size.fromHeight(100.0)
+            : const Size.fromHeight(60.0),
         child: AppBar(
-          toolbarHeight: 100,
+          toolbarHeight: MediaQuery.of(context).size.width > 600
+              ? 100
+              : screenHeight * 0.06,
           elevation: 0,
           backgroundColor: Colors.transparent,
           foregroundColor: Theme.of(context).colorScheme.inversePrimary,
           leading: Padding(
-            padding: const EdgeInsets.only(top: 20.0, left: 10),
+            padding: EdgeInsets.only(
+                top: MediaQuery.of(context).size.width > 600 ? 20.0 : 15,
+                left: 10),
             child: IconButton(
-              icon: const Icon(FontAwesomeIcons.arrowLeft, size: 40),
+              icon: Icon(FontAwesomeIcons.arrowLeft,
+                  size:
+                      MediaQuery.of(context).size.width > 600 ? 40 : iconSize),
               onPressed: () {
                 Navigator.pop(context);
               },
@@ -694,7 +724,9 @@ void createDish() {
             child: Text(
               widget.title!,
               style: GoogleFonts.poppins(
-                fontSize: 50,
+                fontSize: MediaQuery.of(context).size.width > 600
+                    ? 50
+                    : titleFontSize,
                 color: Theme.of(context).colorScheme.inversePrimary,
                 fontWeight: FontWeight.bold,
               ),
@@ -953,18 +985,137 @@ void createDish() {
                     ),
                   ] else ...[
                     // Layout for smaller screens (e.g., mobile)
+
                     Padding(
-                      padding: const EdgeInsets.only(left: 15.0),
-                      child: Column(
+                      padding: EdgeInsets.only(
+                          top: MediaQuery.of(context).size.width * 0.04,
+                          left: MediaQuery.of(context).size.width * 0.04),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                          Container(
+                            width: MediaQuery.of(context).size.width *
+                                0.51, // 90% of screen width
+                            height: MediaQuery.of(context).size.height *
+                                0.04, // 7% of screen height
+                            decoration: BoxDecoration(
+                              color: Colors
+                                  .white, // Set the background color to white
+                              borderRadius: BorderRadius.circular(15.0),
+                              boxShadow: const [
+                                BoxShadow(
+                                  color: Colors.black26,
+                                  spreadRadius: 0,
+                                  blurRadius: 2, // Set the desired blur radius
+                                ),
+                              ],
+                            ),
+                            child: SearchBar(
+                              hintText: 'Search ',
+                              controller: _searchController,
+                              onChanged: (value) {
+                                setState(() {
+                                  searchQuery = value.toLowerCase();
+                                  _filterAndSortNotes(); // Call your filtering method
+                                });
+                              },
+                              backgroundColor: MaterialStateColor.resolveWith(
+                                (states) => Colors.white,
+                              ),
+                              shadowColor: MaterialStateColor.resolveWith(
+                                (states) => Colors.transparent,
+                              ),
+                              leading: Container(
+                                margin: const EdgeInsets.all(0),
+                                child: const Icon(Icons.search),
+                              ),
+                              trailing: <Widget>[
+                                // Use <Widget>[] to define the list of trailing widgets
+                                IconButton(
+                                  icon: const Icon(
+                                    HeroiconsSolid.xMark,
+                                    color: Colors.grey,
+                                  ), // Change the icon as needed
+                                  onPressed: () {
+                                    // Clear the search field
+                                    _searchController.clear();
+                                    setState(() {
+                                      searchQuery =
+                                          ''; // Reset the search query
+                                      _filterAndSortNotes(); // Call your filtering method
+                                    });
+                                  },
+                                ),
+                                IconButton(
+                                  onPressed:
+                                      _startListening, // Start voice search
+                                  icon: Icon(
+                                    _isListening
+                                        ? Icons.mic
+                                        : Icons
+                                            .mic_none, // Change icon based on listening state
+                                    color:
+                                        _isListening ? Colors.red : Colors.grey,
+                                  ),
+                                ),
+                              ],
+                              elevation: MaterialStateProperty.all(0),
+                              shape: MaterialStateProperty.all(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(15.0),
+                                ),
+                              ),
+                            ),
+                          ),
                           Padding(
-                            padding: const EdgeInsets.only(top: 9.0, left: 0),
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width * 0.01),
+                            child: AnimatedToggleSwitch<int>.size(
+                              //   key: _categoryButtonKey,
+                              textDirection: TextDirection.rtl,
+                              current: _currentIndex,
+                              values: const [2, 1, 0],
+                              iconOpacity: 0.50,
+                              height: MediaQuery.of(context).size.height * 0.04,
+                              indicatorSize: const Size.fromWidth(30),
+                              spacing: 0,
+                              iconBuilder: iconBuilder,
+                              borderWidth: 10.0,
+                              iconAnimationType: AnimationType.onHover,
+                              style: ToggleStyle(
+                                borderColor: Colors
+                                    .white, // Set the background color to white
+                                borderRadius: BorderRadius.circular(15.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    spreadRadius: 0,
+                                    blurRadius:
+                                        2, // Set the desired blur radius
+                                  ),
+                                ],
+                              ),
+                              styleBuilder: (i) => ToggleStyle(
+                                indicatorColor: colorBuilder(i),
+                              ),
+                              onChanged: (i) {
+                                setState(() {
+                                  _currentIndex = i;
+                                  _filterAndSortNotes(); // Apply filter and sort
+                                  print(i); // Debug print
+                                });
+                              },
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                                left: MediaQuery.of(context).size.width *
+                                    0.01), // Adjust padding for alignment
                             child: Container(
-                              margin: const EdgeInsets.all(0),
                               width: MediaQuery.of(context).size.width *
-                                  0.935, // 90% of screen width
+                                  0.168, // Adjust width for better balance
                               height: MediaQuery.of(context).size.height *
-                                  0.04, // 7% of screen height
+                                  0.04, // Slightly taller for aesthetics
                               decoration: BoxDecoration(
                                 color: Colors
                                     .white, // Set the background color to white
@@ -978,67 +1129,60 @@ void createDish() {
                                   ),
                                 ],
                               ),
-                              child: SearchBar(
-                                hintText: 'Search ',
-                                controller: _searchController,
-                                onChanged: (value) {
-                                  setState(() {
-                                    searchQuery = value.toLowerCase();
-                                    _filterAndSortNotes(); // Call your filtering method
-                                  });
-                                },
-                                backgroundColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.white,
-                                ),
-                                shadowColor: MaterialStateColor.resolveWith(
-                                  (states) => Colors.transparent,
-                                ),
-                                leading: Container(
-                                  margin: const EdgeInsets.all(8),
-                                  child: const Icon(Icons.search),
-                                ),
-                                trailing: <Widget>[
-                                  // Use <Widget>[] to define the list of trailing widgets
-                                  IconButton(
-                                    icon: const Icon(
-                                      Icons.clear,
-                                      color: Colors.grey,
-                                    ), // Change the icon as needed
-                                    onPressed: () {
-                                      // Clear the search field
-                                      _searchController.clear();
-                                      setState(() {
-                                        searchQuery =
-                                            ''; // Reset the search query
-                                        _filterAndSortNotes(); // Call your filtering method
-                                      });
-                                    },
-                                  ),
-                                  IconButton(
-                                    onPressed:
-                                        _startListening, // Start voice search
-                                    icon: Icon(
-                                      _isListening
-                                          ? Icons.mic
-                                          : Icons
-                                              .mic_none, // Change icon based on listening state
-                                      color: _isListening
-                                          ? Colors.red
-                                          : Colors.grey,
-                                    ),
-                                  ),
-                                ],
-                                elevation: MaterialStateProperty.all(0),
-                                shape: MaterialStateProperty.all(
-                                  RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(15.0),
-                                  ),
+
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<String>(
+                                  key: _sortButtonKey,
+                                  menuWidth:
+                                      MediaQuery.of(context).size.width * 0.2,
+                                  borderRadius: BorderRadius.circular(
+                                      8.0), // Consistent with dropdown radius
+                                  dropdownColor: Colors
+                                      .white, // Ensure dropdown matches container
+                                  /* icon: const Icon(Icons.arrow_drop_down,
+                                            color: Colors
+                                                .grey), */ // Polished dropdown icon
+                                  value: dropdownValue,
+                                  items: <String>[
+                                    'A-Z',
+                                    'Z-A',
+                                    'Shortest',
+                                    'Longest',
+                                    'Newest',
+                                    'Oldest'
+                                  ].map<DropdownMenuItem<String>>(
+                                      (String value) {
+                                    return DropdownMenuItem<String>(
+                                      value: value,
+                                      child: Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 8.0),
+                                        child: Text(
+                                          value,
+                                          style: const TextStyle(
+                                            fontSize: 14.0,
+                                            color: Colors
+                                                .black87, // Text color for better contrast
+                                          ),
+                                        ),
+                                      ),
+                                    );
+                                  }).toList(),
+                                  onChanged: (String? newValue) {
+                                    setState(() {
+                                      dropdownValue = newValue!;
+                                      _filterAndSortNotes(); // Apply filter and sort
+                                    });
+                                  },
                                 ),
                               ),
                             ),
                           ),
-                          // Toggle switch and dropdown for small screens
-                          Row(
+                        ],
+                      ),
+                    ),
+                    // Toggle switch and dropdown for small screens
+                    /* Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Padding(
@@ -1050,21 +1194,21 @@ void createDish() {
                                   current: _currentIndex,
                                   values: const [2, 1, 0],
                                   iconOpacity: 0.50,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.045,
-                                  indicatorSize: const Size.fromWidth(40),
+                                  height:
+                                      MediaQuery.of(context).size.height * 0.04,
+                                  indicatorSize: const Size.fromWidth(30),
                                   spacing: 0,
                                   iconBuilder: iconBuilder,
-                                  borderWidth: 7.0,
+                                  borderWidth: 10.0,
                                   iconAnimationType: AnimationType.onHover,
                                   style: ToggleStyle(
                                     borderColor: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderRadius: BorderRadius.circular(12.0),
                                     boxShadow: [
                                       const BoxShadow(
                                         color: Colors.black26,
                                         spreadRadius: 0,
-                                        blurRadius: 2,
+                                        blurRadius: 0,
                                       ),
                                     ],
                                   ),
@@ -1081,35 +1225,47 @@ void createDish() {
                                 ),
                               ),
                               SizedBox(
-                                width: MediaQuery.of(context).size.width * 0.35,
+                                width: MediaQuery.of(context).size.width * 0.42,
                               ),
                               Padding(
-                                padding:
-                                    const EdgeInsets.only(right: 0.0, top: 10),
+                                padding: const EdgeInsets.only(
+                                    top: 10.0), // Adjust padding for alignment
                                 child: Container(
                                   width: MediaQuery.of(context).size.width *
-                                      0.3, // 90% of screen width
+                                      0.25, // Adjust width for better balance
                                   height: MediaQuery.of(context).size.height *
-                                      0.046,
+                                      0.04, // Slightly taller for aesthetics
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderRadius: BorderRadius.circular(
+                                        12.0), // Softer corner radius
                                     color: Colors.white,
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.grey.withOpacity(0.2),
-                                        spreadRadius: 1,
-                                        blurRadius: 1,
+                                        color: Colors.grey.withOpacity(
+                                            0.2), // Increased opacity for emphasis
+                                        spreadRadius:
+                                            .5, // Slightly larger shadow spread
+                                        blurRadius: 0, // Smooth shadow edges
+                                        offset: const Offset(0,
+                                            0), // Subtle shadow offset for depth
                                       ),
                                     ],
                                   ),
                                   child: Padding(
-                                    padding: const EdgeInsets.only(left: 10.0),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal:
+                                            12.0), // Balanced horizontal padding
                                     child: DropdownButtonHideUnderline(
                                       child: DropdownButton<String>(
                                         key: _sortButtonKey,
-                                        menuWidth: 125,
-                                        borderRadius:
-                                            BorderRadius.circular(20.0),
+                                        menuWidth: 100,
+                                        borderRadius: BorderRadius.circular(
+                                            8.0), // Consistent with dropdown radius
+                                        dropdownColor: Colors
+                                            .white, // Ensure dropdown matches container
+                                        /* icon: const Icon(Icons.arrow_drop_down,
+                                            color: Colors
+                                                .grey), */ // Polished dropdown icon
                                         value: dropdownValue,
                                         items: <String>[
                                           'A-Z',
@@ -1120,52 +1276,15 @@ void createDish() {
                                           'Oldest'
                                         ].map<DropdownMenuItem<String>>(
                                             (String value) {
-                                          Icon trailingIcon;
-                                          switch (value) {
-                                            case 'A-Z':
-                                              trailingIcon = const Icon(
-                                                CupertinoIcons.sort_up,
-                                                size: 17,
-                                              );
-                                              break;
-                                            case 'Z-A':
-                                              trailingIcon = const Icon(
-                                                CupertinoIcons.sort_down,
-                                                size: 17,
-                                              );
-                                              break;
-                                            case 'Shortest':
-                                              trailingIcon = const Icon(
-                                                  CupertinoIcons.timer_fill);
-                                              break;
-                                            case 'Longest':
-                                              trailingIcon = const Icon(
-                                                  CupertinoIcons.timer_fill);
-                                              break;
-                                            case 'Newest':
-                                              trailingIcon = const Icon(
-                                                  CupertinoIcons.today);
-                                              break;
-                                            case 'Oldest':
-                                              trailingIcon = const Icon(
-                                                Icons.date_range,
-                                              );
-                                              break;
-                                            default:
-                                              trailingIcon =
-                                                  const Icon(Icons.label);
-                                          }
-
                                           return DropdownMenuItem<String>(
                                             value: value,
-                                            child: Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
-                                              children: [
-                                                Text(value),
-                                                trailingIcon,
-                                              ],
+                                            child: Text(
+                                              value,
+                                              style: const TextStyle(
+                                                fontSize: 14.0,
+                                                color: Colors
+                                                    .black87, // Text color for better contrast
+                                              ),
                                             ),
                                           );
                                         }).toList(),
@@ -1181,15 +1300,12 @@ void createDish() {
                                 ),
                               )
                             ],
-                          ),
-                        ],
-                      ),
-                    ),
+                          ), */
                   ]
                 ],
               ),
             ),
-            const SizedBox(height: 10),
+            //const SizedBox(height: 10),
             // The ListView to display the filtered notes
             Expanded(
               child: _isLoading

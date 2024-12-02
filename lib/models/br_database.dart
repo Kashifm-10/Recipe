@@ -488,7 +488,7 @@ class database extends ChangeNotifier {
         category: item['category'])));
 
     // Sort by 'id' if server-side ordering is not available or reliable
-    currentIng.sort((a, b) => a.id.compareTo(b.id));
+   /*  currentIng.sort((a, b) => a.id.compareTo(b.id)); */
 
     print(data);
 

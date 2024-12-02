@@ -189,7 +189,7 @@ class CategoryService {
       case '1':
         return colors.isNotEmpty
             ? colors[0]
-            : const Color.fromARGB(255, 242, 203, 160);
+            : const Color.fromARGB(255, 253, 212, 168);
       case '2':
         return colors.isNotEmpty
             ? colors[1]
@@ -270,36 +270,50 @@ class _MyHomePageState extends State<MyHomePage> {
     double screenWidth = MediaQuery.of(context).size.width;
     bool _isEditing = false;
     late TextEditingController _labelController;
-    String _currentLabel = "All"; // Default label
+    String _currentLabel = "Find By Ingredients"; // Default label
     const Color _cardColor =
         Color.fromARGB(255, 240, 189, 197); // Default color
-    const IconData _cardIcon = HeroiconsOutline.squaresPlus; // Default icon
-    const double cardWidth = 600;
-    const double cardHeight = 170;
-    const double iconSize = 80;
+    const IconData cardIcon = HeroiconsOutline.squaresPlus; // Default icon
+    final double cardWidth = MediaQuery.of(context).size.width < 600
+        ? screenWidth * 1.5 // Adjusted width for s screens
+        : 600; // Default width (600) for l screens
+
+    final double cardHeight = MediaQuery.of(context).size.width < 600
+        ? screenWidth * 0.4 // Adjusted height for s screens
+        : 170; // Default height for l screens
+
+    final double iconSize = MediaQuery.of(context).size.width < 600
+        ? screenWidth * 0.2 // Larger icon size for s screens
+        : 80; // Default icon size for l screens
 
     return Scaffold(
       body: Stack(
         children: [
           Positioned.fill(
             child: Image.asset(
-              'assets/images/bg.png',
-              width: screenWidth, // Scale width to 70% of screen width
+              MediaQuery.of(context).size.width > 600
+                  ? 'assets/images/bg.png' // Image for larger screens
+                  : 'assets/images/bg1.png', // Image for smaller screens
+              width: screenWidth,
               height: screenHeight,
-              fit: BoxFit.fill, // Ensure the background covers the screen
+              fit: BoxFit.cover, // Ensure the background covers the screen
             ),
           ),
           Positioned(
             top: 30, // Adjust the position from the top
             right: 20, // Adjust the position from the right
             child: IconButton(
-              icon: const Icon(HeroiconsSolid.user, size: 30, color: Color.fromARGB(255, 238, 160, 160),), // Profile icon
+              icon: const Icon(
+                HeroiconsSolid.user,
+                size: 30,
+                color: Color.fromARGB(255, 238, 160, 160),
+              ), // Profile icon
               onPressed: () {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const ProfilePage()),
                 );
-                },
+              },
             ),
           ),
           FutureBuilder<List<Map<String, dynamic>>>(
@@ -314,8 +328,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
                     SizedBox(
-                        height: screenHeight *
-                            0.17), // Dynamically adjust top padding
+                      height: MediaQuery.of(context).size.width > 600
+                          ? screenHeight * 0.17
+                          : screenHeight * 0.18,
+                    ), // Dynamically adjust top padding
                     Expanded(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -332,7 +348,8 @@ class _MyHomePageState extends State<MyHomePage> {
                               );
                             },
                             child: Padding(
-                              padding: const EdgeInsets.all(13.0),
+                              padding: const EdgeInsets.only(
+                                  left: 13, right: 13.0, top: 7, bottom: 20),
                               child: Card(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(15),
@@ -347,28 +364,34 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
-                                      const Icon(_cardIcon,
+                                      Icon(cardIcon,
                                           size: iconSize), // Default icon
                                       Padding(
-                                        padding: const EdgeInsets.only(top: 15.0),
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
                                         child: Container(
                                           height: cardHeight * 0.3,
                                           width: cardWidth,
                                           child: ClipRRect(
-                                            borderRadius: const BorderRadius.only(
+                                            borderRadius:
+                                                const BorderRadius.only(
                                               bottomLeft: Radius.circular(15.0),
-                                              bottomRight: Radius.circular(15.0),
+                                              bottomRight:
+                                                  Radius.circular(15.0),
                                             ),
                                             child: Container(
-                                              color: _cardColor,
-                                              padding: const EdgeInsets.all(6.0),
+                                              color: const Color.fromARGB(255, 246, 201, 201),// Light Peach
+
+                                              padding:
+                                                  const EdgeInsets.all(10.0),
                                               child: Text(
                                                 _currentLabel,
                                                 style: TextStyle(
-                                                  fontSize: MediaQuery.of(context)
-                                                          .size
-                                                          .height *
-                                                      0.017,
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                              .size
+                                                              .height *
+                                                          0.017,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,
                                                 ),
@@ -414,19 +437,24 @@ class _MyHomePageState extends State<MyHomePage> {
       rows.add(
         Padding(
           padding: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height * 0.014,
+            vertical: MediaQuery.of(context).size.height * 0.01,
             horizontal: MediaQuery.of(context).size.width *
-                0.08, // Make horizontal padding responsive
+                0.01, // Make horizontal padding responsive
           ),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: rowCategories.map((category) {
               // Directly pass the Color object for color
-              return EditableCategoryCard(
-                initialIcon: category['icon'],
-                color: category['color'], // Pass Color object directly
-                initialLabel: category['label'],
-                type: category['type'],
+              return Row(
+                children: [
+                  const SizedBox(width: 6),
+                  EditableCategoryCard(
+                    initialIcon: category['icon'],
+                    color: category['color'], // Pass Color object directly
+                    initialLabel: category['label'],
+                    type: category['type'],
+                  ),
+                ],
               );
             }).toList(),
           ),
@@ -600,7 +628,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                       .toList(),
                 ),
               ),
-              const SizedBox(height: 8.0), // Space between icons and close button
+              const SizedBox(
+                  height: 8.0), // Space between icons and close button
               Align(
                 alignment: Alignment.bottomRight,
                 child: TextButton(
@@ -804,14 +833,11 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
 
     if (existingRecord != null) {
       // If it exists, update the color
-      final response = await Supabase.instance.client
-          .from('titles')
-          .update({
-            'color':
-                '#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase().substring(2)}'
-          })
-          .eq('type', widget.type);
-          //.eq('mail', mail);
+      final response = await Supabase.instance.client.from('titles').update({
+        'color':
+            '#${color.value.toRadixString(16).padLeft(8, '0').toUpperCase().substring(2)}'
+      }).eq('type', widget.type);
+      //.eq('mail', mail);
     } else {
       // If it doesn't exist, insert a new record
       final response = await Supabase.instance.client.from('titles').insert({
@@ -830,9 +856,17 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final double cardWidth = screenWidth * 0.22;
-    final double cardHeight = screenHeight * 0.14;
-    final double iconSize = cardWidth * 0.5;
+    final double cardWidth = MediaQuery.of(context).size.width < 600
+        ? screenWidth * 0.28 // Adjusted width for larger screens
+        : screenWidth * 0.22; // Default width for smaller screens
+
+    final double cardHeight = MediaQuery.of(context).size.width < 600
+        ? screenHeight * 0.14 // Adjusted height for larger screens
+        : screenHeight * 0.14; // Default height for smaller screens
+
+    final double iconSize = MediaQuery.of(context).size.width < 600
+        ? cardWidth * 0.5 // Larger icon size for larger screens
+        : cardWidth * 0.5; // Default icon size for smaller screens
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -875,7 +909,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
-                              borderSide: const BorderSide(color: Colors.blueAccent),
+                              borderSide:
+                                  const BorderSide(color: Colors.blueAccent),
                             ),
                             contentPadding: const EdgeInsets.symmetric(
                                 vertical: 16, horizontal: 12),
@@ -889,7 +924,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: _chooseIcon,
-                                icon: const Icon(Icons.edit, color: Colors.white),
+                                icon:
+                                    const Icon(Icons.edit, color: Colors.white),
                                 label: const Text("Choose Icon"),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.white,
@@ -910,8 +946,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                             Expanded(
                               child: OutlinedButton.icon(
                                 onPressed: _chooseColor,
-                                icon:
-                                    const Icon(Icons.color_lens, color: Colors.white),
+                                icon: const Icon(Icons.color_lens,
+                                    color: Colors.white),
                                 label: const Text("Choose Color"),
                                 style: OutlinedButton.styleFrom(
                                   foregroundColor: Colors.white,
@@ -1005,7 +1041,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   Icon(_currentIcon, size: iconSize),
                   Padding(
                     padding: const EdgeInsets.only(top: 15.0),
-                    child: Container(
+                    child: SizedBox(
                       height: cardHeight * 0.3,
                       width: cardWidth,
                       child: ClipRRect(
