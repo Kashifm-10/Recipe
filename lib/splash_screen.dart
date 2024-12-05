@@ -60,7 +60,7 @@ class _SplashScreenState extends State<SplashScreen> {
           'assets/images/splash.png',
           width: screenWidth, // Make the image responsive to screen size
           height: screenHeight, // Scale height to 100% of screen height
-          fit: BoxFit.fitWidth, // Ensures the image maintains aspect ratio
+          fit: BoxFit.cover, // Ensures the image maintains aspect ratio
         ),
       ),
     );

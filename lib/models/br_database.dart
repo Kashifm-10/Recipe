@@ -256,8 +256,17 @@ class database extends ChangeNotifier {
       String duration, String category, String date, String time) async {
     final prefs = await SharedPreferences.getInstance();
     String? mail = prefs.getString('email');
+
+    // Capitalize the first letter of each word in textFromUser
+    String formattedName = textFromUser
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' ');
+
     final newDish = {
-      'name': textFromUser,
+      'name': formattedName,
       'serial': serial,
       'type': type,
       'duration': duration,
@@ -327,9 +336,17 @@ class database extends ChangeNotifier {
   //UPDATE
   Future<void> updateDish(int id, String newText, String type, String duration,
       String category, String date, String time) async {
+    // Capitalize the first letter of each word in newText
+    String formattedName = newText
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' ');
+
     final existingNote = await isar.dishs.get(id);
     final updatedNote = {
-      'name': newText,
+      'name': formattedName,
       'duration': duration,
       'category': category,
       'date': date,
@@ -452,8 +469,16 @@ class database extends ChangeNotifier {
 
   Future<void> addIngredient(String? serial, String textFromUser, String type,
       String dish, String quantity, String uom, String category) async {
+    // Capitalize the first letter of each word in textFromUser
+    String formattedName = textFromUser
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' ');
+
     final newIng = {
-      'name': textFromUser,
+      'name': formattedName,
       'serial': serial,
       'type': type,
       'dish': dish,
@@ -488,7 +513,7 @@ class database extends ChangeNotifier {
         category: item['category'])));
 
     // Sort by 'id' if server-side ordering is not available or reliable
-   /*  currentIng.sort((a, b) => a.id.compareTo(b.id)); */
+    /*  currentIng.sort((a, b) => a.id.compareTo(b.id)); */
 
     print(data);
 
@@ -546,8 +571,16 @@ class database extends ChangeNotifier {
 
   Future<void> updateIngredient(
       int id, String newText, String type, String quantity, String uom) async {
+    // Capitalize the first letter of each word in newText
+    String formattedName = newText
+        .split(' ')
+        .map((word) => word.isNotEmpty
+            ? '${word[0].toUpperCase()}${word.substring(1).toLowerCase()}'
+            : '')
+        .join(' ');
+
     final response = await Supabase.instance.client.from('ingredients').update({
-      'name': newText,
+      'name': formattedName,
       'quantity': quantity,
       'uom': uom,
     }).eq('id', id);

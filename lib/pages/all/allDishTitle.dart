@@ -3,8 +3,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/pages/recipe.dart';
-import 'package:recipe/models/noteSettings.dart';
-import 'package:recipe/models/dish.dart';
+import 'package:recipe/notInUse/dish.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class allDishTile extends StatefulWidget {

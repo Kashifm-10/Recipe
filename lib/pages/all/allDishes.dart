@@ -13,7 +13,7 @@ import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/pages/all/allDishTitle.dart';
 import 'package:recipe/pages/all/allDishesRecipes.dart';
 import 'package:recipe/pages/recipe.dart';
-import 'package:recipe/models/dish_tile.dart';
+import 'package:recipe/list_view/dish_tile.dart';
 import 'package:recipe/pages/home.dart';
 import 'package:animated_switch/animated_switch.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';

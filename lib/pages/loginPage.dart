@@ -19,31 +19,37 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isGoogleSignInInProgress = false;
 
   Future<void> _signInWithEmailPassword() async {
-    final response = await Supabase.instance.client
-        .from('users')
-        .select('email, password, name')
-        .eq('email', _emailController.text.toLowerCase())
-        .eq('password', _passwordController.text);
+    try {
+      final response = await Supabase.instance.client
+          .from('users')
+          .select('email, password, name')
+          .eq('email', _emailController.text.toLowerCase())
+          .eq('password', _passwordController.text);
 
-    final data = List<Map<String, dynamic>>.from(response);
+      final data = List<Map<String, dynamic>>.from(response);
 
-    if (data.isNotEmpty) {
-      String email = data.first['email'];
-      String username = data.first['name'];
+      if (data.isNotEmpty) {
+        String email = data.first['email'];
+        String username = data.first['name'];
 
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('email', email);
-      await prefs.setString('name', username);
-      await prefs.setBool("isLoggedIn", true);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('email', email);
+        await prefs.setString('name', username);
+        await prefs.setBool("isLoggedIn", true);
 
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const MyHomePage()),
-      );
-    } else {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const MyHomePage()),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid email or password')),
+        );
+      }
+    } catch (e) {
+      print("Email sign-in error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid email or password')),
-      );
+          SnackBar(content: Text('Login failed: No Internet Connection')));
     }
   }
 
@@ -95,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     Container(
                       padding: EdgeInsets.all(screenWidth * 0.03),
                       decoration: BoxDecoration(
-                        color: Color(0xFFF59E9E),
+                        color: const Color(0xFFF59E9E),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Icon(
@@ -110,7 +116,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                         fontSize: screenWidth * 0.05,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF5C2C2C),
+                        color: const Color(0xFF5C2C2C),
                       ),
                     ),
                   ],
@@ -130,7 +136,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
                         blurRadius: 8,
-                        offset: Offset(0, 4),
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
@@ -143,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: TextStyle(
                           fontSize: screenWidth * 0.06,
                           fontWeight: FontWeight.bold,
-                          color: Color(0xFF5C2C2C),
+                          color: const Color(0xFF5C2C2C),
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.03),
@@ -170,7 +176,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: ElevatedButton(
                           onPressed: _signInWithEmailPassword,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Color(0xFFF59E9E),
+                            backgroundColor: const Color(0xFFF59E9E),
                             padding: EdgeInsets.symmetric(
                                 vertical: screenHeight * 0.01),
                             shape: RoundedRectangleBorder(
@@ -195,7 +201,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Text(
                           'Forgot Password?',
                           style: TextStyle(
-                            color: Color(0xFFF59E9E),
+                            color: const Color(0xFFF59E9E),
                             fontSize: screenWidth * 0.02,
                             fontWeight: FontWeight.bold,
                           ),
@@ -280,12 +286,12 @@ class _LoginScreenState extends State<LoginScreen> {
         labelText: label,
         hintText: hintText,
         filled: true,
-        fillColor: Color(0xFFFEE1D5),
+        fillColor: const Color(0xFFFEE1D5),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
           borderSide: BorderSide.none,
         ),
-        prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)), // Icon color
+        prefixIcon: Icon(icon, color: const Color(0xFF5C2C2C)), // Icon color
         labelStyle: const TextStyle(
           color: Color(0xFF5C2C2C), // Set label color same as the icon
         ),

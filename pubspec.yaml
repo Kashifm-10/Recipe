@@ -75,6 +75,7 @@ dependencies:
   flutter_svg: ^2.0.13
   heroicons_flutter: ^0.4.0
   filter_list: ^1.0.3
+  drop_down_search_field: ^1.0.6
 
 dev_dependencies:
   flutter_test:
@@ -113,6 +114,8 @@ flutter:
     - assets/images/logo.png
     - assets/images/login_bg.jpg
     - assets/images/log_bg.png
+    - assets/images/bg_home.jpg
+    - assets/images/test.jpg
     - assets/icons/google_icon.svg
   #   - images/a_dot_ham.jpeg
 

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/pages/recipe.dart';
-import 'package:recipe/models/noteSettings.dart';
 
 import 'package:flutter/material.dart';
 

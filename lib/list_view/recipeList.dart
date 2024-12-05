@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/pages/recipe.dart';
-import 'package:recipe/models/noteSettings.dart';
 
 class RecipeList extends StatelessWidget {
   RecipeList({
@@ -35,10 +34,32 @@ class RecipeList extends StatelessWidget {
           height: 100,
           backgroundColor: Theme.of(context).colorScheme.surface,
           context: context,
-          bodyBuilder: (context) => Notesettings(
-            onEditTap: onEditPressed,
-            onDeleteTap: onDeletePressed,
-          ),
+          bodyBuilder: (context) => Column(
+      children: [
+        //edit option
+        GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+             onEditPressed;
+            },
+            child: Container(
+              height: 50,
+              color: Theme.of(context).colorScheme.surface,
+              child: const Center(child: Text('Edit')),
+            )),
+        //delete option
+        GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+              onDeletePressed;
+            },
+            child: Container(
+              height: 50,
+              color: Theme.of(context).colorScheme.surface,
+              child: const Center(child: Text('Delete')),
+            )),
+      ],
+    ),
         ),
         child: Text(
           text,

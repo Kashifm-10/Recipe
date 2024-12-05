@@ -80,8 +80,8 @@ class AuthService {
       );
     } catch (e) {
       print("Google sign-in error: $e");
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Login failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: No Internet Connection')));
     }
   }
 

@@ -5,16 +5,20 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/pages/all/allDishes.dart';
 import 'package:recipe/pages/dishesList.dart';
 import 'package:recipe/pages/profile.dart';
+import 'package:recipe/pages/recipe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
 import 'package:flutter_hsvcolor_picker/flutter_hsvcolor_picker.dart'
     as hsv_picker;
 import 'package:heroicons_flutter/heroicons_flutter.dart';
+import 'package:drop_down_search_field/drop_down_search_field.dart';
+import 'package:speech_to_text/speech_to_text.dart' as stt;
 
 class CategoryService {
   // Fetch categories from the 'categories' table in Supabase
@@ -173,7 +177,7 @@ class CategoryService {
     List<Color> colors = data.map((item) {
       return _colorFromHex(item['color']);
     }).toList();
-
+    //List<Color> colors = [];
     return colors;
   }
 
@@ -189,15 +193,15 @@ class CategoryService {
       case '1':
         return colors.isNotEmpty
             ? colors[0]
-            : const Color.fromARGB(255, 253, 212, 168);
+            : const Color.fromARGB(255, 238, 183, 125);
       case '2':
         return colors.isNotEmpty
             ? colors[1]
-            : const Color.fromARGB(255, 217, 212, 182);
+            : const Color.fromARGB(255, 245, 226, 119);
       case '3':
         return colors.isNotEmpty
             ? colors[2]
-            : const Color.fromARGB(255, 240, 184, 213);
+            : const Color.fromARGB(255, 245, 145, 197);
       case '4':
         return colors.isNotEmpty
             ? colors[3]
@@ -249,10 +253,24 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   late Future<List<Map<String, dynamic>>> _categories;
+  List<Dish> searchdishes = [];
+  List<Dish> allDishes = [];
+  List<int> typeCountList = [];
+  List<Map<String, int>> typeCategoryCountList = [];
+  List<Dish> searchNames = [];
+  stt.SpeechToText _speech = stt.SpeechToText();
+  bool _isListening = false;
+  bool _isLoading = true; // Manage loading state
+  TextEditingController textController = TextEditingController();
+  String searchQuery = '';
+  bool _isErrorDialogShown = false;
 
   @override
   void initState() {
     super.initState();
+    countDishes();
+    fetchDishes();
+
     // Initialize _categories with a fetch request immediately
     _categories = CategoryService().fetchCategories();
   }
@@ -262,165 +280,539 @@ class _MyHomePageState extends State<MyHomePage> {
     _categories = CategoryService()
         .fetchCategories(); // Refresh the categories after adding a title
   } */
+  Future<void> fetchDishes() async {
+    try {
+      final response = await Supabase.instance.client.from('dishes').select();
+      final data = List<Map<String, dynamic>>.from(response);
+
+      setState(() {
+        searchdishes = data
+            .map((item) => Dish(
+                  name: item['name'],
+                  serial: item['serial'],
+                  type: item['type'],
+                  duration: item['duration'],
+                  category: item['category'],
+                  date: item['date'],
+                  time: item['time'],
+                ))
+            .toList();
+      });
+    } catch (e) {
+      print("Error fetching dishes: $e");
+    }
+  }
+
+  Future<void> countDishes() async {
+    try {
+      final response = await Supabase.instance.client.from('dishes').select();
+      final data = List<Map<String, dynamic>>.from(response);
+
+      // Parse dishes
+      List<Dish> dishes = data
+          .map((item) => Dish(
+                name: item['name'],
+                serial: item['serial'],
+                type: item['type'],
+                duration: item['duration'],
+                category: item['category'],
+                date: item['date'],
+                time: item['time'],
+              ))
+          .toList();
+
+      // Filter by type and category
+      List<Map<String, int>> typeCategoryCounts =
+          List.generate(10, (typeIndex) {
+        int category0Count = dishes
+            .where((dish) =>
+                dish.type == '${typeIndex + 1}' && dish.category == "0")
+            .length;
+        int category1Count = dishes
+            .where((dish) =>
+                dish.type == '${typeIndex + 1}' && dish.category == "1")
+            .length;
+        return {
+          'type': typeIndex + 1,
+          'category0': category0Count,
+          'category1': category1Count,
+        };
+      });
+      for (var count in typeCategoryCounts) {
+        print(
+            'Type ${count['type']}: Category 0 Count = ${count['category0']}, Category 1 Count = ${count['category1']}');
+      }
+
+      setState(() {
+        allDishes = dishes;
+        typeCategoryCountList = typeCategoryCounts; // Store counts in a list
+      });
+    } catch (e) {
+      print("Error fetching dishes: $e");
+    }
+  }
+
+  void _startListening() async {
+    if (!_isListening) {
+      bool available = await _speech.initialize();
+      if (available) {
+        setState(() => _isListening = true);
+        print("Listening started..."); // Debugging statement
+        _speech.listen(
+          onResult: (result) {
+            print(
+                "Result received: ${result.recognizedWords}"); // Debugging statement
+            setState(() {
+              searchQuery = result.recognizedWords.toLowerCase();
+              textController.text = searchQuery; // Update TextField
+            });
+          },
+        );
+
+        await Future.delayed(const Duration(seconds: 5)); // Minimum wait time
+        await _speech.stop(); // Stop the speech recognition
+        setState(() => _isListening = false); // Update state
+        print("Listening stopped..."); // Debugging statement
+      } else {
+        print("Speech recognition is not available.");
+      }
+    }
+  }
+
+  void _stopListening() async {
+    if (_isListening) {
+      await _speech.stop(); // Stop the speech recognition
+      setState(() => _isListening = false); // Update state
+      print("Listening stopped..."); // Debugging statement
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    // Get screen dimensions
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool _isEditing = false;
-    late TextEditingController _labelController;
     String _currentLabel = "Find By Ingredients"; // Default label
     const Color _cardColor =
-        Color.fromARGB(255, 240, 189, 197); // Default color
-    const IconData cardIcon = HeroiconsOutline.squaresPlus; // Default icon
-    final double cardWidth = MediaQuery.of(context).size.width < 600
-        ? screenWidth * 1.5 // Adjusted width for s screens
-        : 600; // Default width (600) for l screens
-
-    final double cardHeight = MediaQuery.of(context).size.width < 600
-        ? screenWidth * 0.4 // Adjusted height for s screens
-        : 170; // Default height for l screens
-
-    final double iconSize = MediaQuery.of(context).size.width < 600
-        ? screenWidth * 0.2 // Larger icon size for s screens
-        : 80; // Default icon size for l screens
+        Color.fromARGB(255, 128, 194, 233); // Default color
+    const IconData cardIcon = HeroiconsOutline.archiveBox; // Default icon
+    final double cardWidth =
+        screenWidth < 600 ? screenWidth * 1.5 : screenWidth * 0.1;
+    final double cardHeight =
+        screenWidth < 600 ? screenWidth * 0.4 : screenHeight * 0.07;
+    final double iconSize = screenWidth < 600 ? screenWidth * 0.2 : 40;
 
     return Scaffold(
-      body: Stack(
-        children: [
-          Positioned.fill(
-            child: Image.asset(
-              MediaQuery.of(context).size.width > 600
-                  ? 'assets/images/bg.png' // Image for larger screens
-                  : 'assets/images/bg1.png', // Image for smaller screens
-              width: screenWidth,
-              height: screenHeight,
-              fit: BoxFit.cover, // Ensure the background covers the screen
+      resizeToAvoidBottomInset: false,
+      body: GestureDetector(
+        // When tapping anywhere outside the search bar, it unfocuses the search field and hides the keyboard.
+        onTap: () {
+          FocusScope.of(context).unfocus();
+        },
+        child: Stack(
+          children: [
+            // Background Image
+            Positioned.fill(
+              child: Image.asset(
+                screenWidth > 600
+                    ? 'assets/images/bg_home.jpg' // Image for larger screens
+                    : 'assets/images/bg_home.jpg', // Image for smaller screens
+                width: screenWidth,
+                height: screenHeight,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-          Positioned(
-            top: 30, // Adjust the position from the top
-            right: 20, // Adjust the position from the right
-            child: IconButton(
-              icon: const Icon(
-                HeroiconsSolid.user,
-                size: 30,
-                color: Color.fromARGB(255, 238, 160, 160),
-              ), // Profile icon
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => const ProfilePage()),
-                );
-              },
+            // Profile Icon
+            Positioned(
+              top: 30,
+              right: 20,
+              child: IconButton(
+                icon: const Icon(
+                  HeroiconsSolid.user,
+                  size: 30,
+                  color: Colors.white,
+                ),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const ProfilePage()),
+                  );
+                },
+              ),
             ),
-          ),
-          FutureBuilder<List<Map<String, dynamic>>>(
-            future: _categories, // Use the initialized _categories
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Center(child: CircularProgressIndicator());
-              } else if (snapshot.hasError) {
-                return Center(child: Text('Error: ${snapshot.error}'));
-              } else {
-                return Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: <Widget>[
-                    SizedBox(
-                      height: MediaQuery.of(context).size.width > 600
-                          ? screenHeight * 0.17
-                          : screenHeight * 0.18,
-                    ), // Dynamically adjust top padding
-                    Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          ..._buildCategoryRows(snapshot.data ?? []),
-                          GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).push(
-                                MaterialPageRoute(
-                                  builder: (context) => alldishesList(
-                                    title: _currentLabel,
-                                  ),
-                                ),
-                              );
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(
-                                  left: 13, right: 13.0, top: 7, bottom: 20),
-                              child: Card(
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(15),
-                                  side: const BorderSide(
-                                    color: _cardColor,
-                                    width: 2.0,
-                                  ),
-                                ),
-                                child: SizedBox(
-                                  width: cardWidth,
-                                  height: cardHeight,
+            // Main Content
+            FutureBuilder<List<Map<String, dynamic>>>(
+              future: _categories,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 7,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  if (!_isErrorDialogShown) {
+                    _isErrorDialogShown = true;
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                          content: Container(
+                              height: screenHeight * 0.15,
+                              width: screenWidth * 0.4,
+                              child: Center(
                                   child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Icon(cardIcon,
-                                          size: iconSize), // Default icon
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 15.0),
-                                        child: Container(
-                                          height: cardHeight * 0.3,
-                                          width: cardWidth,
-                                          child: ClipRRect(
-                                            borderRadius:
-                                                const BorderRadius.only(
-                                              bottomLeft: Radius.circular(15.0),
-                                              bottomRight:
-                                                  Radius.circular(15.0),
-                                            ),
-                                            child: Container(
-                                              color: const Color.fromARGB(255, 246, 201, 201),// Light Peach
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.wifi_off_rounded, size: 50),
+                                  const Text(
+                                    "No Connection",
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                        fontSize: 30,
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  const Text('Please Connect to Internet'),
+                                  TextButton(
+                                    onPressed: () {
+                                      _isErrorDialogShown =
+                                          false; // Reset dialog state
 
-                                              padding:
-                                                  const EdgeInsets.all(10.0),
-                                              child: Text(
-                                                _currentLabel,
-                                                style: TextStyle(
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .height *
-                                                          0.017,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                ),
-                                                textAlign: TextAlign.center,
+                                      Navigator.of(context).pop();
+                                      Navigator.pushAndRemoveUntil(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                const MyHomePage()),
+                                        (Route<dynamic> route) => false,
+                                      );
+                                    },
+                                    child: const Text('Retry'),
+                                  ),
+                                ],
+                              ))),
+                        ),
+                      );
+                    });
+                  }
+                  return const Center(child: Text(''));
+                } else {
+                  return Column(
+                    children: [
+                      // Title
+                      Padding(
+                        padding: const EdgeInsets.only(top: 200.0),
+                        child: Text(
+                          "Categories",
+                          style: TextStyle(
+                            fontSize: screenWidth < 600 ? 24 : 60,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                      const SizedBox(
+                        height: 70,
+                      ),
+                      // Search Bar
+                      Padding(
+                        padding: EdgeInsets.symmetric(
+                            horizontal: screenWidth * 0.08),
+                        child: DropDownSearchField(
+                          displayAllSuggestionWhenTap: true,
+                          textFieldConfiguration: TextFieldConfiguration(
+                            controller: textController,
+                            autofocus: false,
+                            style: DefaultTextStyle.of(context).style.copyWith(
+                                  fontStyle: FontStyle.normal,
+                                ),
+                            decoration: InputDecoration(
+                              hintText: "Search Dishes",
+                              prefixIcon: const Icon(Icons.search),
+                              suffixIcon: Stack(
+                                alignment: Alignment.centerRight,
+                                children: [
+                                  // Microphone Icon Button
+                                  Positioned(
+                                    right:
+                                        3.0, // Adjust this value to control the visibility
+                                    child: IconButton(
+                                      icon: const Icon(
+                                        Ionicons.close_circle_outline,
+                                        color: Colors.grey,
+                                      ),
+                                      onPressed: () {
+                                        // Clear the search field
+                                        textController.clear();
+                                      },
+                                    ),
+                                  ),
+                                  // Close Button
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                        right: 35.0,
+                                        top:
+                                            1), // Adjust this padding as needed
+                                    child: IconButton(
+                                      onPressed: !_isListening
+                                          ? _startListening
+                                          : _stopListening, // Start or stop voice search
+                                      icon: Icon(
+                                        _isListening
+                                            ? Icons.mic
+                                            : Icons
+                                                .mic_none, // Change icon based on listening state
+                                        color: _isListening
+                                            ? Colors.red
+                                            : Colors.grey,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              filled: true,
+                              fillColor: Colors.white,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(30.0),
+                                borderSide: BorderSide.none,
+                              ),
+                            ),
+                          ),
+                          suggestionsCallback: (pattern) async {
+                            final lowercasePattern = pattern.toLowerCase();
+                            return searchdishes
+                                .where((dish) => dish.name
+                                    .toLowerCase()
+                                    .contains(lowercasePattern))
+                                .toList();
+                          },
+                          itemBuilder: (context, suggestion) {
+                            return Column(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                      bottom: 5.0, left: 10.0, right: 10.0),
+                                  child: ListTile(
+                                    leading: const Icon(Icons.fastfood,
+                                        color: Colors.orange, size: 30),
+                                    title: Text(
+                                      suggestion.name,
+                                      style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16),
+                                    ),
+                                    subtitle: Row(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.center,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            suggestion.duration != null
+                                                ? (() {
+                                                    double duration = double
+                                                            .tryParse(suggestion
+                                                                .duration!) ??
+                                                        0.0;
+                                                    int hours =
+                                                        duration.toInt();
+                                                    int minutes =
+                                                        ((duration - hours) *
+                                                                60)
+                                                            .toInt();
+
+                                                    if (hours > 0 &&
+                                                        minutes > 0) {
+                                                      return '$hours hr ${minutes} min';
+                                                    } else if (hours > 0) {
+                                                      return '$hours hr';
+                                                    } else if (minutes > 0) {
+                                                      return '$minutes min';
+                                                    } else {
+                                                      return '0 min';
+                                                    }
+                                                  }())
+                                                : 'Invalid duration',
+                                            style: const TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    tileColor: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      side:
+                                          const BorderSide(color: Colors.white),
+                                    ),
+                                    trailing: CircleAvatar(
+                                      radius: 10,
+                                      backgroundColor:
+                                          Colors.white.withOpacity(0.0),
+                                      child: suggestion.category == "1"
+                                          ? const Icon(Icons.circle_rounded,
+                                              color: Colors.red, size: 15)
+                                          : const Icon(Icons.circle_rounded,
+                                              color: Colors.green, size: 15),
+                                    ),
+                                  ),
+                                ),
+                                Divider(
+                                  color: Colors.grey, // Color of the divider
+                                  height: 1, // Height of the divider
+                                  thickness: 0.4, // Thickness of the divider
+                                  indent: screenWidth * 0.1,
+                                  endIndent: screenWidth * 0.1,
+                                ),
+                              ],
+                            );
+                          },
+                          onSuggestionSelected: (suggestion) {
+                            setState(() {
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => recipe(
+                                        serial: suggestion.serial,
+                                        type: suggestion.type,
+                                        dish: suggestion.name,
+                                        category: suggestion.category,
+                                      )));
+                            });
+                            print("suggestion: ${suggestion.name}");
+                          },
+                          suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                            elevation: 0,
+                            color: Colors
+                                .white, // Background color of the suggestion box
+                            borderRadius: BorderRadius.circular(
+                                20), // Rounded corners for the suggestion box
+                          ),
+                        ),
+                      ),
+                      // Adjust the spacing
+                      // Replace Expanded with Container or SizedBox with a max height
+                      Container(
+                        height: screenHeight *
+                            0.60, // Set the maximum height (adjust as needed)
+                        child: ListView(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 10, horizontal: screenWidth * 0.06),
+                          children: [
+                            // Categories from Snapshot
+                            ..._buildCategoryRows(snapshot.data ?? []),
+                            // Your first GestureDetector Card
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 15.0),
+                              child: Card(
+                                elevation: 8,
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                clipBehavior: Clip.antiAlias,
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => alldishesList(
+                                          title: _currentLabel,
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    width: cardWidth,
+                                    height: cardHeight,
+                                    decoration: const BoxDecoration(
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color.fromARGB(255, 131, 106, 68),
+                                          Color.fromARGB(255, 131, 106, 68),
+                                        ],
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                      ),
+                                    ),
+                                    child: Padding(
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: cardWidth * 2.4),
+                                      child: Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(0.0),
+                                            child: Container(
+                                              height: 60,
+                                              width: 60,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.white
+                                                    .withOpacity(0.8),
+                                              ),
+                                              child: Icon(
+                                                cardIcon,
+                                                size: iconSize,
+                                                color: const Color.fromARGB(
+                                                    255, 182, 143, 84),
                                               ),
                                             ),
                                           ),
-                                        ),
+                                          Expanded(
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 16.0),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    _currentLabel,
+                                                    style: const TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(height: 4),
+                                                  /* const Text(
+                                                    "Subtitle or Description",
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white70,
+                                                    ),
+                                                  ), */
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 8),
+                                        ],
                                       ),
-                                    ],
+                                    ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
-                );
-              }
-            },
-          ),
-        ],
+                    ],
+                  );
+                }
+              },
+            ),
+          ],
+        ),
       ),
     );
   }
 
-  List<Widget> _buildCategoryRows(List<Map<String, dynamic>> categories) {
+  /*  List<Widget> _buildCategoryRows(List<Map<String, dynamic>> categories) {
     // Sort categories by 'type' after converting 'type' to int
     categories
         .sort((a, b) => int.parse(a['type']).compareTo(int.parse(b['type'])));
@@ -437,7 +829,7 @@ class _MyHomePageState extends State<MyHomePage> {
       rows.add(
         Padding(
           padding: EdgeInsets.symmetric(
-            vertical: MediaQuery.of(context).size.height * 0.01,
+            vertical: MediaQuery.of(context).size.height * 0.0,
             horizontal: MediaQuery.of(context).size.width *
                 0.01, // Make horizontal padding responsive
           ),
@@ -463,6 +855,58 @@ class _MyHomePageState extends State<MyHomePage> {
     }
 
     return rows;
+  } */
+  List<Widget> _buildCategoryRows(List<Map<String, dynamic>> categories) {
+    // Sort categories by 'type' after converting 'type' to int
+    categories
+        .sort((a, b) => int.parse(a['type']).compareTo(int.parse(b['type'])));
+
+    final List<Widget> rows = [];
+    for (int i = 0; i < categories.length; i += 2) {
+      rows.add(
+        Padding(
+          padding: EdgeInsets.symmetric(
+            vertical: MediaQuery.of(context).size.height * 0.004,
+            horizontal:
+                MediaQuery.of(context).size.width * 0.02, // Responsive padding
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              // First card
+              Expanded(
+                child: EditableCategoryCard(
+                  initialIcon: categories[i]['icon'],
+                  color: categories[i]['color'], // Pass Color object directly
+                  initialLabel: categories[i]['label'],
+                  type: categories[i]['type'],
+                  veg: typeCategoryCountList[i]['category0']!,
+                  non_veg: typeCategoryCountList[i]['category1']!,
+                ),
+              ),
+              SizedBox(width: MediaQuery.of(context).size.width * 0.02),
+              // Second card if available
+              if (i + 1 < categories.length)
+                Expanded(
+                  child: EditableCategoryCard(
+                    initialIcon: categories[i + 1]['icon'],
+                    color: categories[i + 1]
+                        ['color'], // Pass Color object directly
+                    initialLabel: categories[i + 1]['label'],
+                    type: categories[i + 1]['type'],
+                    veg: typeCategoryCountList[i + 1]['category0']!,
+                    non_veg: typeCategoryCountList[i + 1]['category1']!,
+                  ),
+                )
+              else
+                const Expanded(
+                    child: SizedBox()), // Empty space if no second card
+            ],
+          ),
+        ),
+      );
+    }
+    return rows;
   }
 }
 
@@ -471,12 +915,16 @@ class EditableCategoryCard extends StatefulWidget {
   Color color; // Make color non-final so it can be updated dynamically
   final String initialLabel;
   final String type;
+  final int veg;
+  final int non_veg;
 
   EditableCategoryCard({
     required this.initialIcon,
     required this.color,
     required this.initialLabel,
     required this.type,
+    required this.veg,
+    required this.non_veg,
     Key? key,
   }) : super(key: key);
 
@@ -862,227 +1310,305 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
 
     final double cardHeight = MediaQuery.of(context).size.width < 600
         ? screenHeight * 0.14 // Adjusted height for larger screens
-        : screenHeight * 0.14; // Default height for smaller screens
+        : screenHeight * 0.12; // Default height for smaller screens
 
     final double iconSize = MediaQuery.of(context).size.width < 600
         ? cardWidth * 0.5 // Larger icon size for larger screens
-        : cardWidth * 0.5; // Default icon size for smaller screens
+        : cardWidth * 0.2; // Default icon size for smaller screens
 
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
-          onLongPress: () {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                TextEditingController dialogTextController =
-                    TextEditingController(text: _currentLabel);
+            onLongPress: () {
+              showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  TextEditingController dialogTextController =
+                      TextEditingController(text: _currentLabel);
 
-                return AlertDialog(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                  title: const Center(
-                    child: Text(
-                      "Edit Icon or Text",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                  return AlertDialog(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    title: const Center(
+                      child: Text(
+                        "Edit Icon or Text",
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
                       ),
                     ),
-                  ),
-                  content: SizedBox(
-                    width: 400, // Increase the width of the dialog
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        TextField(
-                          controller: dialogTextController,
-                          decoration: InputDecoration(
-                            labelText: "Edit Text",
-                            labelStyle: TextStyle(color: Colors.grey[700]),
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide: BorderSide(color: Colors.grey[400]!),
+                    content: SizedBox(
+                      width: 400, // Increase the width of the dialog
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextField(
+                            controller: dialogTextController,
+                            decoration: InputDecoration(
+                              labelText: "Edit Text",
+                              labelStyle: TextStyle(color: Colors.grey[700]),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    BorderSide(color: Colors.grey[400]!),
+                              ),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(12),
+                                borderSide:
+                                    const BorderSide(color: Colors.blueAccent),
+                              ),
+                              contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 16, horizontal: 12),
                             ),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(12),
-                              borderSide:
-                                  const BorderSide(color: Colors.blueAccent),
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                vertical: 16, horizontal: 12),
+                            style: const TextStyle(fontSize: 16),
                           ),
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                        const SizedBox(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _chooseIcon,
-                                icon:
-                                    const Icon(Icons.edit, color: Colors.white),
-                                label: const Text("Choose Icon"),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 18, horizontal: 20),
-                                  side: const BorderSide(
-                                      color: Color(0xFFFE9A8B)), // Peach color
-                                  backgroundColor:
-                                      const Color(0xFFFE9A8B), // Peach color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 20),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _chooseIcon,
+                                  icon: const Icon(Icons.edit,
+                                      color: Colors.white),
+                                  label: const Text("Choose Icon"),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 18, horizontal: 20),
+                                    side: const BorderSide(
+                                        color:
+                                            Color(0xFFFE9A8B)), // Peach color
+                                    backgroundColor:
+                                        const Color(0xFFFE9A8B), // Peach color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                            const SizedBox(
-                                width: 10), // Space between the two buttons
-                            Expanded(
-                              child: OutlinedButton.icon(
-                                onPressed: _chooseColor,
-                                icon: const Icon(Icons.color_lens,
-                                    color: Colors.white),
-                                label: const Text("Choose Color"),
-                                style: OutlinedButton.styleFrom(
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 18, horizontal: 20),
-                                  side: const BorderSide(
-                                      color: Color(0xFFFE9A8B)), // Peach color
-                                  backgroundColor:
-                                      const Color(0xFFFE9A8B), // Peach color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
+                              const SizedBox(
+                                  width: 10), // Space between the two buttons
+                              Expanded(
+                                child: OutlinedButton.icon(
+                                  onPressed: _chooseColor,
+                                  icon: const Icon(Icons.color_lens,
+                                      color: Colors.white),
+                                  label: const Text("Choose Color"),
+                                  style: OutlinedButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 18, horizontal: 20),
+                                    side: const BorderSide(
+                                        color:
+                                            Color(0xFFFE9A8B)), // Peach color
+                                    backgroundColor:
+                                        const Color(0xFFFE9A8B), // Peach color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
                                   ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    actions: [
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10, right: 10),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            TextButton(
+                              onPressed: () async {
+                                setState(() {
+                                  _currentLabel = dialogTextController.text;
+                                });
+                                await Supabase.instance.client
+                                    .from('titles')
+                                    .update({'title': _currentLabel}).eq(
+                                        'type', widget.type);
+                                CategoryService().fetchCategories();
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text(
+                                "Save",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Color(0xFFFE9A8B), // Peach color
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10), // Space between buttons
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text(
+                                "Cancel",
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Color(0xFFFE9A8B), // Peach color
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
+                  );
+                },
+              );
+            },
+            onTap: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => dishesList(
+                    type: widget.type,
+                    title: _currentLabel,
                   ),
-                  actions: [
+                ),
+              );
+            },
+            child: Card(
+              elevation: 8,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(20),
+              ),
+              clipBehavior: Clip.antiAlias,
+              child: Container(
+                width: MediaQuery.of(context).size.width * 0.8, // Wider width
+                height:
+                    MediaQuery.of(context).size.height * 0.07, // Shorter height
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      Color(widget.color.value).withOpacity(0.8),
+                      Color(widget.color.value).withOpacity(0.8),
+                    ],
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                  ),
+                ),
+                child: Row(
+                  children: [
+                    // Icon with circular background
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 10, right: 10),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          TextButton(
-                            onPressed: () async {
-                              setState(() {
-                                _currentLabel = dialogTextController.text;
-                              });
-                              await Supabase.instance.client
-                                  .from('titles')
-                                  .update({'title': _currentLabel}).eq(
-                                      'type', widget.type);
-                              CategoryService().fetchCategories();
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "Save",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFFFE9A8B), // Peach color
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 10), // Space between buttons
-                          TextButton(
-                            onPressed: () {
-                              Navigator.of(context).pop();
-                            },
-                            child: const Text(
-                              "Cancel",
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Color(0xFFFE9A8B), // Peach color
-                              ),
-                            ),
-                          ),
-                        ],
+                      padding: const EdgeInsets.all(16.0),
+                      child: Container(
+                        height: 60,
+                        width: 60,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.white.withOpacity(0.8),
+                        ),
+                        child: Icon(
+                          _currentIcon,
+                          size: 32, // Adjusted icon size for horizontal layout
+                          color: Color(widget.color.value),
+                        ),
                       ),
                     ),
+                    Expanded(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            // Title Text
+                            _isEditing
+                                ? TextField(
+                                    controller: _labelController,
+                                    onSubmitted: (_) => _saveText(),
+                                    decoration: InputDecoration(
+                                      hintText: "Enter label...",
+                                      hintStyle: TextStyle(
+                                        color: Colors.white.withOpacity(0.5),
+                                      ),
+                                      border: InputBorder.none,
+                                    ),
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 16,
+                                    ),
+                                  )
+                                : Text(
+                                    _currentLabel,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                            const SizedBox(height: 4),
+                            // Optional Subtitle or Description
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              children: [
+                                Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Veg: ', // Placeholder text
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          widget.non_veg
+                                              .toString(), // Placeholder text
+                                          style: const TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Text(
+                                          'Non-Veg: ', // Placeholder text
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          widget.veg
+                                              .toString(), // Placeholder text
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 8), // Spacer at the end
                   ],
-                );
-              },
-            );
-          },
-          onTap: () {
-            Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => dishesList(
-                  type: widget.type,
-                  title: _currentLabel,
                 ),
               ),
-            );
-          },
-          child: Card(
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
-              side: BorderSide(
-                  color: Color(widget.color.value),
-                  width: 2.0), // Convert hex string back to Color
-            ),
-            child: SizedBox(
-              width: cardWidth,
-              height: cardHeight,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Icon(_currentIcon, size: iconSize),
-                  Padding(
-                    padding: const EdgeInsets.only(top: 15.0),
-                    child: SizedBox(
-                      height: cardHeight * 0.3,
-                      width: cardWidth,
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.only(
-                          bottomLeft: Radius.circular(15.0),
-                          bottomRight: Radius.circular(15.0),
-                        ),
-                        child: Container(
-                          color: Color(
-                            (widget.color.value),
-                          ), // Convert hex string to color
-                          padding: const EdgeInsets.all(9.0),
-                          child: _isEditing
-                              ? TextField(
-                                  controller: _labelController,
-                                  onSubmitted: (_) => _saveText(),
-                                  decoration: const InputDecoration(
-                                    border: InputBorder.none,
-                                    contentPadding:
-                                        EdgeInsets.symmetric(horizontal: 10.0),
-                                  ),
-                                )
-                              : Text(
-                                  _currentLabel,
-                                  style: TextStyle(
-                                      fontSize:
-                                          MediaQuery.of(context).size.height *
-                                              0.017,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white),
-                                  textAlign: TextAlign.center,
-                                ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+            ));
       },
     );
   }
