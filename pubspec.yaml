@@ -76,6 +76,8 @@ dependencies:
   heroicons_flutter: ^0.4.0
   filter_list: ^1.0.3
   drop_down_search_field: ^1.0.6
+  drop_down_list: ^0.0.8
+  page_transition: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -117,6 +119,9 @@ flutter:
     - assets/images/bg_home.jpg
     - assets/images/test.jpg
     - assets/icons/google_icon.svg
+    - assets/icons/steak_icon.svg
+    - assets/icons/no_items.png
+    - assets/icons/no_recipe.png
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

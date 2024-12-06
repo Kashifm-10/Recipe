@@ -4,13 +4,14 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/pages/all/allDishes.dart';
-import 'package:recipe/pages/dishesList.dart';
-import 'package:recipe/pages/profile.dart';
-import 'package:recipe/pages/recipe.dart';
+import 'package:recipe/pages/dishesPage.dart';
+import 'package:recipe/pages/profilePage.dart';
+import 'package:recipe/pages/recipePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
@@ -693,10 +694,12 @@ class _MyHomePageState extends State<MyHomePage> {
                       ),
                       // Adjust the spacing
                       // Replace Expanded with Container or SizedBox with a max height
-                      Container(
+                      SizedBox(
                         height: screenHeight *
                             0.60, // Set the maximum height (adjust as needed)
                         child: ListView(
+                          physics:
+                              const ScrollPhysics(), //remove this line to make scrollable
                           padding: EdgeInsets.symmetric(
                               vertical: 10, horizontal: screenWidth * 0.06),
                           children: [
@@ -1319,7 +1322,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
-            onLongPress: () {
+            //to edit color and icon
+            /* onLongPress: () {
               showDialog(
                 context: context,
                 builder: (BuildContext context) {
@@ -1465,11 +1469,16 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   );
                 },
               );
-            },
+            }, */
             onTap: () {
               Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => dishesList(
+                PageTransition(
+                  curve: Curves.linear,
+                  type: PageTransitionType.bottomToTop,
+                  duration: const Duration(
+                      milliseconds:
+                          300), // Adjust duration to slow down the transition
+                  child: dishesList(
                     type: widget.type,
                     title: _currentLabel,
                   ),

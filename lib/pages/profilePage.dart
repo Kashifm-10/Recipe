@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recipe/pages/loginPage.dart';
@@ -19,18 +20,41 @@ class ProfilePage extends StatelessWidget {
     final User? user = FirebaseAuth.instance.currentUser;
 
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        title: const Text("Profile"),
+        foregroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        title: const Text(
+          "Profile",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+        ),
+        leading: Padding(
+          padding: EdgeInsets.only(left: 10, bottom: 10),
+          child: IconButton(
+            icon: Icon(
+              FontAwesomeIcons.arrowLeft,
+              color: Colors.white,
+              size: 40,
+            ),
+            onPressed: () {
+              Navigator.pop(context); // Navigate back when pressed
+            },
+          ),
+        ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.exit_to_app),
+            icon: const Icon(Icons.exit_to_app, color: Colors.white, size: 40),
             onPressed: () async {
               // Sign out the user
               await GoogleSignIn().signOut();
               await FirebaseAuth.instance.signOut();
-              Navigator.pushReplacement(
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool("isLoggedIn", false);
+
+              Navigator.pushAndRemoveUntil(
                 context,
                 MaterialPageRoute(builder: (context) => LoginScreen()),
+                (Route<dynamic> route) => false,
               );
             },
           ),
@@ -48,7 +72,8 @@ class ProfilePage extends StatelessWidget {
 
           // Content
           Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding:
+                const EdgeInsets.symmetric(vertical: 100.0, horizontal: 50),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -134,11 +159,11 @@ class ProfilePage extends StatelessWidget {
                 const SizedBox(height: 20),
 
                 // Log Out Button
-                ElevatedButton.icon(
+                /*    ElevatedButton.icon(
                   icon: const Icon(Icons.exit_to_app),
                   label: const Text('Log Out'),
                   style: ElevatedButton.styleFrom(
-                    minimumSize: const Size(double.infinity, 50), // full width
+                    minimumSize: const Size(100, 50), // full width
                     padding: const EdgeInsets.symmetric(vertical: 16),
                   ),
                   onPressed: () async {
@@ -154,7 +179,7 @@ class ProfilePage extends StatelessWidget {
                       (Route<dynamic> route) => false,
                     );
                   },
-                ),
+                ), */
               ],
             ),
           ),

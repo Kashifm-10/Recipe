@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/collections/names.dart';
-import 'package:recipe/pages/recipe.dart';
+import 'package:recipe/pages/recipePage.dart';
 import 'package:recipe/notInUse/dish.dart';
 
 class DishTile extends StatelessWidget {
@@ -26,10 +26,10 @@ class DishTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
       child: Container(
         width: MediaQuery.of(context).size.width * 0.1,
-        height: MediaQuery.of(context).size.height * 0.11,
+        height: MediaQuery.of(context).size.height * 0.08,
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(20),

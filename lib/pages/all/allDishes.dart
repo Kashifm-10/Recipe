@@ -12,7 +12,7 @@ import 'package:recipe/models/br_database.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/pages/all/allDishTitle.dart';
 import 'package:recipe/pages/all/allDishesRecipes.dart';
-import 'package:recipe/pages/recipe.dart';
+import 'package:recipe/pages/recipePage.dart';
 import 'package:recipe/list_view/dish_tile.dart';
 import 'package:recipe/pages/home.dart';
 import 'package:animated_switch/animated_switch.dart';
@@ -53,7 +53,10 @@ class _alldishesListState extends State<alldishesList> {
   int _currentIndex = 0;
   String? dishName;
   TextEditingController _searchController = TextEditingController();
+  TextEditingController _searchControllerIng = TextEditingController();
+
   String searchQuery = '';
+  String searchQueryIng = '';
 
   stt.SpeechToText _speech = stt.SpeechToText();
   bool _isListening = false;
@@ -462,22 +465,28 @@ class _alldishesListState extends State<alldishesList> {
     final noteDatabase = context.read<database>();
 
     _filteredByIng = noteDatabase.currentAllIng.where((note) {
+      // Check if the note name matches the search query
       final matchesSearch =
-          note.name!.toLowerCase().contains(searchQuery.toLowerCase());
+          note.name!.toLowerCase().contains(searchQueryIng.toLowerCase());
 
+      // Check if the serial matches the selected serials
       final matchesSerial =
           selectedSerials.isEmpty || selectedSerials.contains(note.serial);
 
+      // Filter based on the current index (category filtering logic)
       if (_currentIndex == 0) {
-        return matchesSearch; // Show all items that match search and serial
+        return matchesSearch && matchesSerial; // Match search and serial
       } else if (_currentIndex == 1) {
         return note.category == '1' &&
-            matchesSearch; // Filter by category == 1, search, and serial
+            matchesSearch &&
+            matchesSerial; // Category 1, search, and serial
       } else if (_currentIndex == 2) {
         return note.category == '0' &&
-            matchesSearch; // Filter by category == 0, search, and serial
+            matchesSearch &&
+            matchesSerial; // Category 0, search, and serial
       }
-      return false; // Default case
+
+      return false; // Default case: no match
     }).toList();
   }
 
@@ -1323,54 +1332,139 @@ class _alldishesListState extends State<alldishesList> {
                         Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: ElevatedButton(
-                                onPressed: _resetAll,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red, // Button background color
-                                  foregroundColor: Colors.white, // Text color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8.0), // Rounded corners
+                            Container(
+                              margin: const EdgeInsets.only(left: 8),
+                              width: MediaQuery.of(context).size.width *
+                                  0.3, // 90% of screen width
+                              height: MediaQuery.of(context).size.height *
+                                  0.03, // 7% of screen height
+                              decoration: BoxDecoration(
+                                color: Colors
+                                    .white, // Set the background color to white
+                                borderRadius: BorderRadius.circular(15.0),
+                                boxShadow: const [
+                                  BoxShadow(
+                                    color: Colors.black26,
+                                    spreadRadius: 0,
+                                    blurRadius:
+                                        2, // Set the desired blur radius
                                   ),
-                                  padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0), // Smaller padding
-                                  minimumSize: Size(50, 30), // Ensures the button has a small size
+                                ],
+                              ),
+                              child: SearchBar(
+                                hintText: 'Search Ingredients',
+                                controller: _searchControllerIng,
+                                onChanged: (value) {
+                                  setState(() {
+                                    searchQueryIng = value.toLowerCase();
+                                    _filterbying(); // Call your filtering method
+                                  });
+                                },
+                                backgroundColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.white,
                                 ),
-                                child: Text(
-                                  'Reset All',
-                                  style: TextStyle(fontSize: 12), // Smaller font size
+                                shadowColor: MaterialStateColor.resolveWith(
+                                  (states) => Colors.transparent,
+                                ),
+                                leading: Container(
+                                  margin: const EdgeInsets.all(8),
+                                  child: const Icon(Icons.search),
+                                ),
+                                trailing: <Widget>[
+                                  // Use <Widget>[] to define the list of trailing widgets
+                                  IconButton(
+                                    icon: const Icon(
+                                      Icons.clear,
+                                      color: Colors.grey,
+                                    ), // Change the icon as needed
+                                    onPressed: () {
+                                      // Clear the search field
+                                      _searchControllerIng.clear();
+                                      setState(() {
+                                        searchQueryIng =
+                                            ''; // Reset the search query
+                                        _filterbying(); // Call your filtering method
+                                      });
+                                    },
+                                  ),
+                                ],
+                                elevation: MaterialStateProperty.all(0),
+                                shape: MaterialStateProperty.all(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(15.0),
+                                  ),
                                 ),
                               ),
                             ),
-
-                            Container(
-                              width: 250,
-                              child: ListView.builder(
-                                shrinkWrap: true,
-                                itemCount: _filteredByIng.length,
-                                itemBuilder: (context, index) {
-                                  final ingredient = _filteredByIng[index].name;
-                                  final serials = _filteredByIng
-                                      .where((item) => item.name == ingredient)
-                                      .map((item) => item.serial)
-                                      .toList();
-                            
-                                  return CheckboxListTile(
-                                    title: Text(ingredient!),
-                                    value: selectedIngredients.contains(ingredient),
-                                    onChanged: (bool? selected) async {
-                                      for (int i = 0; i < serials.length; i++) {
-                                        selectedSerials.add(serials[i]!);
-                                        await _onIngredientSelected(
-                                            selected, ingredient, serials[i]!);
-                                      }
-                                      _filterbying();
-                                      print(
-                                        'Selected Ingredients: ${_getSelectedIngredientsText()}',
-                                      );
-                                    },
-                                  );
+                            Padding(
+                              padding: const EdgeInsets.only( left: 170.0),
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  _resetAll();
+                                  _searchControllerIng.clear();
+                                  setState(() {
+                                    searchQueryIng =
+                                        ''; // Reset the search query
+                                    _filterbying(); // Call your filtering method
+                                  });
                                 },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor:
+                                      Colors.red, // Button background color
+                                  foregroundColor: Colors.white, // Text color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        8.0), // Rounded corners
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12.0,
+                                      vertical: 8.0), // Smaller padding
+                                  minimumSize: Size(50,
+                                      30), // Ensures the button has a small size
+                                ),
+                                child: Text(
+                                  'Reset All',
+                                  style: TextStyle(
+                                      fontSize: 12), // Smaller font size
+                                ),
+                              ),
+                            ),
+                            
+                            Expanded(
+                              child: Container(
+                                width: 250,
+                                child: ListView.builder(
+                                  shrinkWrap: true,
+                                  itemCount: _filteredByIng.length,
+                                  itemBuilder: (context, index) {
+                                    final ingredient =
+                                        _filteredByIng[index].name;
+                                    final serials = _filteredByIng
+                                        .where(
+                                            (item) => item.name == ingredient)
+                                        .map((item) => item.serial)
+                                        .toList();
+
+                                    return CheckboxListTile(
+                                      title: Text(ingredient!),
+                                      value: selectedIngredients
+                                          .contains(ingredient),
+                                      onChanged: (bool? selected) async {
+                                        for (int i = 0;
+                                            i < serials.length;
+                                            i++) {
+                                          selectedSerials.add(serials[i]!);
+                                          await _onIngredientSelected(selected,
+                                              ingredient, serials[i]!);
+                                        }
+                                        _filterbying();
+                                        print(
+                                          'Selected Ingredients: ${_getSelectedIngredientsText()}',
+                                        );
+                                      },
+                                    );
+                                  },
+                                ),
                               ),
                             ),
                           ],

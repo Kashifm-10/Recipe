@@ -417,26 +417,33 @@ class database extends ChangeNotifier {
   }
 
   Future<void> fetchRecipe(String serial) async {
+    // Fetch data from the Supabase database, ordered by 'id' in ascending order (server-side)
     final response = await Supabase.instance.client
         .from('recipes')
         .select()
         .eq('serial', serial)
-        .order(
-            'id'); // Add this line to order by 'id' on the server side, if supported
+        .order('id',
+            ascending: true); // Explicitly specify ascending order if needed
 
+    // Convert the response to a list of maps
     final data = List<Map<String, dynamic>>.from(response);
+
+    // Clear the existing recipes and update with fetched data
     recipes.clear();
     recipes.addAll(data.map((item) => Recipe(
+          // Include 'id' for proper sorting
           name: item['name'],
           serial: item['serial'],
           type: item['type'],
         )));
 
-    // Sort by 'id' if the server-side ordering is not available or reliable
+    // Local sorting (in case server-side ordering isn't applied or reliable)
     recipes.sort((a, b) => a.id.compareTo(b.id));
 
-    print(response);
+    print(
+        response); // Debugging: Print the response to ensure correct data retrieval
 
+    // Update the current recipe list and notify listeners
     currentRecipe.clear();
     currentRecipe.addAll(recipes);
     notifyListeners();
@@ -499,8 +506,9 @@ class database extends ChangeNotifier {
         .from('ingredients')
         .select()
         .eq('serial', serial!)
-        .order(
-            'id'); // Add this line to order by 'id' on the server side, if supported
+        .order('id',
+            ascending:
+                true); // Add this line to order by 'id' on the server side, if supported
 
     final data = List<Map<String, dynamic>>.from(response);
 
