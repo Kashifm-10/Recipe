@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
-import 'package:recipe/pages/recipePage.dart';
+import 'package:recipe/pages/biggerScreens/recipePage.dart';
 
 import 'package:flutter/material.dart';
 
@@ -12,6 +12,7 @@ class ingredientList extends StatelessWidget {
     required this.quantity,
     required this.count,
     required this.uom,
+    required this.access,
     this.onEditPressed,
     this.onDeletePressed,
   });
@@ -20,6 +21,7 @@ class ingredientList extends StatelessWidget {
   final double? quantity;
   final String? uom;
   final String text;
+  final bool access;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
 
@@ -70,7 +72,7 @@ class ingredientList extends StatelessWidget {
                   final item = items[index];
                   return GestureDetector(
                     onLongPress: () {
-                      onEditPressed!();
+                      if (access) onEditPressed!();
                     },
                     child: Container(
                       // margin: const EdgeInsets.only(bottom: 8.0),
@@ -225,7 +227,7 @@ class ingredientList extends StatelessWidget {
                   final item = items[index];
                   return GestureDetector(
                     onLongPress: () {
-                      onEditPressed!();
+                      if (access) onEditPressed!();
                     },
                     child: Container(
                       child: Table(

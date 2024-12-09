@@ -14,9 +14,9 @@ import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/models/crazy_switch.dart';
 import 'package:recipe/models/isar_instance.dart';
-import 'package:recipe/pages/recipePage.dart';
+import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/list_view/dish_tile.dart';
-import 'package:recipe/pages/home.dart';
+import 'package:recipe/pages/biggerScreens/home.dart';
 import 'package:animated_switch/animated_switch.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -175,10 +175,12 @@ class _dishesListState extends State<dishesList> {
     const height = 58.0;
     const innerIndicatorSize = height - 4 * borderWidth;
     String? selectedOption;
-    double selectedDurationHours = 1.0; // Start with 1 hour
+    double selectedDurationHours = 0.5; // Start with 1 hour
     bool isSwitched = false;
     String category = '0';
     String? duration;
+    textController.clear();
+    bool isTextFieldEmpty = false; // Flag for empty text field error message
 
     showDialog(
       context: context,
@@ -186,8 +188,7 @@ class _dishesListState extends State<dishesList> {
         builder: (context, setState) {
           return AlertDialog(
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(
-                  20.0), // Large rounded corners for a smooth look
+              borderRadius: BorderRadius.circular(20.0), // Rounded corners
             ),
             backgroundColor: Colors.white,
             title: Row(
@@ -198,8 +199,7 @@ class _dishesListState extends State<dishesList> {
                   style: TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
-                    color: Colors
-                        .black87, // Dark, professional color for the title
+                    color: Colors.black87,
                   ),
                 ),
                 Padding(
@@ -208,47 +208,37 @@ class _dishesListState extends State<dishesList> {
                     width: 70,
                     height: 35,
                     child: CustomAnimatedToggleSwitch(
-                      current: category == '0'
-                          ? false
-                          : true, // false for 'Veg', true for 'Non-Veg'
+                      current: category == '0' ? false : true,
                       spacing: 36.0,
                       values: const [false, true],
                       animationDuration: const Duration(milliseconds: 350),
                       animationCurve: Curves.bounceOut,
                       iconBuilder: (context, local, global) => const SizedBox(),
-
-                      onTap: (_) => setState(() => category = category == '0'
-                          ? '1'
-                          : '0'), // Toggle between 'Veg' and 'Non-Veg'
+                      onTap: (_) => setState(
+                          () => category = category == '0' ? '1' : '0'),
                       iconsTappable: false,
-                      onChanged: (b) => setState(() => category =
-                          b ? '1' : '0'), // Update category based on true/false
+                      onChanged: (b) =>
+                          setState(() => category = b ? '1' : '0'),
                       height: 40,
-                      padding: const EdgeInsets.all(
-                          5.0), // Adjust the padding based on your design
-                      indicatorSize:
-                          const Size.square(40), // Adjust the indicator size
+                      padding: const EdgeInsets.all(5.0),
+                      indicatorSize: const Size.square(40),
                       foregroundIndicatorBuilder: (context, global) {
-                        final color = Color.lerp(
-                            Colors.green, Colors.red, global.position)!;
                         return Container(
-                            alignment: Alignment.center,
-                            decoration: const BoxDecoration(
-                                color: Colors.white, shape: BoxShape.circle),
-                            child: Center(
-                              child: category == '0' // 'Veg'
-                                  ? Icon(
-                                      Icons.eco,
-                                      size: 20.0,
-                                      color: Colors.green,
-                                    )
-                                  : SvgPicture.asset(
-                                      'assets/icons/steak_icon.svg', // Path to your custom SVG icon
-                                      width: 20.0, // Adjust width
-                                      height: 20.0, // Adjust height
-                                      color: Colors.red, // Adjust color
-                                    ),
-                            ));
+                          alignment: Alignment.center,
+                          decoration: const BoxDecoration(
+                              color: Colors.white, shape: BoxShape.circle),
+                          child: Center(
+                            child: category == '0'
+                                ? Icon(Icons.eco,
+                                    size: 20.0, color: Colors.green)
+                                : SvgPicture.asset(
+                                    'assets/icons/steak_icon.svg',
+                                    width: 20.0,
+                                    height: 20.0,
+                                    color: Colors.red,
+                                  ),
+                          ),
+                        );
                       },
                       wrapperBuilder: (context, global, child) {
                         final color = Color.lerp(
@@ -275,7 +265,7 @@ class _dishesListState extends State<dishesList> {
             ),
             content: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              width: 380, // A bit wider dialog for a more spacious feel
+              width: 380,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -287,9 +277,7 @@ class _dishesListState extends State<dishesList> {
                       decoration: InputDecoration(
                         hintText: 'Dish name',
                         hintStyle: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey.shade600,
-                        ),
+                            fontSize: 16, color: Colors.grey.shade600),
                         filled: true,
                         fillColor: Colors.grey.shade200,
                         border: OutlineInputBorder(
@@ -298,24 +286,21 @@ class _dishesListState extends State<dishesList> {
                         ),
                       ),
                       style: const TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
+                          fontSize: 16, fontWeight: FontWeight.w500),
+                    ),
+                  ),
+                  // Show error message if text field is empty
+                  if (isTextFieldEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Text(
+                        'Please enter a dish name.',
+                        style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
                       ),
                     ),
-                  ),
-
-                  // Duration Selector Title
-                  /*  const Padding(
-                  padding: EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    "Select Duration",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.black87,
-                    ),
-                  ),
-                ), */
 
                   // Slider for Duration Selection
                   Column(
@@ -323,21 +308,18 @@ class _dishesListState extends State<dishesList> {
                     children: [
                       SizedBox(
                         width: 400,
-                        child: Expanded(
-                          child: Slider(
-                            value: selectedDurationHours,
-                            min: 0.5,
-                            max: 5,
-                            divisions: 9,
-                            onChanged: (value) {
-                              setState(() {
-                                selectedDurationHours = value;
-                              });
-                            },
-                            activeColor: colorList[int.parse(widget.type!) -
-                                1], // Use indigo for a professional touch
-                            inactiveColor: Colors.grey.shade300,
-                          ),
+                        child: Slider(
+                          value: selectedDurationHours,
+                          min: 0.5,
+                          max: 5,
+                          divisions: 9,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedDurationHours = value;
+                            });
+                          },
+                          activeColor: colorList[int.parse(widget.type!) - 1],
+                          inactiveColor: Colors.grey.shade300,
                         ),
                       ),
                       Padding(
@@ -359,61 +341,37 @@ class _dishesListState extends State<dishesList> {
                             }
                           }(),
                           style: TextStyle(
-                            color: Colors.grey.shade700,
-                            fontSize: 16,
-                          ),
+                              color: Colors.grey.shade700, fontSize: 16),
                         ),
                       ),
                     ],
                   ),
-
-                  // Category Toggle
-
-                  /* Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 20.0),
-                    child: ToggleSwitch(
-                      minWidth: 120.0,
-                      initialLabelIndex: 0,
-                      cornerRadius: 20.0,
-                      activeFgColor: Colors.white,
-                      inactiveBgColor: Colors.grey.shade400,
-                      inactiveFgColor: Colors.white,
-                      totalSwitches: 2,
-                      labels: ['Veg', 'Non-Veg'],
-                      activeBgColors: [
-                        [Colors.green],
-                        [Colors.red]
-                      ],
-                      onToggle: (index) {
-                        setState(() {
-                          category = index.toString();
-                        });
-                      },
-                    ),
-                  ), */
                 ],
               ),
             ),
             actions: [
-              // Cancel Button
               TextButton(
                 onPressed: () {
-                  Navigator.pop(context); // Close the dialog
+                  Navigator.pop(context);
                 },
                 style: TextButton.styleFrom(
-                  foregroundColor: Colors
-                      .grey.shade600, // Neutral color for the cancel button
+                  foregroundColor: Colors.grey.shade600,
                   textStyle: const TextStyle(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
-              // Create Button
               ElevatedButton(
                 onPressed: () {
-                  serial;
-                  int incrementedSerial = (serial! + 1);
-                  saveSerial(incrementedSerial);
-                  if (textController.text.isNotEmpty) {
+                  setState(() {
+                    // Check if the text field is empty
+                    isTextFieldEmpty = textController.text.isEmpty;
+                  });
+
+                  if (!isTextFieldEmpty) {
+                    serial;
+                    int incrementedSerial = (serial! + 1);
+                    saveSerial(incrementedSerial);
+
                     final now = DateTime.now();
                     final date =
                         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
@@ -436,8 +394,7 @@ class _dishesListState extends State<dishesList> {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorList[int.parse(widget.type!) -
-                      1], // Use indigo color for the create button
+                  backgroundColor: colorList[int.parse(widget.type!) - 1],
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(12.0),
                   ),
@@ -447,7 +404,7 @@ class _dishesListState extends State<dishesList> {
                 child: const Text(
                   'Create',
                   style: TextStyle(
-                    color: Colors.white, // White text for the button
+                    color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
                   ),
@@ -466,40 +423,43 @@ class _dishesListState extends State<dishesList> {
   }
 
   void updateDish(Dish name, String type, String dish) async {
-  final response = await Supabase.instance.client
-      .from('dishes')
-      .select('id') // Specify the field to fetch
-      .eq('type', type) // First filter
-      .eq('name', dish); // Second filter (example)
-  final data = List<Map<String, dynamic>>.from(response);
+    final response = await Supabase.instance.client
+        .from('dishes')
+        .select('id') // Specify the field to fetch
+        .eq('type', type) // First filter
+        .eq('name', dish); // Second filter (example)
+    final data = List<Map<String, dynamic>>.from(response);
+    textController.text = name.name;
+    int dishId = data.isNotEmpty ? data[0]['id'] : 0; // Ensure a default value
+    String category = name.category!; // Default value
+    String selectedDurationHours = name.duration!; // Default duration
+    bool isTextFieldEmpty = false; // Flag for empty text field error message
 
-  int dishId = data.isNotEmpty ? data[0]['id'] : '';
-  String category = name.category!; // Default value
-  String selectedDurationHours = name.duration!; // Default duration
-
-  showDialog(
-    context: context,
-    builder: (context) => StatefulBuilder(
-      builder: (context, setState) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20.0), // Large rounded corners for a smooth look
-          ),
-          backgroundColor: Colors.white,
-          title: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  const Text(
-                    "Update Dish",
-                    style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87, // Dark, professional color for the title
+    showDialog(
+      context: context,
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(
+                  20.0), // Large rounded corners for a smooth look
+            ),
+            backgroundColor: Colors.white,
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    const Text(
+                      "Update Dish",
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors
+                            .black87, // Dark, professional color for the title
+                      ),
                     ),
-                  ),
-                  IconButton(
+                    IconButton(
                       onPressed: () {
                         // Show confirmation dialog
                         showDialog(
@@ -529,42 +489,42 @@ class _dishesListState extends State<dishesList> {
                           ),
                         );
                       },
-                      icon:
-                          Icon(Icons.delete, color: Colors.red, size: 25),
+                      icon: Icon(Icons.delete, color: Colors.red, size: 25),
                     ),
-                ],
-              ),
-              Padding(
-                padding: const EdgeInsets.only(right: 0.0),
-                child: SizedBox(
-                  width: 70,
-                  height: 35,
-                  child: CustomAnimatedToggleSwitch(
-                    current: category == '0'
-                        ? false
-                        : true, // false for 'Veg', true for 'Non-Veg'
-                    spacing: 36.0,
-                    values: const [false, true],
-                    animationDuration: const Duration(milliseconds: 350),
-                    animationCurve: Curves.bounceOut,
-                    iconBuilder: (context, local, global) => const SizedBox(),
+                  ],
+                ),
+                Padding(
+                  padding: const EdgeInsets.only(right: 0.0),
+                  child: SizedBox(
+                    width: 70,
+                    height: 35,
+                    child: CustomAnimatedToggleSwitch(
+                      current: category == '0'
+                          ? false
+                          : true, // false for 'Veg', true for 'Non-Veg'
+                      spacing: 36.0,
+                      values: const [false, true],
+                      animationDuration: const Duration(milliseconds: 350),
+                      animationCurve: Curves.bounceOut,
+                      iconBuilder: (context, local, global) => const SizedBox(),
 
-                    onTap: (_) => setState(() => category = category == '0'
-                        ? '1'
-                        : '0'), // Toggle between 'Veg' and 'Non-Veg'
-                    iconsTappable: false,
-                    onChanged: (b) => setState(() => category =
-                        b ? '1' : '0'), // Update category based on true/false
-                    height: 40,
-                    padding: const EdgeInsets.all(5.0), // Adjust the padding based on your design
-                    indicatorSize: const Size.square(40), // Adjust the indicator size
-                    foregroundIndicatorBuilder: (context, global) {
-                      final color = Color.lerp(
-                          Colors.green, Colors.red, global.position)!;
-                      return Container(
+                      onTap: (_) => setState(() => category = category == '0'
+                          ? '1'
+                          : '0'), // Toggle between 'Veg' and 'Non-Veg'
+                      iconsTappable: false,
+                      onChanged: (b) => setState(
+                          () => category = b ? '1' : '0'), // Update category
+                      height: 40,
+                      padding: const EdgeInsets.all(5.0), // Adjust the padding
+                      indicatorSize:
+                          const Size.square(40), // Adjust the indicator size
+                      foregroundIndicatorBuilder: (context, global) {
+                        return Container(
                           alignment: Alignment.center,
                           decoration: const BoxDecoration(
-                              color: Colors.white, shape: BoxShape.circle),
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                          ),
                           child: Center(
                             child: category == '0' // 'Veg'
                                 ? Icon(
@@ -573,74 +533,85 @@ class _dishesListState extends State<dishesList> {
                                     color: Colors.green,
                                   )
                                 : SvgPicture.asset(
-                                    'assets/icons/steak_icon.svg', // Path to your custom SVG icon
-                                    width: 20.0, // Adjust width
-                                    height: 20.0, // Adjust height
-                                    color: Colors.red, // Adjust color
+                                    'assets/icons/steak_icon.svg',
+                                    width: 20.0,
+                                    height: 20.0,
+                                    color: Colors.red,
                                   ),
-                          ));
-                    },
-                    wrapperBuilder: (context, global, child) {
-                      final color = Color.lerp(
-                          Colors.green, Colors.red, global.position)!;
-                      return DecoratedBox(
-                        decoration: BoxDecoration(
-                          color: color,
-                          borderRadius: BorderRadius.circular(50.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: color.withOpacity(0.7),
-                              blurRadius: 12.0,
-                              offset: const Offset(0.0, 8.0),
-                            ),
-                          ],
+                          ),
+                        );
+                      },
+                      wrapperBuilder: (context, global, child) {
+                        final color = Color.lerp(
+                            Colors.green, Colors.red, global.position)!;
+                        return DecoratedBox(
+                          decoration: BoxDecoration(
+                            color: color,
+                            borderRadius: BorderRadius.circular(50.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: color.withOpacity(0.7),
+                                blurRadius: 12.0,
+                                offset: const Offset(0.0, 8.0),
+                              ),
+                            ],
+                          ),
+                          child: child,
+                        );
+                      },
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            content: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              width: 380,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // Dish Name TextField
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 20.0),
+                    child: TextField(
+                      controller: textController,
+                      decoration: InputDecoration(
+                        hintText: 'Dish name',
+                        hintStyle: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey.shade600,
                         ),
-                        child: child,
-                      );
-                    },
-                  ),
-                ),
-              ),
-            ],
-          ),
-          content: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            width: 380, // A bit wider dialog for a more spacious feel
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                // Dish Name TextField
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 20.0),
-                  child: TextField(
-                    controller: textController..text = name.name,
-                    decoration: InputDecoration(
-                      hintText: 'Dish name',
-                      hintStyle: TextStyle(
+                        filled: true,
+                        fillColor: Colors.grey.shade200,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12.0),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      style: const TextStyle(
                         fontSize: 16,
-                        color: Colors.grey.shade600,
+                        fontWeight: FontWeight.w500,
                       ),
-                      filled: true,
-                      fillColor: Colors.grey.shade200,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.0),
-                        borderSide: BorderSide.none,
-                      ),
-                    ),
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                ),
+                  if (isTextFieldEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 20.0),
+                      child: Text(
+                        'Please enter a dish name.',
+                        style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    ),
 
-                // Slider for Duration Selection
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    SizedBox(
-                      width: 400,
-                      child: Expanded(
+                  // Slider for Duration Selection
+                  Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 400, // Constrain the slider width
                         child: Slider(
                           value: double.parse(selectedDurationHours),
                           min: 0.5,
@@ -651,100 +622,104 @@ class _dishesListState extends State<dishesList> {
                               selectedDurationHours = value.toStringAsFixed(1);
                             });
                           },
-                          activeColor: colorList[int.parse(widget.type!) - 1], // Use indigo for a professional touch
+                          activeColor: colorList[int.parse(widget.type!) - 1],
                           inactiveColor: Colors.grey.shade300,
                         ),
                       ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(right: 16.0),
-                      child: Text(
-                        () {
-                          double duration = double.parse(selectedDurationHours); // Parse string to double
-                          int hours = duration.toInt();
-                          int minutes = ((duration - hours) * 60).toInt();
+                      Padding(
+                        padding: const EdgeInsets.only(right: 16.0),
+                        child: Text(
+                          () {
+                            double duration =
+                                double.parse(selectedDurationHours);
+                            int hours = duration.toInt();
+                            int minutes = ((duration - hours) * 60).toInt();
 
-                          if (hours > 0 && minutes > 0) {
-                            return '$hours hr $minutes min';
-                          } else if (hours > 0) {
-                            return '$hours hr';
-                          } else if (minutes > 0) {
-                            return '$minutes min';
-                          } else {
-                            return '0 min';
-                          }
-                        }(),
-                        style: TextStyle(
-                          color: Colors.grey.shade700,
-                          fontSize: 16,
+                            if (hours > 0 && minutes > 0) {
+                              return '$hours hr $minutes min';
+                            } else if (hours > 0) {
+                              return '$hours hr';
+                            } else if (minutes > 0) {
+                              return '$minutes min';
+                            } else {
+                              return '0 min';
+                            }
+                          }(),
+                          style: TextStyle(
+                            color: Colors.grey.shade700,
+                            fontSize: 16,
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          actions: [
-            // Cancel Button
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context); // Close the dialog
-              },
-              style: TextButton.styleFrom(
-                foregroundColor: Colors.grey.shade600,
-                textStyle: const TextStyle(fontSize: 16),
-              ),
-              child: const Text('Cancel'),
-            ),
-            // Update Button
-            ElevatedButton(
-              onPressed: () {
-                if (textController.text.isNotEmpty) {
-                  final now = DateTime.now();
-                  final date =
-                      '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
-                  final time =
-                      '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
-
-                  // Update dish information
-                  context.read<database>().updateDish(
-                    dishId, // Dish ID to update
-                    textController.text,
-                    widget.type!,
-                    selectedDurationHours,
-                    category,
-                    date,
-                    time,
-                  );
-
-                  Navigator.pop(context);
-                  textController.clear();
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: colorList[int.parse(widget.type!) - 1], // Change color as needed
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-              ),
-              child: const Text(
-                'Update',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
+                    ],
+                  ),
+                ],
               ),
             ),
-          ],
-        );
-      },
-    ),
-  );
-}
+            actions: [
+              // Cancel Button
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                child: const Text('Cancel'),
+              ),
+              // Update Button
+              ElevatedButton(
+                onPressed: () {
+                  setState(() {
+                    // Check if the text field is empty
+                    isTextFieldEmpty = textController.text.isEmpty;
+                  });
+                  if (textController.text.isNotEmpty) {
+                    final now = DateTime.now();
+                    final date =
+                        '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
+                    final time =
+                        '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
+                    // Update dish information
+                    context.read<database>().updateDish(
+                          dishId, // Dish ID to update
+                          textController.text,
+                          widget.type!,
+                          selectedDurationHours,
+                          category,
+                          date,
+                          time,
+                        );
+
+                    Navigator.pop(context);
+                    textController.clear();
+                  }
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: colorList[int.parse(widget.type!) - 1],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20.0, vertical: 12.0),
+                ),
+                child: const Text(
+                  'Update',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
 
   //delete a note
   void deleteNote(int id, String type, String dish) async {
@@ -1000,36 +975,45 @@ class _dishesListState extends State<dishesList> {
         preferredSize: MediaQuery.of(context).size.width > 600
             ? const Size.fromHeight(100.0)
             : const Size.fromHeight(60.0),
-        child: AppBar(
-          toolbarHeight: MediaQuery.of(context).size.width > 600
-              ? 100
-              : screenHeight * 0.06,
-          elevation: 0,
-          backgroundColor: Colors.transparent,
-          foregroundColor: Colors.white,
-          leading: Padding(
-            padding: EdgeInsets.only(
-                top: MediaQuery.of(context).size.width > 600 ? 20.0 : 15,
-                left: 10),
-            child: IconButton(
-              icon: Icon(FontAwesomeIcons.arrowDown,
-                  size:
-                      MediaQuery.of(context).size.width > 600 ? 40 : iconSize),
-              onPressed: () {
-                Navigator.pop(context);
-              },
+        child: GestureDetector(
+          onVerticalDragEnd: (details) {
+            // Check the swipe direction (down)
+            if (details.velocity.pixelsPerSecond.dy > 500) {
+              Navigator.pop(context);
+            }
+          },
+          child: AppBar(
+            toolbarHeight: MediaQuery.of(context).size.width > 600
+                ? 100
+                : screenHeight * 0.06,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            leading: Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.width > 600 ? 20.0 : 15,
+                  left: 10),
+              child: IconButton(
+                icon: Icon(FontAwesomeIcons.arrowDown,
+                    size: MediaQuery.of(context).size.width > 600
+                        ? 40
+                        : iconSize),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
-          ),
-          title: Padding(
-            padding: const EdgeInsets.only(top: 20.0),
-            child: Text(
-              widget.title!,
-              style: GoogleFonts.poppins(
-                fontSize: MediaQuery.of(context).size.width > 600
-                    ? 50
-                    : titleFontSize,
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
+            title: Padding(
+              padding: const EdgeInsets.only(top: 20.0),
+              child: Text(
+                widget.title!,
+                style: GoogleFonts.poppins(
+                  fontSize: MediaQuery.of(context).size.width > 600
+                      ? 50
+                      : titleFontSize,
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),
@@ -1067,6 +1051,44 @@ class _dishesListState extends State<dishesList> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
+                          // Your existing toggle switch
+
+                          AnimatedToggleSwitch<int>.size(
+                            key: _categoryButtonKey,
+                            textDirection: TextDirection.rtl,
+                            current: _currentIndex,
+                            values: const [2, 1, 0],
+                            iconOpacity: 0.50,
+                            height: MediaQuery.of(context).size.height * 0.03,
+                            indicatorSize: const Size.fromWidth(37),
+                            spacing: 0,
+                            iconBuilder: iconBuilder,
+                            borderWidth: 1.0,
+                            iconAnimationType: AnimationType.onHover,
+                            style: ToggleStyle(
+                              borderColor: Colors.transparent,
+                              borderRadius: BorderRadius.circular(15.0),
+                              boxShadow: [
+                                const BoxShadow(
+                                  color: Colors.black26,
+                                  spreadRadius: 0,
+                                  blurRadius: 2,
+                                ),
+                              ],
+                            ),
+                            styleBuilder: (i) => ToggleStyle(
+                              indicatorColor: colorBuilder(i),
+                            ),
+                            onChanged: (i) {
+                              setState(() {
+                                _currentIndex = i;
+                                _filterAndSortNotes(); // Apply filter and sort
+                                print(i); // Debug print
+                              });
+                            },
+                          ),
+                          SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.01),
                           Container(
                             margin: const EdgeInsets.all(0),
                             width: MediaQuery.of(context).size.width *
@@ -1085,8 +1107,9 @@ class _dishesListState extends State<dishesList> {
                                 ),
                               ],
                             ),
+
                             child: SearchBar(
-                              hintText: 'Search ',
+                              hintText: 'Search Dishes',
                               controller: _searchController,
                               onChanged: (value) {
                                 setState(() {
@@ -1159,45 +1182,6 @@ class _dishesListState extends State<dishesList> {
                                 ),
                               ),
                             ),
-                          ),
-
-                          SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.01),
-                          // Your existing toggle switch
-
-                          AnimatedToggleSwitch<int>.size(
-                            key: _categoryButtonKey,
-                            textDirection: TextDirection.rtl,
-                            current: _currentIndex,
-                            values: const [2, 1, 0],
-                            iconOpacity: 0.50,
-                            height: MediaQuery.of(context).size.height * 0.03,
-                            indicatorSize: const Size.fromWidth(37),
-                            spacing: 0,
-                            iconBuilder: iconBuilder,
-                            borderWidth: 1.0,
-                            iconAnimationType: AnimationType.onHover,
-                            style: ToggleStyle(
-                              borderColor: Colors.transparent,
-                              borderRadius: BorderRadius.circular(15.0),
-                              boxShadow: [
-                                const BoxShadow(
-                                  color: Colors.black26,
-                                  spreadRadius: 0,
-                                  blurRadius: 2,
-                                ),
-                              ],
-                            ),
-                            styleBuilder: (i) => ToggleStyle(
-                              indicatorColor: colorBuilder(i),
-                            ),
-                            onChanged: (i) {
-                              setState(() {
-                                _currentIndex = i;
-                                _filterAndSortNotes(); // Apply filter and sort
-                                print(i); // Debug print
-                              });
-                            },
                           ),
 
                           SizedBox(
@@ -1665,6 +1649,9 @@ class _dishesListState extends State<dishesList> {
                                       type: widget.type,
                                       dish: note.name,
                                       category: note.category,
+                                      access: true,
+                                      background: colorList[
+                                          int.parse(widget.type!) - 1],
                                     )));
                               });
                             },
@@ -1672,8 +1659,9 @@ class _dishesListState extends State<dishesList> {
                               duration: note.duration,
                               category: note.category,
                               dish: note.name,
-                              // type: widget.type,
+                              type: widget.type,
                               text: note.name,
+                              fromType: 'no',
                               onEditPressed: () =>
                                   updateDish(note, widget.type!, note.name!),
                               onDeletePressed: () =>

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/collections/names.dart';
-import 'package:recipe/pages/recipePage.dart';
+import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/notInUse/dish.dart';
 
 class DishTile extends StatelessWidget {
@@ -11,14 +11,16 @@ class DishTile extends StatelessWidget {
     required this.duration,
     required this.category,
     required this.text,
-    //  required this.type,
+    required this.type,
     this.onEditPressed,
     this.onDeletePressed,
+    this.fromType,
   });
-//  String? type;
+  String? type;
   String? dish;
   String? duration;
   String? category;
+  String? fromType;
   final String text;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
@@ -31,7 +33,7 @@ class DishTile extends StatelessWidget {
         width: MediaQuery.of(context).size.width * 0.1,
         height: MediaQuery.of(context).size.height * 0.08,
         decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
@@ -69,6 +71,7 @@ class DishTile extends StatelessWidget {
                     ),
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       /*  Padding(
                         padding: const EdgeInsets.only(bottom: 4.0),
@@ -96,10 +99,18 @@ class DishTile extends StatelessWidget {
                               }())
                             : 'Invalid duration',
                         style: TextStyle(
-                          color: Colors.grey.shade900,
-                          fontSize: 16,
+                          color: Colors.grey.shade500,
+                          fontSize: 12,
                         ),
-                      )
+                      ),
+                      if (fromType! != 'no')
+                        Text(
+                          fromType!,
+                          style: TextStyle(
+                            color: Colors.grey.shade500,
+                            fontSize: 12,
+                          ),
+                        ),
                     ],
                   ),
                 ],

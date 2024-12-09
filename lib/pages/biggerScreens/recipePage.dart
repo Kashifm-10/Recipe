@@ -20,6 +20,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'dart:async'; // For using Timer
 
 class recipe extends StatefulWidget {
@@ -28,11 +29,15 @@ class recipe extends StatefulWidget {
       required this.serial,
       required this.type,
       required this.dish,
-      required this.category});
+      required this.category,
+      required this.access,
+      required this.background});
   String? serial;
   String? type;
   String? dish;
   String? category;
+  bool? access;
+  Color? background;
 
   @override
   State<recipe> createState() => _recipeState();
@@ -364,6 +369,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   void createIngredient() {
     TextEditingController quantityController = TextEditingController();
     TextEditingController textController = TextEditingController();
+    bool isName = false; // Flag for empty text field error message
+    bool isQuantity = false; // Flag for empty text field error message
+    bool isUOM = false; // Flag for empty text field error message
 
     String? selectedUnit;
     final List<String> unitOptions = [
@@ -450,6 +458,14 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         fillColor: Colors.grey[50],
                       ),
                     ),
+                    if (isName)
+                      Text(
+                        'Please enter a ingredient name.',
+                        style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
 
                     const SizedBox(height: 20),
 
@@ -459,33 +475,45 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         // Quantity Input
                         Expanded(
                           flex: 2,
-                          child: TextField(
-                            controller: quantityController,
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.black),
-                              labelText: 'Quantity',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors
-                                        .grey[300]!), // Default border color
+                          child: Column(
+                            children: [
+                              TextField(
+                                controller: quantityController,
+                                decoration: InputDecoration(
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey[
+                                            300]!), // Default border color
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey[
+                                            300]!), // Border color when focused
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey[
+                                            300]!), // Border color when not focused
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[50],
+                                ),
+                                keyboardType: TextInputType.number,
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors.grey[
-                                        300]!), // Border color when focused
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors.grey[
-                                        300]!), // Border color when not focused
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
-                            keyboardType: TextInputType.number,
+                              if (isQuantity)
+                                Text(
+                                  'Please enter quantity.',
+                                  style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -493,43 +521,55 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         // Unit Dropdown
                         Expanded(
                           flex: 3,
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelStyle: TextStyle(color: Colors.black),
-                              labelText: 'Unit',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors
-                                        .grey[300]!), // Default border color
+                          child: Column(
+                            children: [
+                              DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  labelStyle: TextStyle(color: Colors.black),
+                                  labelText: 'Unit',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey[
+                                            300]!), // Default border color
+                                  ),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey[
+                                            300]!), // Border color when focused
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                    borderSide: BorderSide(
+                                        color: Colors.grey[
+                                            300]!), // Border color when not focused
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[50],
+                                ),
+                                isExpanded: true,
+                                items: unitOptions.map((String unit) {
+                                  return DropdownMenuItem<String>(
+                                    value: unit,
+                                    child: Text(unit),
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  setState(() => selectedUnit = value);
+                                },
+                                value: selectedUnit,
+                                hint: const Text('Select'),
                               ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors.grey[
-                                        300]!), // Border color when focused
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
-                                borderSide: BorderSide(
-                                    color: Colors.grey[
-                                        300]!), // Border color when not focused
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey[50],
-                            ),
-                            isExpanded: true,
-                            items: unitOptions.map((String unit) {
-                              return DropdownMenuItem<String>(
-                                value: unit,
-                                child: Text(unit),
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              setState(() => selectedUnit = value);
-                            },
-                            value: selectedUnit,
-                            hint: const Text('Select'),
+                              if (isUOM)
+                                Text(
+                                  'Please select UOM.',
+                                  style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                            ],
                           ),
                         ),
                       ],
@@ -564,24 +604,47 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   final quantity = int.tryParse(quantityText);
 
                   if (ingredientName.isEmpty) {
+                    setState(() {
+                      isName = true;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text('Ingredient name is required.')),
                     );
                     return;
+                  } else {
+                    setState(() {
+                      isName = false;
+                    });
                   }
                   if (quantity == null || quantity <= 0) {
+                    setState(() {
+                      // Check if the text field is empty
+                      isQuantity = true;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text('Please enter a valid quantity.')),
                     );
                     return;
+                  } else {
+                    setState(() {
+                      isQuantity = false;
+                    });
                   }
                   if (selectedUnit == null) {
+                    setState(() {
+                      // Check if the text field is empty
+                      isUOM = true;
+                    });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(content: Text('Please select a unit.')),
                     );
                     return;
+                  } else {
+                    setState(() {
+                      isUOM = false;
+                    });
                   }
 
                   // Adjust unit for quantity
@@ -603,7 +666,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   readIngeadints(widget.dish!, widget.serial!);
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorList[int.parse(widget.type!) - 1],
+                  backgroundColor: widget.background,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -640,6 +703,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
         TextEditingController(text: ingredient.name);
     TextEditingController quantityController =
         TextEditingController(text: ingredient.quantity);
+    bool isName = false; // Flag for empty text field error message
+    bool isQuantity = false; // Flag for empty text field error message
+    bool isUOM = false; // Flag for empty text field error message
 
     final unitMap = {
       'gms': 'gm',
@@ -722,6 +788,15 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         fillColor: Colors.grey[100],
                       ),
                     ),
+                    if (isName)
+                      Text(
+                        'Please enter a ingredient name.',
+                        style: TextStyle(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+
                     const SizedBox(height: 20),
 
                     // Quantity and Unit in One Row
@@ -730,17 +805,29 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         // Quantity Input
                         Expanded(
                           flex: 2,
-                          child: TextField(
-                            controller: quantityController,
-                            decoration: InputDecoration(
-                              labelText: 'Quantity',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                          child: Column(
+                            children: [
+                              TextField(
+                                controller: quantityController,
+                                decoration: InputDecoration(
+                                  labelText: 'Quantity',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                ),
+                                keyboardType: TextInputType.number,
                               ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                            ),
-                            keyboardType: TextInputType.number,
+                              if (isQuantity)
+                                Text(
+                                  'Please enter quantity.',
+                                  style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                            ],
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -748,27 +835,39 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         // Unit Dropdown
                         Expanded(
                           flex: 3,
-                          child: DropdownButtonFormField<String>(
-                            decoration: InputDecoration(
-                              labelText: 'Unit',
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(8),
+                          child: Column(
+                            children: [
+                              DropdownButtonFormField<String>(
+                                decoration: InputDecoration(
+                                  labelText: 'Unit',
+                                  border: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey[100],
+                                ),
+                                isExpanded: true,
+                                items: unitOptions.map((String unit) {
+                                  return DropdownMenuItem<String>(
+                                    value: unit,
+                                    child: Text(unit),
+                                  );
+                                }).toList(),
+                                onChanged: (String? value) {
+                                  setState(() => selectedUnit = value);
+                                },
+                                value: selectedUnit,
+                                hint: const Text('Select'),
                               ),
-                              filled: true,
-                              fillColor: Colors.grey[100],
-                            ),
-                            isExpanded: true,
-                            items: unitOptions.map((String unit) {
-                              return DropdownMenuItem<String>(
-                                value: unit,
-                                child: Text(unit),
-                              );
-                            }).toList(),
-                            onChanged: (String? value) {
-                              setState(() => selectedUnit = value);
-                            },
-                            value: selectedUnit,
-                            hint: const Text('Select'),
+                              if (isUOM)
+                                Text(
+                                  'Please select UOM.',
+                                  style: TextStyle(
+                                      color: Colors.red.shade700,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500),
+                                ),
+                            ],
                           ),
                         ),
                       ],
@@ -797,6 +896,53 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               // Update Button
               ElevatedButton(
                 onPressed: () async {
+                  final ingredientName = textController.text.trim();
+                  final quantityText = quantityController.text.trim();
+                  final quantity = int.tryParse(quantityText);
+
+                  if (ingredientName.isEmpty) {
+                    setState(() {
+                      isName = true;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Ingredient name is required.')),
+                    );
+                    return;
+                  } else {
+                    setState(() {
+                      isName = false;
+                    });
+                  }
+                  if (quantity == null || quantity <= 0) {
+                    setState(() {
+                      // Check if the text field is empty
+                      isQuantity = true;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text('Please enter a valid quantity.')),
+                    );
+                    return;
+                  } else {
+                    setState(() {
+                      isQuantity = false;
+                    });
+                  }
+                  if (selectedUnit == null) {
+                    setState(() {
+                      // Check if the text field is empty
+                      isUOM = true;
+                    });
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Please select a unit.')),
+                    );
+                    return;
+                  } else {
+                    setState(() {
+                      isUOM = false;
+                    });
+                  }
                   if (textController.text.isNotEmpty &&
                       quantityController.text.isNotEmpty &&
                       selectedUnit != null) {
@@ -833,7 +979,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   }
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorList[int.parse(widget.type!) - 1],
+                  backgroundColor: widget.background,
                   foregroundColor: Colors.white,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
@@ -905,106 +1051,127 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 ]));
   } */
   void createRecipe() {
+    bool isTextEmpty = false; // Track if the text is empty after button tap
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0), // Soft rounded edges
-        ),
-        title: Center(
-          child: Text(
-            'Add Recipe',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 22,
-              color: colorList[int.parse(widget.type!) - 1],
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0), // Soft rounded edges
             ),
-          ),
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Write your recipe details below:',
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.grey[600],
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: MediaQuery.of(context).size.width * 0.8,
-              child: TextField(
-                controller: textController,
-                maxLines: 6,
-                keyboardType: TextInputType.multiline,
-                textInputAction: TextInputAction.newline,
-                decoration: InputDecoration(
-                  hintText: 'Enter your recipe...',
-                  hintStyle: TextStyle(color: Colors.grey[400]),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.0),
-                    borderSide: BorderSide(
-                      color: Theme.of(context).colorScheme.primary,
-                      width: 2.0,
-                    ),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
+            title: Center(
+              child: Text(
+                'Add Recipe',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 22,
+                  color: widget.background,
                 ),
               ),
             ),
-          ],
-        ),
-        actionsAlignment: MainAxisAlignment.end,
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey.shade600,
-              textStyle: const TextStyle(fontSize: 16),
-            ),
-            onPressed: () {
-              Navigator.pop(context); // Close dialog
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorList[int.parse(widget.type!) - 1],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-            ),
-            onPressed: () async {
-              if (textController.text.trim().isNotEmpty) {
-                await context.read<database>().addRecipe(widget.serial!,
-                    textController.text, widget.type!, widget.dish!);
-                Navigator.pop(context); // Close the dialog
-                readRecipe(
-                    widget.dish!, widget.type!, widget.serial!); // Refresh data
-                textController.clear(); // Clear input
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: const Text('Recipe cannot be empty!'),
-                    backgroundColor: Colors.redAccent,
-                    behavior: SnackBarBehavior.floating,
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Write your recipe details below:',
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: Colors.grey[600],
                   ),
-                );
-              }
-            },
-            child: const Text('Add Recipe'),
-          ),
-        ],
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: TextField(
+                    controller: textController,
+                    maxLines: 6,
+                    keyboardType: TextInputType.multiline,
+                    textInputAction: TextInputAction.newline,
+                    decoration: InputDecoration(
+                      hintText: 'Enter your recipe...',
+                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2.0,
+                        ),
+                      ),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                  ),
+                ),
+                // Show the message if the text is empty after button tap
+                isTextEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Recipe cannot be empty!',
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 14,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+            actionsAlignment: MainAxisAlignment.end,
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                  textStyle: const TextStyle(fontSize: 16),
+                ),
+                onPressed: () {
+                  Navigator.pop(context); // Close dialog
+                },
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.background,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onPressed: () async {
+                  if (textController.text.trim().isNotEmpty) {
+                    await context.read<database>().addRecipe(
+                          widget.serial!,
+                          textController.text,
+                          widget.type!,
+                          widget.dish!,
+                        );
+                    Navigator.pop(context); // Close the dialog
+                    readRecipe(widget.dish!, widget.type!,
+                        widget.serial!); // Refresh data
+                    textController.clear(); // Clear input
+                  } else {
+                    // Set state to show the error message
+                    setState(() {
+                      isTextEmpty = true;
+                    });
+                  }
+                },
+                child: const Text('Add Recipe'),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -1016,6 +1183,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
 
   //update note
   void updateRecipe(Recipe name, String rec) async {
+    bool isTextEmpty = false; // Track if the text is empty after button tap
+
     // Fetch the recipe ID from the database
     final response = await Supabase.instance.client
         .from('recipes')
@@ -1030,127 +1199,165 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
 
     await showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0), // Rounded corners
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(" "),
-            Text(
-              'Edit Recipe',
-              style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                  color: colorList[int.parse(widget.type!) - 1]),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16.0), // Rounded corners
             ),
-            IconButton(
-              onPressed: () {
-                // Show delete confirmation dialog
-                showDialog(
-                  context: context,
-                  builder: (context) => AlertDialog(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
-                    ),
-                    title: const Text(
-                      "Confirm Action",
-                      style: TextStyle(fontWeight: FontWeight.bold),
-                    ),
-                    content: const Text(
-                      "Are you sure you want to delete this recipe?",
-                    ),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          deleteRecipe(rec); // Perform the delete action
-                          Navigator.pop(context); // Close confirmation dialog
-                          Navigator.pop(context); // Close edit dialog
-                        },
-                        child: const Text(
-                          "Yes, Delete",
-                          style: TextStyle(color: Colors.red),
+            title: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(" "),
+                Text(
+                  'Edit Recipe',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20,
+                      color: widget.background),
+                ),
+                IconButton(
+                  onPressed: () {
+                    // Show delete confirmation dialog
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                        ),
+                        title: const Text(
+                          "Confirm Action",
+                          style: TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        content: const Text(
+                          "Are you sure you want to delete this recipe?",
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              deleteRecipe(rec); // Perform the delete action
+                              Navigator.pop(
+                                  context); // Close confirmation dialog
+                              Navigator.pop(context); // Close edit dialog
+                            },
+                            child: const Text(
+                              "Yes, Delete",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(
+                                  context); // Close confirmation dialog
+                            },
+                            child: const Text("Cancel"),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                  icon:
+                      Icon(Icons.delete, color: Colors.red.shade800, size: 20),
+                ),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: TextField(
+                    controller: textController,
+                    maxLines: 6,
+                    decoration: InputDecoration(
+                      hintText: 'Edit your recipe here...',
+                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                        borderSide: BorderSide(
+                          color: Theme.of(context).colorScheme.primary,
+                          width: 2.0,
                         ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          Navigator.pop(context); // Close confirmation dialog
-                        },
-                        child: const Text("Cancel"),
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
-                    ],
-                  ),
-                );
-              },
-              icon: Icon(Icons.delete, color: Colors.red.shade800, size: 20),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: textController,
-              maxLines: 6,
-              decoration: InputDecoration(
-                hintText: 'Edit your recipe here...',
-                hintStyle: TextStyle(color: Colors.grey[400]),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12.0),
-                  borderSide: BorderSide(
-                    color: Theme.of(context).colorScheme.primary,
-                    width: 2.0,
+                    ),
                   ),
                 ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                contentPadding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
+                // Show the message if the text is empty after button tap
+                isTextEmpty
+                    ? Padding(
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Text(
+                          'Recipe cannot be empty!',
+                          style: TextStyle(
+                            color: Colors.redAccent,
+                            fontSize: 14,
+                          ),
+                        ),
+                      )
+                    : Container(),
+              ],
+            ),
+            actionsAlignment: MainAxisAlignment.end,
+            actions: [
+              TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.grey.shade600,
+                  textStyle: const TextStyle(fontSize: 16),
                 ),
+                onPressed: () {
+                  Navigator.pop(context); // Close the dialog
+                },
+                child: const Text('Cancel'),
               ),
-            ),
-          ],
-        ),
-        actionsAlignment: MainAxisAlignment.end,
-        actions: [
-          TextButton(
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey.shade600,
-              textStyle: const TextStyle(fontSize: 16),
-            ),
-            onPressed: () {
-              Navigator.pop(context); // Close the dialog
-            },
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              backgroundColor: colorList[int.parse(widget.type!) - 1],
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8.0),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: widget.background,
+                  foregroundColor: Colors.white,
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onPressed: () async {
+                  if (textController.text.trim().isNotEmpty) {
+                    // Update the recipe in the database
+                    await context.read<database>().updateRecipe(
+                          widget.serial!,
+                          recipeId,
+                          textController.text,
+                          widget.type!,
+                          widget.dish!,
+                        );
+                    textController.clear(); // Clear the input
+                    readRecipe(widget.dish!, widget.type!,
+                        widget.serial!); // Refresh the recipe list
+                    Navigator.pop(context); // Close the dialog
+                  } else {
+                    // Set state to show the error message
+                    setState(() {
+                      isTextEmpty = true;
+                    });
+                  }
+                },
+                child: const Text('Update Recipe'),
               ),
-            ),
-            onPressed: () async {
-              // Update the recipe in the database
-              await context.read<database>().updateRecipe(widget.serial!,
-                  recipeId, textController.text, widget.type!, widget.dish!);
-              textController.clear(); // Clear the input
-              readRecipe(widget.dish!, widget.type!,
-                  widget.serial!); // Refresh the recipe list
-              Navigator.pop(context); // Close the dialog
-            },
-            child: const Text('Update Recipe'),
-          ),
-        ],
+            ],
+          );
+        },
       ),
     );
+
+    // Refresh data after the dialog is closed
     readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
 
@@ -1261,7 +1468,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: colorList[int.parse(widget.type!) - 1],
+              backgroundColor: widget.background,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -1386,7 +1593,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               }
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: colorList[int.parse(widget.type!) - 1],
+              backgroundColor: widget.background,
               foregroundColor: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               shape: RoundedRectangleBorder(
@@ -1568,7 +1775,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Scaffold(
-        backgroundColor: colorList[int.parse(widget.type!) - 1],
+        backgroundColor: widget.background,
         appBar: PreferredSize(
           preferredSize: MediaQuery.of(context).size.width > 600
               ? Size.fromHeight(screenHeight * 0.115)
@@ -1616,7 +1823,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),
                           child: Text(
-                            widget.dish != null && widget.dish!.length > 10
+                            widget.dish != null && widget.dish!.length > 20
                                 ? '${widget.dish!.substring(0, 10)}...'
                                 : widget.dish ?? '',
                             style: GoogleFonts.poppins(
@@ -1640,23 +1847,35 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     child: Row(
                       children: [
                         // Add button
-                        IconButton(
-                          key: _add,
-                          onPressed: () => add(selectedTabIndex),
-                          icon: const Icon(
-                            Icons.add,
-                            size: 35,
-                            color: Colors.white,
+                        if (widget.access!)
+                          IconButton(
+                            key: _add,
+                            onPressed: () => add(selectedTabIndex),
+                            icon: SvgPicture.asset(
+                              'assets/icons/add.svg',
+                              color: Colors
+                                  .white, // Make sure to use your correct asset path
+                              height: screenWidth *
+                                  0.035, // Adjust the size as needed
+                              width: 50.0,
+                            ),
+                            tooltip: 'Add item',
                           ),
-                          tooltip: 'Add item',
-                        ),
 
                         // Link button
                         GestureDetector(
                           key: _link,
                           onTap: () {
                             if (fetchedlink == null) {
-                              createLink();
+                              if (widget.access!) {
+                                createLink();
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: Text('No links available')),
+                                );
+                                return;
+                              }
                             } else {
                               final fetchedLinksId = fetchedlinkid is List<int>
                                   ? fetchedlinkid as List<int>
@@ -1673,11 +1892,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   fetchedlinkNames);
                             }
                           },
-                          onLongPress: newLink,
-                          child: const Icon(
-                            Icons.link,
-                            size: 40,
-                            color: Colors.white,
+                          onLongPress: () {
+                            if (widget.access!) newLink;
+                          },
+                          child: SvgPicture.asset(
+                            'assets/icons/youtube.svg',
+                            color: Colors
+                                .white, // Make sure to use your correct asset path
+                            height:
+                                screenWidth * 0.04, // Adjust the size as needed
+                            width: 100.0,
                           ),
                         ),
                       ],
@@ -1985,6 +2209,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                         text: note.name!,
                                         quantity: double.parse(note.quantity!),
                                         uom: note.uom,
+                                        access: widget.access!,
                                         onEditPressed: () =>
                                             updateIng(note, note.name!),
                                         onDeletePressed: () =>
@@ -2058,6 +2283,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   dish: widget.dish,
                                   //  type: widget.type!,
                                   text: note.name!,
+                                  access: widget.access,
                                   onEditPressed: () =>
                                       updateRecipe(note, note.name!),
                                   onDeletePressed: () =>

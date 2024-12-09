@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:recipe/pages/home.dart';
-import 'package:recipe/pages/loginPage.dart';
+import 'package:recipe/pages/biggerScreens/home.dart';
+import 'package:recipe/pages/biggerScreens/loginPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SplashScreen extends StatefulWidget {

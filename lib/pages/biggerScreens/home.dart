@@ -8,10 +8,10 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
-import 'package:recipe/pages/all/allDishes.dart';
-import 'package:recipe/pages/dishesPage.dart';
-import 'package:recipe/pages/profilePage.dart';
-import 'package:recipe/pages/recipePage.dart';
+import 'package:recipe/pages/biggerScreens/allDishes.dart';
+import 'package:recipe/pages/biggerScreens/dishesPage.dart';
+import 'package:recipe/pages/biggerScreens/profilePage.dart';
+import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
@@ -265,6 +265,18 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController textController = TextEditingController();
   String searchQuery = '';
   bool _isErrorDialogShown = false;
+  List<Color> colorList = [
+    const Color.fromARGB(255, 249, 168, 37), // #F9A825
+    const Color.fromARGB(255, 102, 187, 106), // #66BB6A
+    const Color.fromARGB(255, 183, 28, 28), // #B71C1C
+    const Color.fromARGB(255, 141, 110, 99), // #8D6E63
+    const Color.fromARGB(255, 255, 128, 171), // #FF80AB
+    const Color.fromARGB(255, 255, 112, 67), // #FF7043
+    const Color.fromARGB(255, 195, 176, 153), // #C3B099
+    const Color.fromARGB(255, 79, 195, 247), // #4FC3F7
+    const Color.fromARGB(255, 104, 159, 56), // #689F38
+    const Color.fromARGB(255, 179, 157, 219), // #B39DDB
+  ];
 
   @override
   void initState() {
@@ -390,6 +402,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    Color allColor = Color.fromARGB(255, 131, 106, 68);
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool _isEditing = false;
@@ -679,6 +692,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         type: suggestion.type,
                                         dish: suggestion.name,
                                         category: suggestion.category,
+                                        access: true,
+                                        background: colorList[
+                                            int.parse(suggestion.type!) - 1],
                                       )));
                             });
                             print("suggestion: ${suggestion.name}");
@@ -718,9 +734,15 @@ class _MyHomePageState extends State<MyHomePage> {
                                 child: GestureDetector(
                                   onTap: () {
                                     Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => alldishesList(
+                                      PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.bottomToTop,
+                                        duration: const Duration(
+                                            milliseconds:
+                                                300), // Adjust duration to slow down the transition
+                                        child: alldishesList(
                                           title: _currentLabel,
+                                          scafColor: allColor,
                                         ),
                                       ),
                                     );
@@ -728,12 +750,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                   child: Container(
                                     width: cardWidth,
                                     height: cardHeight,
-                                    decoration: const BoxDecoration(
+                                    decoration: BoxDecoration(
                                       gradient: LinearGradient(
-                                        colors: [
-                                          Color.fromARGB(255, 131, 106, 68),
-                                          Color.fromARGB(255, 131, 106, 68),
-                                        ],
+                                        colors: [allColor, allColor],
                                         begin: Alignment.topCenter,
                                         end: Alignment.bottomCenter,
                                       ),

@@ -1,18 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:popover/popover.dart';
-import 'package:recipe/pages/recipePage.dart';
+import 'package:recipe/pages/biggerScreens/recipePage.dart';
 
 class RecipeList extends StatelessWidget {
   RecipeList({
     super.key,
     required this.dish,
     required this.text,
+    required this.access,
     this.onEditPressed,
     this.onDeletePressed,
   });
 
   final String? dish;
   final String text;
+  final bool? access;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
 
@@ -30,6 +32,7 @@ class RecipeList extends StatelessWidget {
               Theme.of(context).colorScheme.primary), // Small circle as a point
       title: GestureDetector(
         onLongPress: () {
+           if(access!)
           onEditPressed!();
         },
         child: Text(

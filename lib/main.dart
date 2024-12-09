@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/notInUse/brin_db.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:recipe/pages/splash_screen.dart';
+import 'package:recipe/pages/biggerScreens/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();

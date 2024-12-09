@@ -1,8 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:recipe/pages/home.dart';
-import 'package:recipe/pages/loginPage.dart';
+import 'package:recipe/pages/biggerScreens/home.dart';
+import 'package:recipe/pages/biggerScreens/loginPage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
