@@ -27,14 +27,17 @@ class DishTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
       child: Container(
-        width: MediaQuery.of(context).size.width * 0.1,
-        height: MediaQuery.of(context).size.height * 0.08,
+        width: screenWidth * 0.1,
+        height: screenWidth > 600 ? screenHeight * 0.1 : screenHeight * 0.07,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -46,27 +49,35 @@ class DishTile extends StatelessWidget {
         child: Stack(
           children: [
             Positioned(
-              right: 10,
-              top: 10,
+              right: 5,
+              top: 5,
               child: CircleAvatar(
                 radius: 10,
                 backgroundColor: Colors.white.withOpacity(0.0),
                 child: category == "1"
-                    ? Icon(Icons.circle_rounded, color: Colors.red, size: 15)
-                    : Icon(Icons.circle_rounded, color: Colors.green, size: 15),
+                    ? Icon(Icons.circle_rounded,
+                        color: Colors.red,
+                        size: screenWidth > 600 ? 15 : screenWidth * 0.025)
+                    : Icon(Icons.circle_rounded,
+                        color: Colors.green,
+                        size: screenWidth > 600 ? 15 : screenWidth * 0.025),
               ),
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
+              padding: screenWidth > 600
+                  ? EdgeInsets.all(20.0)
+                  : EdgeInsets.only(left: 15.0, top: 0, bottom: 5),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                mainAxisAlignment: screenWidth > 600
+                    ? MainAxisAlignment.spaceBetween
+                    : MainAxisAlignment.spaceEvenly,
                 children: [
                   Text(
                     text,
                     style: TextStyle(
                       color: Colors.black,
-                      fontSize: 24,
+                      fontSize: screenWidth > 600 ? 24 : screenWidth * 0.045,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -100,15 +111,23 @@ class DishTile extends StatelessWidget {
                             : 'Invalid duration',
                         style: TextStyle(
                           color: Colors.grey.shade500,
-                          fontSize: 12,
+                          fontSize:
+                              screenWidth > 600 ? 12 : screenWidth * 0.025,
                         ),
                       ),
                       if (fromType! != 'no')
-                        Text(
-                          fromType!,
-                          style: TextStyle(
-                            color: Colors.grey.shade500,
-                            fontSize: 12,
+                        Padding(
+                          padding: EdgeInsets.only(
+                              right: MediaQuery.of(context).size.width > 600
+                                  ? 0
+                                  : MediaQuery.of(context).size.width * 0.02),
+                          child: Text(
+                            fromType!,
+                            style: TextStyle(
+                              color: Colors.grey.shade500,
+                              fontSize:
+                                  screenWidth > 600 ? 12 : screenWidth * 0.025,
+                            ),
                           ),
                         ),
                     ],

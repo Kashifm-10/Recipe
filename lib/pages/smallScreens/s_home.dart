@@ -4,6 +4,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/names.dart';
@@ -12,6 +13,9 @@ import 'package:recipe/pages/biggerScreens/allDishes.dart';
 import 'package:recipe/pages/biggerScreens/dishesPage.dart';
 import 'package:recipe/pages/profilePage.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
+import 'package:recipe/pages/smallScreens/s_allDishes.dart';
+import 'package:recipe/pages/smallScreens/s_dishesPage.dart';
+import 'package:recipe/pages/smallScreens/s_recipePage.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart' as color_picker;
@@ -245,14 +249,14 @@ class CategoryService {
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+class MySmallHomePage extends StatefulWidget {
+  const MySmallHomePage({super.key});
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<MySmallHomePage> createState() => _MySmallHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MySmallHomePageState extends State<MySmallHomePage> {
   late Future<List<Map<String, dynamic>>> _categories;
   List<Dish> searchdishes = [];
   List<Dish> allDishes = [];
@@ -265,6 +269,8 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController textController = TextEditingController();
   String searchQuery = '';
   bool _isErrorDialogShown = false;
+  final FocusNode _focusNode = FocusNode();
+
   List<Color> colorList = [
     const Color.fromARGB(255, 249, 168, 37), // #F9A825
     const Color.fromARGB(255, 102, 187, 106), // #66BB6A
@@ -410,11 +416,9 @@ class _MyHomePageState extends State<MyHomePage> {
     const Color _cardColor =
         Color.fromARGB(255, 128, 194, 233); // Default color
     const IconData cardIcon = HeroiconsOutline.archiveBox; // Default icon
-    final double cardWidth =
-        screenWidth < 600 ? screenWidth * 1.5 : screenWidth * 0.1;
-    final double cardHeight =
-        screenWidth < 600 ? screenWidth * 0.4 : screenHeight * 0.07;
-    final double iconSize = screenWidth < 600 ? screenWidth * 0.2 : 40;
+    final double cardWidth = screenWidth * 0.05;
+    final double cardHeight = screenHeight * 0.08;
+    final double iconSize = screenWidth * 0.07;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -422,15 +426,15 @@ class _MyHomePageState extends State<MyHomePage> {
         // When tapping anywhere outside the search bar, it unfocuses the search field and hides the keyboard.
         onTap: () {
           FocusScope.of(context).unfocus();
+          textController.clear();
+          _focusNode.unfocus();
         },
         child: Stack(
           children: [
             // Background Image
             Positioned.fill(
               child: Image.asset(
-                screenWidth > 600
-                    ? 'assets/images/bg_home.jpg' // Image for larger screens
-                    : 'assets/images/bg_home.jpg', // Image for smaller screens
+                'assets/images/bg_home.jpg', // Image for smaller screens
                 width: screenWidth,
                 height: screenHeight,
                 fit: BoxFit.cover,
@@ -460,11 +464,15 @@ class _MyHomePageState extends State<MyHomePage> {
               future: _categories,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 7,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
+                  return  Center(
+                    child: /* ColorFiltered(
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      child:  */Lottie.asset(
+                        'assets/lottie_json/burger.json',
+                        width: screenWidth * 0.6,
+                      //),
+                    )
                   );
                 } else if (snapshot.hasError) {
                   if (!_isErrorDialogShown) {
@@ -499,7 +507,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                const MyHomePage()),
+                                                const MySmallHomePage()),
                                         (Route<dynamic> route) => false,
                                       );
                                     },
@@ -513,317 +521,356 @@ class _MyHomePageState extends State<MyHomePage> {
                   }
                   return const Center(child: Text(''));
                 } else {
-                  return Column(
-                    children: [
-                      // Title
-                      Padding(
-                        padding: const EdgeInsets.only(top: 200.0),
-                        child: Text(
-                          "Categories",
-                          style: TextStyle(
-                            fontSize: screenWidth < 600 ? 24 : 60,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
+                  return Padding(
+                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.1),
+                    child: Column(
+                      children: [
+                        // Title
+                        Padding(
+                          padding: EdgeInsets.only(top: 0.0),
+                          child: Text(
+                            "Categories",
+                            style: TextStyle(
+                              fontSize: MediaQuery.of(context).size.width * 0.1,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
                         ),
-                      ),
-                      const SizedBox(
-                        height: 70,
-                      ),
-                      // Search Bar
-                      Padding(
-                        padding: EdgeInsets.symmetric(
-                            horizontal: screenWidth * 0.08),
-                        child: DropDownSearchField(
-                          displayAllSuggestionWhenTap: true,
-                          textFieldConfiguration: TextFieldConfiguration(
-                            controller: textController,
-                            autofocus: false,
-                            style: DefaultTextStyle.of(context).style.copyWith(
-                                  fontStyle: FontStyle.normal,
-                                ),
-                            decoration: InputDecoration(
-                              hintText: "Search Dishes",
-                              prefixIcon: const Icon(Icons.search),
-                              suffixIcon: Stack(
-                                alignment: Alignment.centerRight,
-                                children: [
-                                  // Microphone Icon Button
-                                  Positioned(
-                                    right:
-                                        3.0, // Adjust this value to control the visibility
-                                    child: IconButton(
-                                      icon: const Icon(
-                                        Ionicons.close_circle_outline,
-                                        color: Colors.grey,
+                        const SizedBox(
+                          height: 70,
+                        ),
+                        // Search Bar
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: screenWidth * 0.09),
+                          child: DropDownSearchField(
+                            displayAllSuggestionWhenTap: true,
+                            textFieldConfiguration: TextFieldConfiguration(
+                              controller: textController,
+                              focusNode: _focusNode, // Attach the focus node
+                              autofocus: false,
+                              style:
+                                  DefaultTextStyle.of(context).style.copyWith(
+                                        fontStyle: FontStyle.normal,
                                       ),
-                                      onPressed: () {
-                                        // Clear the search field
-                                        textController.clear();
-                                      },
+                              decoration: InputDecoration(
+                                hintText: "Search Dishes",
+                                prefixIcon: const Icon(Icons.search),
+                                suffixIcon: Stack(
+                                  alignment: Alignment.centerRight,
+                                  children: [
+                                    // Microphone Icon Button
+                                    Positioned(
+                                      right: 3.0,
+                                      child: IconButton(
+                                        icon: const Icon(
+                                          Ionicons.close_circle_outline,
+                                          color: Colors.grey,
+                                        ),
+                                        onPressed: () {
+                                          // Clear the search field and close dropdown
+                                          textController.clear();
+                                        },
+                                      ),
                                     ),
-                                  ),
-                                  // Close Button
+                                    // Close Button
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                          right: screenWidth * 0.08,
+                                          top: screenHeight * 0.002),
+                                      child: IconButton(
+                                        onPressed: !_isListening
+                                            ? _startListening
+                                            : _stopListening,
+                                        icon: Icon(
+                                          _isListening
+                                              ? Icons.mic
+                                              : Icons.mic_none,
+                                          color: _isListening
+                                              ? Colors.red
+                                              : Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                filled: true,
+                                fillColor: Colors.white,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(25.0),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                            ),
+                            suggestionsCallback: (pattern) async {
+                              final lowercasePattern = pattern.toLowerCase();
+                              return searchdishes
+                                  .where((dish) => dish.name
+                                      .toLowerCase()
+                                      .contains(lowercasePattern))
+                                  .toList();
+                            },
+                            itemBuilder: (context, suggestion) {
+                              return Column(
+                                children: [
                                   Padding(
                                     padding: const EdgeInsets.only(
-                                        right: 35.0,
-                                        top:
-                                            1), // Adjust this padding as needed
-                                    child: IconButton(
-                                      onPressed: !_isListening
-                                          ? _startListening
-                                          : _stopListening, // Start or stop voice search
-                                      icon: Icon(
-                                        _isListening
-                                            ? Icons.mic
-                                            : Icons
-                                                .mic_none, // Change icon based on listening state
-                                        color: _isListening
-                                            ? Colors.red
-                                            : Colors.grey,
+                                        bottom: 5.0, left: 10.0, right: 10.0),
+                                    child: ListTile(
+                                      leading: const Icon(Icons.fastfood,
+                                          color: Colors.orange, size: 30),
+                                      title: Text(
+                                        suggestion.name,
+                                        style: const TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 16),
                                       ),
+                                      subtitle: Row(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Expanded(
+                                            child: Text(
+                                              suggestion.duration != null
+                                                  ? (() {
+                                                      double duration = double
+                                                              .tryParse(suggestion
+                                                                  .duration!) ??
+                                                          0.0;
+                                                      int hours =
+                                                          duration.toInt();
+                                                      int minutes =
+                                                          ((duration - hours) *
+                                                                  60)
+                                                              .toInt();
+
+                                                      if (hours > 0 &&
+                                                          minutes > 0) {
+                                                        return '$hours hr ${minutes} min';
+                                                      } else if (hours > 0) {
+                                                        return '$hours hr';
+                                                      } else if (minutes > 0) {
+                                                        return '$minutes min';
+                                                      } else {
+                                                        return '0 min';
+                                                      }
+                                                    }())
+                                                  : 'Invalid duration',
+                                              style: const TextStyle(
+                                                  fontSize: 14,
+                                                  color: Colors.grey),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      tileColor: Colors.white,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(10),
+                                        side: const BorderSide(
+                                            color: Colors.white),
+                                      ),
+                                      trailing: CircleAvatar(
+                                        radius: 10,
+                                        backgroundColor:
+                                            Colors.white.withOpacity(0.0),
+                                        child: suggestion.category == "1"
+                                            ? const Icon(Icons.circle_rounded,
+                                                color: Colors.red, size: 15)
+                                            : const Icon(Icons.circle_rounded,
+                                                color: Colors.green, size: 15),
+                                      ),
+                                    ),
+                                  ),
+                                  Divider(
+                                    color: Colors.grey,
+                                    height: 1,
+                                    thickness: 0.4,
+                                    indent:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                    endIndent:
+                                        MediaQuery.of(context).size.width * 0.1,
+                                  ),
+                                ],
+                              );
+                            },
+                            onSuggestionSelected: (suggestion) {
+                              setState(() {
+                                Navigator.of(context).push(MaterialPageRoute(
+                                    builder: (context) => smallrecipe(
+                                          serial: suggestion.serial,
+                                          type: suggestion.type,
+                                          dish: suggestion.name,
+                                          category: suggestion.category,
+                                          access: true,
+                                          background: colorList[
+                                              int.parse(suggestion.type!) - 1],
+                                        )));
+                              });
+                              print("suggestion: ${suggestion.name}");
+                            },
+                            suggestionsBoxDecoration: SuggestionsBoxDecoration(
+                              elevation: 0,
+                              color: Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            noItemsFoundBuilder: (context) => Center(
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Lottie.asset(
+                                      'assets/lottie_json/nothing.json',
+                                      width: screenWidth*0.9,
+                                      ),
+                                  const SizedBox(height: 1),
+                                  Text(
+                                    "Nothing Here",
+                                    style: TextStyle(
+                                      color: Colors.grey,
+                                      fontSize: 16,
                                     ),
                                   ),
                                 ],
                               ),
-                              filled: true,
-                              fillColor: Colors.white,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(30.0),
-                                borderSide: BorderSide.none,
-                              ),
                             ),
                           ),
-                          suggestionsCallback: (pattern) async {
-                            final lowercasePattern = pattern.toLowerCase();
-                            return searchdishes
-                                .where((dish) => dish.name
-                                    .toLowerCase()
-                                    .contains(lowercasePattern))
-                                .toList();
-                          },
-                          itemBuilder: (context, suggestion) {
-                            return Column(
-                              children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 5.0, left: 10.0, right: 10.0),
-                                  child: ListTile(
-                                    leading: const Icon(Icons.fastfood,
-                                        color: Colors.orange, size: 30),
-                                    title: Text(
-                                      suggestion.name,
-                                      style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: 16),
-                                    ),
-                                    subtitle: Row(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Expanded(
-                                          child: Text(
-                                            suggestion.duration != null
-                                                ? (() {
-                                                    double duration = double
-                                                            .tryParse(suggestion
-                                                                .duration!) ??
-                                                        0.0;
-                                                    int hours =
-                                                        duration.toInt();
-                                                    int minutes =
-                                                        ((duration - hours) *
-                                                                60)
-                                                            .toInt();
-
-                                                    if (hours > 0 &&
-                                                        minutes > 0) {
-                                                      return '$hours hr ${minutes} min';
-                                                    } else if (hours > 0) {
-                                                      return '$hours hr';
-                                                    } else if (minutes > 0) {
-                                                      return '$minutes min';
-                                                    } else {
-                                                      return '0 min';
-                                                    }
-                                                  }())
-                                                : 'Invalid duration',
-                                            style: const TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    tileColor: Colors.white,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10),
-                                      side:
-                                          const BorderSide(color: Colors.white),
-                                    ),
-                                    trailing: CircleAvatar(
-                                      radius: 10,
-                                      backgroundColor:
-                                          Colors.white.withOpacity(0.0),
-                                      child: suggestion.category == "1"
-                                          ? const Icon(Icons.circle_rounded,
-                                              color: Colors.red, size: 15)
-                                          : const Icon(Icons.circle_rounded,
-                                              color: Colors.green, size: 15),
-                                    ),
-                                  ),
-                                ),
-                                Divider(
-                                  color: Colors.grey, // Color of the divider
-                                  height: 1, // Height of the divider
-                                  thickness: 0.4, // Thickness of the divider
-                                  indent: screenWidth * 0.1,
-                                  endIndent: screenWidth * 0.1,
-                                ),
-                              ],
-                            );
-                          },
-                          onSuggestionSelected: (suggestion) {
-                            setState(() {
-                              Navigator.of(context).push(MaterialPageRoute(
-                                  builder: (context) => recipe(
-                                        serial: suggestion.serial,
-                                        type: suggestion.type,
-                                        dish: suggestion.name,
-                                        category: suggestion.category,
-                                        access: true,
-                                        background: colorList[
-                                            int.parse(suggestion.type!) - 1],
-                                      )));
-                            });
-                            print("suggestion: ${suggestion.name}");
-                          },
-                          suggestionsBoxDecoration: SuggestionsBoxDecoration(
-                            elevation: 0,
-                            color: Colors
-                                .white, // Background color of the suggestion box
-                            borderRadius: BorderRadius.circular(
-                                20), // Rounded corners for the suggestion box
-                          ),
                         ),
-                      ),
-                      // Adjust the spacing
-                      // Replace Expanded with Container or SizedBox with a max height
-                      SizedBox(
-                        height: screenHeight *
-                            0.60, // Set the maximum height (adjust as needed)
-                        child: ListView(
-                          physics:
-                              const ScrollPhysics(), //remove this line to make scrollable
-                          padding: EdgeInsets.symmetric(
-                              vertical: 10, horizontal: screenWidth * 0.06),
-                          children: [
-                            // Categories from Snapshot
-                            ..._buildCategoryRows(snapshot.data ?? []),
-                            // Your first GestureDetector Card
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 15.0),
-                              child: Card(
-                                elevation: 8,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                clipBehavior: Clip.antiAlias,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context).push(
-                                      PageTransition(
-                                        curve: Curves.linear,
-                                        type: PageTransitionType.bottomToTop,
-                                        duration: const Duration(
-                                            milliseconds:
-                                                300), // Adjust duration to slow down the transition
-                                        child: alldishesList(
-                                          title: _currentLabel,
-                                          scafColor: allColor,
+                        // Adjust the spacing
+                        // Replace Expanded with Container or SizedBox with a max height
+                        SizedBox(
+                          height: screenHeight *
+                              0.60, // Set the maximum height (adjust as needed)
+                          child: ListView(
+                            physics:
+                                const ScrollPhysics(), //remove this line to make scrollable
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenHeight * 0.01,
+                                horizontal: screenWidth * 0.06),
+                            children: [
+                              // Categories from Snapshot
+                              ..._buildCategoryRows(snapshot.data ?? []),
+                              // Your first GestureDetector Card
+                              Padding(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: screenWidth * 0.02,
+                                    vertical: screenHeight * 0.004),
+                                child: Card(
+                                  elevation: 8,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  clipBehavior: Clip.antiAlias,
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        PageTransition(
+                                          curve: Curves.linear,
+                                          type: PageTransitionType.bottomToTop,
+                                          duration: const Duration(
+                                              milliseconds:
+                                                  300), // Adjust duration to slow down the transition
+                                          child: MediaQuery.of(context)
+                                                      .size
+                                                      .width >
+                                                  600
+                                              ? alldishesList(
+                                                  title: _currentLabel,
+                                                  scafColor: allColor,
+                                                )
+                                              : smallalldishesList(
+                                                  title: _currentLabel,
+                                                  scafColor: allColor,
+                                                ),
+                                        ),
+                                      );
+                                    },
+                                    child: Container(
+                                      width: cardWidth,
+                                      height: cardHeight,
+                                      decoration: BoxDecoration(
+                                        gradient: LinearGradient(
+                                          colors: [allColor, allColor],
+                                          begin: Alignment.topCenter,
+                                          end: Alignment.bottomCenter,
                                         ),
                                       ),
-                                    );
-                                  },
-                                  child: Container(
-                                    width: cardWidth,
-                                    height: cardHeight,
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: [allColor, allColor],
-                                        begin: Alignment.topCenter,
-                                        end: Alignment.bottomCenter,
-                                      ),
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.symmetric(
-                                          horizontal: cardWidth * 2.4),
-                                      child: Row(
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(0.0),
-                                            child: Container(
-                                              height: 60,
-                                              width: 60,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                color: Colors.white
-                                                    .withOpacity(0.8),
-                                              ),
-                                              child: Icon(
-                                                cardIcon,
-                                                size: iconSize,
-                                                color: const Color.fromARGB(
-                                                    255, 182, 143, 84),
-                                              ),
-                                            ),
-                                          ),
-                                          Expanded(
-                                            child: Padding(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            horizontal: cardWidth * 3),
+                                        child: Row(
+                                          children: [
+                                            Padding(
                                               padding:
-                                                  const EdgeInsets.symmetric(
-                                                      horizontal: 16.0),
-                                              child: Column(
-                                                mainAxisAlignment:
-                                                    MainAxisAlignment.center,
-                                                crossAxisAlignment:
-                                                    CrossAxisAlignment.start,
-                                                children: [
-                                                  Text(
-                                                    _currentLabel,
-                                                    style: const TextStyle(
-                                                      fontSize: 20,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(height: 4),
-                                                  /* const Text(
-                                                    "Subtitle or Description",
-                                                    style: TextStyle(
-                                                      fontSize: 14,
-                                                      color: Colors.white70,
-                                                    ),
-                                                  ), */
-                                                ],
+                                                  const EdgeInsets.all(0.0),
+                                              child: Container(
+                                                height: MediaQuery.of(context)
+                                                        .size
+                                                        .height *
+                                                    0.05,
+                                                width: 60,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  color: Colors.white
+                                                      .withOpacity(0.8),
+                                                ),
+                                                child: Icon(
+                                                  cardIcon,
+                                                  size: iconSize,
+                                                  color: const Color.fromARGB(
+                                                      255, 182, 143, 84),
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                        ],
+                                            Expanded(
+                                              child: Padding(
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                        horizontal: 16.0),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: [
+                                                    Text(
+                                                      _currentLabel,
+                                                      style: TextStyle(
+                                                        fontSize: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .width *
+                                                            0.04,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    const SizedBox(height: 4),
+                                                    /* const Text(
+                                                        "Subtitle or Description",
+                                                        style: TextStyle(
+                                                          fontSize: 14,
+                                                          color: Colors.white70,
+                                                        ),
+                                                      ), */
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
+                                            const SizedBox(width: 8),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 }
               },
@@ -1326,18 +1373,6 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
 
-    final double cardWidth = MediaQuery.of(context).size.width < 600
-        ? screenWidth * 0.28 // Adjusted width for larger screens
-        : screenWidth * 0.22; // Default width for smaller screens
-
-    final double cardHeight = MediaQuery.of(context).size.width < 600
-        ? screenHeight * 0.14 // Adjusted height for larger screens
-        : screenHeight * 0.12; // Default height for smaller screens
-
-    final double iconSize = MediaQuery.of(context).size.width < 600
-        ? cardWidth * 0.5 // Larger icon size for larger screens
-        : cardWidth * 0.2; // Default icon size for smaller screens
-
     return LayoutBuilder(
       builder: (context, constraints) {
         return GestureDetector(
@@ -1497,7 +1532,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   duration: const Duration(
                       milliseconds:
                           300), // Adjust duration to slow down the transition
-                  child: dishesList(
+                  child: smalldishesList(
                     type: widget.type,
                     title: _currentLabel,
                   ),
@@ -1530,22 +1565,23 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                     Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Container(
-                        height: 60,
-                        width: 60,
+                        height: screenHeight * 0.06,
+                        width: screenWidth * 0.08,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           color: Colors.white.withOpacity(0.8),
                         ),
                         child: Icon(
                           _currentIcon,
-                          size: 32, // Adjusted icon size for horizontal layout
+                          size: screenWidth *
+                              0.05, // Adjusted icon size for horizontal layout
                           color: Color(widget.color.value),
                         ),
                       ),
                     ),
                     Expanded(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                        padding: const EdgeInsets.symmetric(horizontal: 0.0),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -1569,13 +1605,13 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                   )
                                 : Text(
                                     _currentLabel,
-                                    style: const TextStyle(
-                                      fontSize: 18,
+                                    style: TextStyle(
+                                      fontSize: screenWidth * 0.04,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
                                   ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: 0),
                             // Optional Subtitle or Description
                             Row(
                               mainAxisAlignment: MainAxisAlignment.start,
@@ -1587,18 +1623,18 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Veg: ', // Placeholder text
                                           style: TextStyle(
-                                            fontSize: 10,
+                                            fontSize: screenWidth * 0.02,
                                             color: Colors.white,
                                           ),
                                         ),
                                         Text(
                                           widget.non_veg
                                               .toString(), // Placeholder text
-                                          style: const TextStyle(
-                                            fontSize: 10,
+                                          style: TextStyle(
+                                            fontSize: screenWidth * 0.02,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -1606,10 +1642,10 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                     ),
                                     Row(
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Non-Veg: ', // Placeholder text
                                           style: TextStyle(
-                                            fontSize: 10,
+                                            fontSize: screenWidth * 0.02,
                                             color: Colors.white,
                                           ),
                                         ),
@@ -1617,7 +1653,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                           widget.veg
                                               .toString(), // Placeholder text
                                           style: TextStyle(
-                                            fontSize: 10,
+                                            fontSize: screenWidth * 0.02,
                                             color:
                                                 Colors.white.withOpacity(0.8),
                                           ),

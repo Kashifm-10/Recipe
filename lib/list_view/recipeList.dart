@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:heroicons_flutter/heroicons_flutter.dart';
+import 'package:ionicons/ionicons.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 
@@ -25,23 +28,21 @@ class RecipeList extends StatelessWidget {
           vertical: MediaQuery.of(context).size.width > 600 ? 8 : 0,
           horizontal: MediaQuery.of(context).size.width > 600
               ? 20
-              : 15), // Padding around the list item
-      leading: Icon(Icons.circle,
-          size: 7,
-          color:
-              Theme.of(context).colorScheme.primary), // Small circle as a point
+              : 20), // Padding around the list item
+      leading:  Icon(FontAwesomeIcons.circle,
+          size: 10, color: Colors.grey[850]), // Small circle as a point
       title: GestureDetector(
         onLongPress: () {
-           if(access!)
-          onEditPressed!();
+          if (access!) onEditPressed!();
         },
         child: Text(
-          text,
+          '${text[0].toUpperCase()}${text.substring(1)}',
           style: TextStyle(
             fontSize: MediaQuery.of(context).size.width > 600
                 ? 25
                 : MediaQuery.of(context).size.width * 0.04,
-            color: Theme.of(context).colorScheme.onBackground,
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
           ),
           textAlign:
               TextAlign.left, // Justified text alignment for cleaner look

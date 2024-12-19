@@ -1,29 +1,45 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:recipe/models/auth_service.dart';
-import 'package:recipe/pages/biggerScreens/loginPage.dart';
+import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:mailer/mailer.dart';
+import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:mailer/smtp_server.dart';
+import 'package:awesome_dialog/awesome_dialog.dart';
+import 'package:flutter/foundation.dart';
+import 'package:lottie/lottie.dart';
+import 'package:material_dialogs/material_dialogs.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 
 // Make sure AuthService is available
 
-class RegisterScreen extends StatefulWidget {
+class ForgotPasswordScreen extends StatefulWidget {
   @override
-  _RegisterScreenState createState() => _RegisterScreenState();
+  _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
 
-class _RegisterScreenState extends State<RegisterScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>(); // FormKey to manage form validation
   bool _isGoogleSignInInProgress = false;
 
+  bool _isSending = false;
   String? _usernameError;
   String? _emailError;
   String? _passwordError;
+  final String host = 'smtp.gmail.com'; // Example: smtp.gmail.com
+  final int port = 465; // Port for TLS
+  final String username = 'noreplyoraction@gmail.com';
+//final String password = 'dhur bvcc xvhu fqgg';
+  final String password = 'pyaf nqep hcif qnqk';
+
+  // Your custom HTML template
 
   @override
   void initState() {
@@ -106,21 +122,175 @@ class _RegisterScreenState extends State<RegisterScreen> {
     }
   }
 
-  Future<void> _signInWithGoogle() async {
+  String getEmailTemplate(String otp) {
+    return '''
+   <table width="100%" bgcolor="#fff5e6" cellpadding="0" cellspacing="0" style="margin: 0; padding: 0; font-family: Arial, sans-serif;">
+  <tr>
+    <td align="center" style="padding: 10px;">
+      <!-- Container -->
+      <table width="500" cellpadding="0" cellspacing="0" bgcolor="#ffffff" style="border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.15);">
+        <tr>
+          <td align="center" style="padding: 20px;">
+            <!-- Logo -->
+            <img src="https://cdn-icons-png.flaticon.com/128/1830/1830839.png" alt="Logo" width="60" style="display: block; margin: 0 auto;">
+
+            <!-- Title -->
+            <h1 style="color: #ff6f00; font-size: 24px; margin: 10px 0;">Cook Book</h1>
+
+            <!-- Separator -->
+            <img src="https://cdn-icons-png.flaticon.com/128/17632/17632141.png" alt="Icon" width="30" style="margin: 10px auto;">
+
+            <!-- Message -->
+            <p style="color: #333; font-size: 14px; line-height: 1.5; margin: 10px 0;">
+              Your new password for accessing delicious recipes is:
+            </p>
+
+            <!-- OTP -->
+            <p style="color: #ff6f00; font-size: 20px; font-weight: bold; margin: 20px 0;">
+              $otp
+            </p>
+
+            <!-- Footer -->
+            <p style="color: #777; font-size: 10px; margin: 0;">
+              Thank you for choosing <strong>Cook Book</strong>. Bon Appétit!
+            </p>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+    ''';
+  }
+
+  String generateRandomPassword() {
+    const String upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const String lowerCase = 'abcdefghijklmnopqrstuvwxyz';
+    const String numbers = '0123456789';
+    const String specialChars = '@#%^&*!()_+[]{}|;:,.<>?';
+
+    // Combine all characters into one pool (without special characters initially)
+    final String allCharacters = upperCase + lowerCase + numbers;
+
+    // Create a random generator
+    final Random random = Random();
+
+    // Ensure the password has at least one of each character type
+    String password = '';
+    password += upperCase[random.nextInt(upperCase.length)];
+    password += lowerCase[random.nextInt(lowerCase.length)];
+    password += numbers[random.nextInt(numbers.length)];
+    password += specialChars[random
+        .nextInt(specialChars.length)]; // Add exactly one special character
+
+    // Fill the rest of the password (length 8 in total)
+    for (int i = 4; i < 8; i++) {
+      password += allCharacters[random.nextInt(allCharacters.length)];
+    }
+
+    // Shuffle the password to randomize character order
+    List<String> passwordChars = password.split('');
+    passwordChars.shuffle(random);
+
+    return passwordChars.join();
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  Future<void> _signInWithEmailPassword() async {
+    try {
+      final response = await Supabase.instance.client
+          .from('users')
+          .select('email, password, name')
+          .eq('email', _emailController.text.toLowerCase());
+
+      final data = List<Map<String, dynamic>>.from(response);
+
+      if (data.isNotEmpty) {
+        _sendForgotMail();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text('Invalid email or not registered before')),
+        );
+      }
+    } catch (e) {
+      print("Email sign-in error: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Login failed: No Internet Connection')));
+    }
+  }
+
+  Future<void> _sendForgotMail() async {
     setState(() {
       _isGoogleSignInInProgress = true;
     });
 
-    try {
-      await AuthService().signInWithGoogle(context);
-    } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
-    } finally {
-      setState(() {
-        _isGoogleSignInInProgress = false;
-      });
+    final recipient = _emailController.text.trim();
+    if (recipient.isEmpty) {
+      _showSnackBar('Please enter a valid email address.');
+      return;
     }
+
+    setState(() => _isSending = true);
+
+    final smtpServer = SmtpServer(host,
+        port: port, username: username, password: password, ssl: true);
+
+    String otp = generateRandomPassword();
+    print(
+        "generateRandomPassword ${generateRandomPassword()}"); // Replace with your OTP logic
+    final htmlContent = getEmailTemplate(otp);
+
+    final message = Message()
+      ..from = Address(username, 'Cook Book')
+      ..recipients.add(recipient)
+      ..subject = 'Your OTP for Cook Book'
+      ..html = htmlContent;
+
+    await send(message, smtpServer);
+    showMailSentDialog(context);
+    //  _showSnackBar('Email sent successfully to $recipient.');
+    final response = await Supabase.instance.client
+        .from('users')
+        .update({'password': otp}) // Update password field with the new value
+        .eq('email', _emailController.text.toLowerCase()); // Filter by email
+
+    setState(() => _isSending = false);
+  }
+
+  void showMailSentDialog(BuildContext context) {
+    Dialogs.materialDialog(
+      color: Colors.white,
+      msg: 'Use the password sent to your mail to login',
+      title: 'Mail Sent',
+      lottieBuilder: Lottie.asset(
+        'assets/lottie_json/mail_sent.json',
+        fit: BoxFit.contain,
+      ),
+      dialogWidth: kIsWeb ? 0.3 : null,
+      context: context,
+      actions: [
+        IconsButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          text: 'OK',
+          iconData: Icons.done,
+          color: Colors.blue,
+          textStyle: TextStyle(color: Colors.white),
+          iconColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius:
+                BorderRadius.circular(15.0), // Adjust radius as needed
+          ),
+        )
+      ],
+    );
   }
 
   @override
@@ -138,6 +308,46 @@ class _RegisterScreenState extends State<RegisterScreen> {
         FocusScope.of(context).requestFocus(FocusNode());
       },
       child: Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          foregroundColor: Colors.white,
+          backgroundColor: Colors.transparent,
+          title: const Text(
+            "",
+            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+          ),
+          leading: Padding(
+            padding: const EdgeInsets.only(left: 10, bottom: 10),
+            child: IconButton(
+              icon: const Icon(
+                FontAwesomeIcons.arrowLeft,
+                color: Colors.white,
+                size: 40,
+              ),
+              onPressed: () {
+                Navigator.pop(context); // Navigate back when pressed
+              },
+            ),
+          ),
+          /* actions: [
+          IconButton(
+            icon: const Icon(Icons.exit_to_app, color: Colors.white, size: 40),
+            onPressed: () async {
+              // Sign out the user
+              await GoogleSignIn().signOut();
+              await FirebaseAuth.instance.signOut();
+              final prefs = await SharedPreferences.getInstance();
+              await prefs.setBool("isLoggedIn", false);
+
+              Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (context) => LoginScreen()),
+                (Route<dynamic> route) => false,
+              );
+            },
+          ),
+        ], */
+        ),
         resizeToAvoidBottomInset: false,
         body: Stack(
           children: [
@@ -150,27 +360,36 @@ class _RegisterScreenState extends State<RegisterScreen> {
             Align(
               alignment: Alignment.topCenter,
               child: Padding(
-                padding: EdgeInsets.only(top: screenHeight * 0.03),
+                padding: EdgeInsets.only(
+                    top: screenWidth > 600
+                        ? screenWidth * 0.03
+                        : screenWidth * 0.5),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(screenWidth * 0.03),
+                      padding: EdgeInsets.all(screenWidth > 600
+                          ? screenWidth * 0.03
+                          : screenWidth * 0.05),
                       decoration: BoxDecoration(
                         color: Color(0xFFF59E9E),
                         borderRadius: BorderRadius.circular(50),
                       ),
                       child: Icon(
                         Icons.restaurant_menu,
-                        size: screenWidth * 0.06,
+                        size: screenWidth > 600
+                            ? screenWidth * 0.06
+                            : screenWidth * 0.1,
                         color: Colors.white,
                       ),
                     ),
                     SizedBox(height: screenHeight * 0.02),
                     Text(
-                      'Create an Account',
+                      'Forgot Password',
                       style: TextStyle(
-                        fontSize: screenWidth * 0.05,
+                        fontSize: screenWidth > 600
+                            ? screenWidth * 0.05
+                            : screenWidth * 0.07,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF5C2C2C),
                       ),
@@ -186,7 +405,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   key: _formKey,
                   child: Container(
                     padding: EdgeInsets.all(screenWidth * 0.06),
-                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
+                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.1),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(20),
@@ -202,78 +421,50 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         SizedBox(height: screenHeight * 0.01),
-                        _buildTextField(
-                          controller: _usernameController,
-                          label: 'Username',
-                          hintText: 'Enter your username',
-                          icon: Icons.person,
-                          errorText: _usernameError,
-                          screenWidth: screenWidth,
-                        ),
-                        SizedBox(height: screenHeight * 0.02),
-                        _buildEmailTextField(
+                        TextField(
                           controller: _emailController,
-                          label: 'Email Address',
-                          hintText: 'Enter your email',
+                          decoration: InputDecoration(
+                            labelText: 'Email Address',
+                            errorText: _emailError,
+                            filled: true,
+                            fillColor:
+                                Colors.grey[200], // Optional: background color
+                            // No border and rounded corners
+                            border: InputBorder.none,
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(
+                                  30.0), // Rounded corners
+                              borderSide: BorderSide(color: Colors.transparent),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(
+                                  30.0), // Rounded corners
+                              borderSide: BorderSide(color: Colors.transparent),
+                            ),
+                            floatingLabelBehavior: FloatingLabelBehavior
+                                .never, // Prevent label from floating
+                          ),
                           keyboardType: TextInputType.emailAddress,
-                          icon: Icons.email,
-                          errorText: _emailError,
-                          screenWidth: screenWidth,
                         ),
                         SizedBox(height: screenHeight * 0.02),
-                        _buildPasswordTextField(screenWidth),
-                        SizedBox(height: screenHeight * 0.03),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: isFormFilled
-                                ? _registerWithEmailPassword
-                                : null,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor:
-                                  isFormFilled ? Colors.redAccent : Colors.grey,
-                              padding: EdgeInsets.symmetric(
-                                  vertical: screenHeight * 0.01),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(12),
-                              ),
-                            ),
-                            child: Text(
-                              'Register',
-                              style: TextStyle(
-                                fontSize: screenWidth * 0.02,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.005),
-                        const Text(
-                          'or',
-                          style: TextStyle(
-                            color: Color(0xFF5C2C2C),
-                          ),
-                        ),
-                        SizedBox(height: screenHeight * 0.005),
                         ElevatedButton.icon(
-                          onPressed: _signInWithGoogle,
-                          icon: _isGoogleSignInInProgress
+                          onPressed: _signInWithEmailPassword,
+                          icon: _isSending
                               ? LoadingAnimationWidget.inkDrop(
                                   size: screenWidth * 0.04,
                                   color: Colors.white,
                                 )
-                              : SvgPicture.asset(
-                                  'assets/icons/google_icon.svg', // Make sure to use your correct asset path
-                                  height: screenWidth *
-                                      0.04, // Adjust the size as needed
-                                  width: 100.0,
+                              : Icon(
+                                  Icons.mail,
+                                  color: Colors.white,
                                 ),
                           label: Text(
-                            'Sign up with Google',
+                            'Send Email',
                             style: TextStyle(
                                 color: Colors.white,
-                                fontSize: screenWidth * 0.02),
+                                fontSize: screenWidth > 600
+                                    ? screenWidth * 0.02
+                                    : screenWidth * 0.025),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.redAccent,
@@ -302,10 +493,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     );
                   },
                   child: Text(
-                    "Already have an account? Login",
+                    "Back to Login",
                     style: TextStyle(
                       color: Colors.white,
-                      fontSize: screenWidth * 0.02,
+                      fontSize: screenWidth > 600
+                          ? screenWidth * 0.02
+                          : screenWidth * 0.03,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
@@ -366,7 +559,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     required String hintText,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
-    required IconData icon,
+    IconData? icon,
     required String? errorText,
     required double screenWidth,
   }) {

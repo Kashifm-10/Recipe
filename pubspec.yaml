@@ -77,6 +77,10 @@ dependencies:
   drop_down_search_field: ^1.0.6
   drop_down_list: ^0.0.8
   page_transition: ^2.1.0
+  mailer: ^6.3.0
+  awesome_dialog: ^3.2.1
+  material_dialogs: ^1.1.5
+  lottie: ^3.2.0
 
 dev_dependencies:
   flutter_test:
@@ -121,6 +125,16 @@ flutter:
     - assets/icons/steak_icon.svg
     - assets/icons/no_items.png
     - assets/icons/no_recipe.png
+    - assets/lottie_json/mail_sent.json
+    - assets/lottie_json/nothing.json
+    - assets/lottie_json/loading.json
+    - assets/lottie_json/norecipe.json
+    - assets/lottie_json/splash.json
+    - assets/lottie_json/splashload.json
+    - assets/lottie_json/ghost.json
+    - assets/lottie_json/loadingspoons.json
+    - assets/lottie_json/noingredients.json
+    - assets/lottie_json/burger.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
