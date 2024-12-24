@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
@@ -34,7 +35,7 @@ class DishTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
       child: Container(
         width: screenWidth * 0.1,
-        height: screenWidth > 600 ? screenHeight * 0.1 : screenHeight * 0.07,
+        height: screenWidth > 600 ? screenHeight * 0.08 : screenHeight * 0.07,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -75,7 +76,7 @@ class DishTile extends StatelessWidget {
                 children: [
                   Text(
                     text,
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.black,
                       fontSize: screenWidth > 600 ? 24 : screenWidth * 0.045,
                       fontWeight: FontWeight.bold,
@@ -109,7 +110,7 @@ class DishTile extends StatelessWidget {
                                 }
                               }())
                             : 'Invalid duration',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           color: Colors.grey.shade500,
                           fontSize:
                               screenWidth > 600 ? 12 : screenWidth * 0.025,
@@ -123,7 +124,7 @@ class DishTile extends StatelessWidget {
                                   : MediaQuery.of(context).size.width * 0.02),
                           child: Text(
                             fromType!,
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               color: Colors.grey.shade500,
                               fontSize:
                                   screenWidth > 600 ? 12 : screenWidth * 0.025,

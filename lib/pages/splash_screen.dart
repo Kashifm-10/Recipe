@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
         overlays: [SystemUiOverlay.top]);
 
     // Navigate to the home page after 3 seconds
-    Timer(const Duration(milliseconds: 4700), () {
+     Timer(const Duration(milliseconds: 3500), () {
       if (isLoggedIn!) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -72,7 +72,7 @@ class _SplashScreenState extends State<SplashScreen> {
     ),
     // Lottie animation in the center
     Positioned(
-      top: screenHeight *0.15, // You can adjust this value for the desired vertical offset
+      top: screenWidth<600 ? screenHeight *0.15: screenHeight*0.07, // You can adjust this value for the desired vertical offset
       left: (screenWidth - screenWidth * 0.9) / 2, // To center it horizontally
       child: Lottie.asset(
         'assets/lottie_json/splash.json',
@@ -80,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
       ),
     ),
 Positioned(
-      top: screenHeight *0.3, // You can adjust this value for the desired vertical offset
+      top: screenWidth<600 ?screenHeight *0.3:screenHeight*0.22, // You can adjust this value for the desired vertical offset
       left: (screenWidth * 0.1) , // To center it horizontally
       child: Lottie.asset(
         'assets/lottie_json/splashload.json',

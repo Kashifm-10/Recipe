@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:recipe/models/auth_service.dart';
@@ -154,38 +155,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
               child: Padding(
                 padding: EdgeInsets.only(
                     top: screenWidth > 600
-                        ? screenWidth * 0.03
+                        ? screenWidth * 0.15
                         : screenWidth * 0.2),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: EdgeInsets.all(screenWidth > 600
-                          ? screenWidth * 0.03
-                          : screenWidth * 0.05),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF59E9E),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Icon(
-                        Icons.restaurant_menu,
-                        size: screenWidth > 600
-                            ? screenWidth * 0.06
-                            : screenWidth * 0.1,
-                        color: Colors.white,
-                      ),
+                    Container(child: 
+                     Image.asset(
+                      'assets/images/banner.png',
+width: screenWidth > 600
+                        ?screenWidth * 0.3 : screenWidth * 0.4,                    )
                     ),
-                    SizedBox(height: screenHeight * 0.02),
+                   /*  SizedBox(height: screenHeight * 0.02),
                     Text(
                       'Create an Account',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: screenWidth > 600
                             ? screenWidth * 0.05
                             : screenWidth * 0.07,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF5C2C2C),
                       ),
-                    ),
+                    ), */
                   ],
                 ),
               ),
@@ -212,7 +203,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        SizedBox(height: screenHeight * 0.01),
+                        Text(
+                        'Create an Account',
+                        style: GoogleFonts.poppins(
+                          fontSize: screenWidth * 0.04,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF5C2C2C),
+                        ),
+                      ),
+                      
+                        SizedBox(height: screenHeight * 0.02),
                         _buildTextField(
                           controller: _usernameController,
                           label: 'Username',
@@ -251,7 +251,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             child: Text(
                               'Register',
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: screenWidth > 600
                                     ? screenWidth * 0.02
                                     : screenWidth * 0.025,
@@ -263,7 +263,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         Text(
                           'or',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: const Color(0xFFF59E9E),
                               fontSize: screenWidth > 600
                                   ? screenWidth * 0.02
@@ -284,7 +284,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                           label: Text(
                             'Sign up with Google',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: screenWidth > 600
                                     ? screenWidth * 0.02
@@ -315,7 +315,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                   child: Text(
                     "Already have an account? Login",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: screenWidth > 600
                           ? screenWidth * 0.02
@@ -361,7 +361,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderSide: BorderSide.none,
               ),
               // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-              labelStyle: TextStyle(
+              labelStyle: GoogleFonts.poppins(
                 fontSize: screenWidth * 0.03,
                 color: Color(0xFF5C2C2C),
               ),
@@ -409,7 +409,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderSide: BorderSide.none,
               ),
               // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-              labelStyle: TextStyle(
+              labelStyle: GoogleFonts.poppins(
                 fontSize: screenWidth * 0.03,
                 color: Color(0xFF5C2C2C),
               ),
@@ -464,7 +464,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
-              labelStyle: TextStyle(
+              labelStyle: GoogleFonts.poppins(
                 fontSize: screenWidth * 0.03,
                 color: Color(0xFF5C2C2C),
               ),

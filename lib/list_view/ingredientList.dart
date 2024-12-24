@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:popover/popover.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 
@@ -79,11 +80,10 @@ class ingredientList extends StatelessWidget {
                       child: Table(
                         // border: TableBorder.all(),
                         columnWidths: const {
-                          0: FlexColumnWidth(2),
+                          0: FlexColumnWidth(4.5),
                           1: FlexColumnWidth(1),
-                          2: FlexColumnWidth(1.2),
-                          3: FlexColumnWidth(1),
-                          4: FlexColumnWidth(0.2),
+                          2: FlexColumnWidth(1),
+                          3: FlexColumnWidth(1.5),
                         },
                         children: [
                           TableRow(
@@ -93,122 +93,117 @@ class ingredientList extends StatelessWidget {
                                   padding: EdgeInsets.only(
                                       left: cellPadding, top: cellPadding),
                                   child: Text(
-                                    item['text']!,
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w600,
+                                    item['text']!.length > 25
+                                        ? "${item['text']!.substring(0, 24)}..."
+                                        : item['text']!,
+                                    style: GoogleFonts.poppins(
+                                      fontSize: fontSize,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
                               ),
                               TableCell(
                                 child: Padding(
-                                  padding: EdgeInsets.all(cellPadding),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        (() {
-                                          // Parse and trim quantity value
-                                          String quantityStr =
-                                              item['quantity']!.trim();
-                                          double? quantity =
-                                              double.tryParse(quantityStr);
+                                  padding: EdgeInsets.only(
+                                      right: cellPadding + cellPadding,
+                                      top: cellPadding),
+                                  child: Text(
+                                    (() {
+                                      // Parse and trim quantity value
+                                      String quantityStr =
+                                          item['quantity']!.trim();
+                                      double? quantity =
+                                          double.tryParse(quantityStr);
 
-                                          if (quantity == null) {
-                                            return quantityStr; // Fallback if parsing fails
-                                          } else if (quantity == 0.5) {
-                                            return '1/2';
-                                          } else if (quantity == 0.25) {
-                                            return '1/4';
-                                          } else if (quantity % 1 == 0) {
-                                            return quantity
-                                                .toInt()
-                                                .toString(); // Display integer if no decimal part
-                                          } else {
-                                            return quantity
-                                                .toString(); // Display full decimal if needed
-                                          }
-                                        })(),
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        //  textAlign: TextAlign.left,
-                                      ),
-                                      Text(
-                                        " ${item['uom']!}",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                                      if (quantity == null) {
+                                        return quantityStr; // Fallback if parsing fails
+                                      } else if (quantity == 0.5) {
+                                        return '1/2';
+                                      } else if (quantity == 0.25) {
+                                        return '1/4';
+                                      } else if (quantity % 1 == 0) {
+                                        return quantity
+                                            .toInt()
+                                            .toString(); // Display integer if no decimal part
+                                      } else {
+                                        return quantity
+                                            .toString(); // Display full decimal if needed
+                                      }
+                                    })(),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: fontSize,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
                               TableCell(
                                 child: Padding(
-                                    padding: EdgeInsets.only(
-                                        right: cellPadding, top: cellPadding),
-                                    child: const Text("")),
-                              ),
-                              TableCell(
-                                child: Padding(
-                                  padding: EdgeInsets.all(cellPadding),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        (() {
-                                          // Parse and trim quantityCal value
-                                          String quantityCal =
-                                              item['quantityCal']!.trim();
-                                          double? quantity =
-                                              double.tryParse(quantityCal);
+                                  padding: EdgeInsets.only(
+                                      top: cellPadding, right: cellPadding),
+                                  child: Text(
+                                    (() {
+                                      // Parse and trim quantityCal value
+                                      String quantityCal =
+                                          item['quantityCal']!.trim();
+                                      double? quantity =
+                                          double.tryParse(quantityCal);
 
-                                          if (quantity == null) {
-                                            return quantityCal; // Fallback if parsing fails
-                                          } else if (quantity == 0.5) {
-                                            return '1/2';
-                                          } else if (quantity == 0.25) {
-                                            return '1/4';
-                                          } else if (quantity % 1 == 0) {
-                                            return quantity
-                                                .toInt()
-                                                .toString(); // Display integer if no decimal part
-                                          } else {
-                                            return quantity
-                                                .toString(); // Display full decimal if needed
-                                          }
-                                        })(),
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                        textAlign: TextAlign.right,
-                                      ),
-                                      Text(
-                                        " ${item['uom']!}",
-                                        style: TextStyle(
-                                          fontSize: 20,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ],
+                                      if (quantity == null) {
+                                        return quantityCal; // Fallback if parsing fails
+                                      } else if (quantity == 0.5) {
+                                        return '1/2';
+                                      } else if (quantity == 0.25) {
+                                        return '1/4';
+                                      } else if (quantity % 1 == 0) {
+                                        return quantity
+                                            .toInt()
+                                            .toString(); // Display integer if no decimal part
+                                      } else {
+                                        return quantity
+                                            .toString(); // Display full decimal if needed
+                                      }
+                                    })(),
+                                    style: GoogleFonts.poppins(
+                                      fontSize: fontSize,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                    textAlign: TextAlign.center,
                                   ),
                                 ),
                               ),
                               TableCell(
                                 child: Padding(
+                                  padding: EdgeInsets.only(
+                                      left: cellPadding, top: cellPadding),
+                                  child: Text(
+                                    " ${item['uom']!}",
+                                    style: GoogleFonts.poppins(
+                                      fontSize: fontSize,
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              /*  TableCell(
+                                  child: Padding(
                                     padding: EdgeInsets.all(cellPadding),
-                                    child: const Text('')),
-                              ),
+                                    child: Text(
+                                      " ${item['uom']!}",
+                                      style: GoogleFonts.poppins(
+                                        fontSize: fontSize,
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ),
+                                ), */
                             ],
                           ),
                         ],
@@ -254,8 +249,10 @@ class ingredientList extends StatelessWidget {
                                     padding: EdgeInsets.only(
                                         right: cellPadding, top: cellPadding),
                                     child: Text(
-                                      item['text']!.length>20 ? "${item['text']!.substring(0,20)}...": item['text']!,
-                                      style: TextStyle(
+                                      item['text']!.length > 20
+                                          ? "${item['text']!.substring(0, 20)}..."
+                                          : item['text']!,
+                                      style: GoogleFonts.poppins(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -291,7 +288,7 @@ class ingredientList extends StatelessWidget {
                                               .toString(); // Display full decimal if needed
                                         }
                                       })(),
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -327,7 +324,7 @@ class ingredientList extends StatelessWidget {
                                               .toString(); // Display full decimal if needed
                                         }
                                       })(),
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -342,7 +339,7 @@ class ingredientList extends StatelessWidget {
                                         left: cellPadding, top: cellPadding),
                                     child: Text(
                                       " ${item['uom']!}",
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -355,7 +352,7 @@ class ingredientList extends StatelessWidget {
                                     padding: EdgeInsets.all(cellPadding),
                                     child: Text(
                                       " ${item['uom']!}",
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                         fontSize: fontSize,
                                         color: Colors.black,
                                         fontWeight: FontWeight.w600,

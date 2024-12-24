@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:ionicons/ionicons.dart';
@@ -104,38 +105,28 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Padding(
                 padding: EdgeInsets.only(
                     top: screenWidth > 600
-                        ? screenWidth * 0.03
+                        ? screenHeight * 0.09
                         : screenWidth * 0.2),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(screenWidth > 600
-                          ? screenWidth * 0.03
-                          : screenWidth * 0.05),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFF59E9E),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Icon(
-                        Icons.restaurant_menu,
-                        size: screenWidth > 600
-                            ? screenWidth * 0.06
-                            : screenWidth * 0.1,
-                        color: Colors.white,
-                      ),
-                    ),
+                        child: Image.asset(
+                      'assets/images/banner.png',
+                      width: screenWidth > 600
+                        ?screenWidth * 0.3 : screenWidth * 0.4,
+                    )),
                     SizedBox(height: screenHeight * 0.02),
-                    Text(
+                    /* Text(
                       'Ready to Cook',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: screenWidth > 600
                             ? screenWidth * 0.05
                             : screenWidth * 0.07,
                         fontWeight: FontWeight.bold,
                         color: const Color(0xFF5C2C2C),
                       ),
-                    ),
+                    ), */
                   ],
                 ),
               ),
@@ -163,7 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: screenHeight * 0.01),
                       Text(
                         'Login',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: screenWidth * 0.06,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF5C2C2C),
@@ -208,7 +199,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           child: Text(
                             'Login',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                               fontSize: screenWidth > 600
                                   ? screenWidth * 0.02
                                   : screenWidth * 0.025,
@@ -220,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Text(
                         'or',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: const Color(0xFFF59E9E),
                             fontSize: screenWidth > 600
                                 ? screenWidth * 0.02
@@ -241,7 +232,8 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                         label: Text(
                           'Continue with Google',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
+                              fontWeight: FontWeight.bold,
                               color: Colors.white,
                               fontSize: screenWidth > 600
                                   ? screenWidth * 0.02
@@ -256,7 +248,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.01),
+                      SizedBox(height: screenHeight * 0.02),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
@@ -267,10 +259,10 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text(
                           'Forgot Password?',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: const Color(0xFFF59E9E),
                             fontSize: screenWidth * 0.025,
-                            fontWeight: FontWeight.bold,
+                            //fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
@@ -292,7 +284,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: Text(
                     "Don't have an account? Sign up",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: screenWidth > 600
                           ? screenWidth * 0.02
@@ -310,55 +302,53 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Widget _buildTextField({
-  required TextEditingController controller,
-  required String label,
-  required String hintText,
-  bool obscureText = false,
-  TextInputType keyboardType = TextInputType.text,
-  required IconData icon,
-  required double screenWidth,
-}) {
-  final ValueNotifier<bool> isObscured = ValueNotifier(obscureText);
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    bool obscureText = false,
+    TextInputType keyboardType = TextInputType.text,
+    required IconData icon,
+    required double screenWidth,
+  }) {
+    final ValueNotifier<bool> isObscured = ValueNotifier(obscureText);
 
-  return ValueListenableBuilder<bool>(
-    valueListenable: isObscured,
-    builder: (context, value, child) {
-      return TextField(
-        controller: controller,
-        obscureText: value,
-        keyboardType: keyboardType,
-        decoration: InputDecoration(
-          labelText: label,
-          hintText: hintText,
-          filled: true,
-          fillColor: const Color(0xFFFEE1D5),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide.none,
+    return ValueListenableBuilder<bool>(
+      valueListenable: isObscured,
+      builder: (context, value, child) {
+        return TextField(
+          controller: controller,
+          obscureText: value,
+          keyboardType: keyboardType,
+          decoration: InputDecoration(
+            labelText: label,
+            hintText: hintText,
+            filled: true,
+            fillColor: const Color(0xFFFEE1D5),
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+            //prefixIcon: Icon(icon, color: const Color(0xFF5C2C2C)),
+            suffixIcon: label.toLowerCase() == 'password'
+                ? IconButton(
+                    icon: Icon(
+                      value ? HeroiconsMicro.eyeSlash : HeroiconsMicro.eye,
+                      color: const Color(0xFF5C2C2C),
+                      size: screenWidth * 0.04,
+                    ),
+                    onPressed: () {
+                      isObscured.value = !value;
+                    },
+                  )
+                : null,
+            labelStyle: GoogleFonts.poppins(
+              fontSize: screenWidth * 0.03,
+              color: const Color(0xFF5C2C2C),
+            ),
+            floatingLabelBehavior: FloatingLabelBehavior.never,
           ),
-          //prefixIcon: Icon(icon, color: const Color(0xFF5C2C2C)),
-          suffixIcon: label.toLowerCase() == 'password'
-              ? IconButton(
-                  icon: Icon(
-                    value ? HeroiconsMicro.eyeSlash : HeroiconsMicro.eye,
-                    color: const Color(0xFF5C2C2C),
-                    size: screenWidth * 0.04,
-                  ),
-                  onPressed: () {
-                    isObscured.value = !value;
-                  },
-                )
-              : null,
-          labelStyle: TextStyle(
-            fontSize: screenWidth * 0.03,
-            color: const Color(0xFF5C2C2C),
-          ),
-          floatingLabelBehavior: FloatingLabelBehavior
-                                .never, 
-        ),
-      );
-    },
-  );
-}
-
+        );
+      },
+    );
+  }
 }

@@ -208,9 +208,9 @@ class _smallrecipeState extends State<smallrecipe>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                        Text(
                         "Manage Links",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -247,7 +247,7 @@ class _smallrecipeState extends State<smallrecipe>
                               name.length > 20
                                   ? '${name.substring(0, 20)}...'
                                   : name,
-                              style: const TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
@@ -255,7 +255,7 @@ class _smallrecipeState extends State<smallrecipe>
                             ),
                             subtitle: Text(
                               link,
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: Colors.grey.shade600,
                               ),
@@ -422,9 +422,9 @@ class _smallrecipeState extends State<smallrecipe>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            title: const Text(
+            title:   Text(
               'Add Ingredient',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -439,7 +439,7 @@ class _smallrecipeState extends State<smallrecipe>
                     TextField(
                       controller: textController,
                       decoration: InputDecoration(
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: GoogleFonts.poppins(color: Colors.black),
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -465,7 +465,7 @@ class _smallrecipeState extends State<smallrecipe>
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -484,7 +484,7 @@ class _smallrecipeState extends State<smallrecipe>
                               TextField(
                                 controller: quantityController,
                                 decoration: InputDecoration(
-                                  labelStyle: TextStyle(color: Colors.black),
+                                  labelStyle: GoogleFonts.poppins(color: Colors.black),
                                   labelText: 'Quantity',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -512,7 +512,7 @@ class _smallrecipeState extends State<smallrecipe>
                               if (isQuantity)
                                 Text(
                                   'Please enter quantity.',
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                       color: Colors.red.shade700,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500),
@@ -529,7 +529,7 @@ class _smallrecipeState extends State<smallrecipe>
                             children: [
                               DropdownButtonFormField<String>(
                                 decoration: InputDecoration(
-                                  labelStyle: TextStyle(color: Colors.black),
+                                  labelStyle: GoogleFonts.poppins(color: Colors.black),
                                   labelText: 'Unit',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -568,7 +568,7 @@ class _smallrecipeState extends State<smallrecipe>
                               if (isUOM)
                                 Text(
                                   'Please select UOM.',
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                       color: Colors.red.shade700,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500),
@@ -595,7 +595,7 @@ class _smallrecipeState extends State<smallrecipe>
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -684,7 +684,7 @@ class _smallrecipeState extends State<smallrecipe>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Create'),
               ),
@@ -743,9 +743,9 @@ class _smallrecipeState extends State<smallrecipe>
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                  Text(
                   'Edit Ingredient',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -802,7 +802,7 @@ class _smallrecipeState extends State<smallrecipe>
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -833,7 +833,7 @@ class _smallrecipeState extends State<smallrecipe>
                               if (isQuantity)
                                 Text(
                                   'Please enter quantity.',
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                       color: Colors.red.shade700,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500),
@@ -873,7 +873,7 @@ class _smallrecipeState extends State<smallrecipe>
                               if (isUOM)
                                 Text(
                                   'Please select UOM.',
-                                  style: TextStyle(
+                                  style: GoogleFonts.poppins(
                                       color: Colors.red.shade700,
                                       fontSize: 14,
                                       fontWeight: FontWeight.w500),
@@ -899,7 +899,7 @@ class _smallrecipeState extends State<smallrecipe>
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -1023,7 +1023,7 @@ class _smallrecipeState extends State<smallrecipe>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Update'),
               ),
@@ -1081,7 +1081,7 @@ class _smallrecipeState extends State<smallrecipe>
                         }
                       },
                       child: Text('Create',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -1101,7 +1101,7 @@ class _smallrecipeState extends State<smallrecipe>
             title: Center(
               child: Text(
                 'Add Recipe',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
                   color: widget.background,
@@ -1113,7 +1113,7 @@ class _smallrecipeState extends State<smallrecipe>
               children: [
                 Text(
                   'Write your recipe details below:',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     color: Colors.grey[600],
                   ),
@@ -1128,7 +1128,7 @@ class _smallrecipeState extends State<smallrecipe>
                     textInputAction: TextInputAction.newline,
                     decoration: InputDecoration(
                       hintText: 'Enter your recipe...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1154,7 +1154,7 @@ class _smallrecipeState extends State<smallrecipe>
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Recipe cannot be empty!',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.redAccent,
                             fontSize: 14,
                           ),
@@ -1168,7 +1168,7 @@ class _smallrecipeState extends State<smallrecipe>
               TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
@@ -1248,7 +1248,7 @@ class _smallrecipeState extends State<smallrecipe>
                 Text(" "),
                 Text(
                   'Edit Recipe',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: widget.background),
@@ -1262,9 +1262,9 @@ class _smallrecipeState extends State<smallrecipe>
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
-                        title: const Text(
+                        title:   Text(
                           "Confirm Action",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
                         ),
                         content: const Text(
                           "Are you sure you want to delete this recipe?",
@@ -1277,9 +1277,9 @@ class _smallrecipeState extends State<smallrecipe>
                                   context); // Close confirmation dialog
                               Navigator.pop(context); // Close edit dialog
                             },
-                            child: const Text(
+                            child:   Text(
                               "Yes, Delete",
-                              style: TextStyle(color: Colors.red),
+                              style: GoogleFonts.poppins(color: Colors.red),
                             ),
                           ),
                           TextButton(
@@ -1308,7 +1308,7 @@ class _smallrecipeState extends State<smallrecipe>
                     maxLines: 6,
                     decoration: InputDecoration(
                       hintText: 'Edit your recipe here...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1334,7 +1334,7 @@ class _smallrecipeState extends State<smallrecipe>
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Recipe cannot be empty!',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.redAccent,
                             fontSize: 14,
                           ),
@@ -1348,7 +1348,7 @@ class _smallrecipeState extends State<smallrecipe>
               TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
@@ -1427,9 +1427,9 @@ class _smallrecipeState extends State<smallrecipe>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        title: const Text(
+        title:   Text(
           'Add Link',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1480,7 +1480,7 @@ class _smallrecipeState extends State<smallrecipe>
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey.shade600,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Cancel'),
           ),
@@ -1511,7 +1511,7 @@ class _smallrecipeState extends State<smallrecipe>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Create'),
           ),
@@ -1552,9 +1552,9 @@ class _smallrecipeState extends State<smallrecipe>
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        title: const Text(
+        title:   Text(
           'New Link',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1605,7 +1605,7 @@ class _smallrecipeState extends State<smallrecipe>
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey.shade600,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Cancel'),
           ),
@@ -1636,7 +1636,7 @@ class _smallrecipeState extends State<smallrecipe>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Update'),
           ),
@@ -1671,7 +1671,7 @@ class _smallrecipeState extends State<smallrecipe>
                         Navigator.pop(context);
                       },
                       child: Text('Update',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -1984,7 +1984,7 @@ class _smallrecipeState extends State<smallrecipe>
                             children: [
                               Text(
                                 "Calculator : ",
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize:
                                       MediaQuery.of(context).size.width > 600
                                           ? 20
@@ -2013,7 +2013,7 @@ class _smallrecipeState extends State<smallrecipe>
                                       Expanded(
                                         child: Text(
                                           '1',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontSize: MediaQuery.of(context)
                                                         .size
                                                         .width >
@@ -2034,7 +2034,7 @@ class _smallrecipeState extends State<smallrecipe>
                                             value: item,
                                             child: Text(
                                               item,
-                                              style: TextStyle(
+                                              style: GoogleFonts.poppins(
                                                 fontSize: MediaQuery.of(context)
                                                             .size
                                                             .width >
@@ -2192,7 +2192,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                       top: cellPadding),
                                                   child: Text(
                                                     "INGREDIENTS",
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: fontSize,
                                                       color: Colors.grey[850],
                                                       fontWeight:
@@ -2208,7 +2208,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                       top: cellPadding),
                                                   child: Text(
                                                     'Qty',
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: fontSize,
                                                       color: Colors.grey[850],
                                                       fontWeight:
@@ -2224,7 +2224,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                       top: cellPadding),
                                                   child: Text(
                                                     'Calc',
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: fontSize,
                                                       color: Colors.grey[850],
                                                       fontWeight:
@@ -2241,7 +2241,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                       left: cellPadding),
                                                   child: Text(
                                                     "Unit",
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: fontSize,
                                                       color: Colors.grey[850],
                                                       fontWeight:
@@ -2256,7 +2256,7 @@ class _smallrecipeState extends State<smallrecipe>
                                       padding: EdgeInsets.all(cellPadding),
                                       child: Text(
                                         " ${item['uom']!}",
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                           fontSize: fontSize,
                                           color: Colors.black,
                                           fontWeight: FontWeight.w600,
@@ -2303,9 +2303,15 @@ class _smallrecipeState extends State<smallrecipe>
 
             SingleChildScrollView(
               child: _isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Show loading indicator
+                  ? Center(
+                            child: ColorFiltered(
+                            colorFilter:
+                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            child: Lottie.asset(
+                              'assets/lottie_json/loadingspoons.json',
+                              width: screenWidth * 0.4,
+                            ),
+                          )) // Show loading indicator
                   : currentRecipe.isEmpty
                       ? Center(
                           child: Padding(
@@ -2349,7 +2355,7 @@ class _smallrecipeState extends State<smallrecipe>
                               padding: EdgeInsets.all(20.0),
                               child: Text(
                                 "How to Cook",
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize:
                                       MediaQuery.of(context).size.width > 600
                                           ? 22

@@ -101,7 +101,7 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.png"
+  image_path: "assets/images/logo.jpg"
 # The following section is specific to Flutter packages.
 flutter:
   # The following line ensures that the Material Icons font is
@@ -111,10 +111,9 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/images/splash_screen.png
     - assets/images/splash.png
-    - assets/images/logo.png
-    - assets/images/login_bg.jpg
+    - assets/images/logo.jpg
+    - assets/images/banner.png
     - assets/images/log_bg.png
     - assets/images/bg_home.jpg
     - assets/images/test.jpg
@@ -127,7 +126,6 @@ flutter:
     - assets/icons/no_recipe.png
     - assets/lottie_json/mail_sent.json
     - assets/lottie_json/nothing.json
-    - assets/lottie_json/loading.json
     - assets/lottie_json/norecipe.json
     - assets/lottie_json/splash.json
     - assets/lottie_json/splashload.json
@@ -135,6 +133,9 @@ flutter:
     - assets/lottie_json/loadingspoons.json
     - assets/lottie_json/noingredients.json
     - assets/lottie_json/burger.json
+    - assets/lottie_json/cat.json
+    - assets/lottie_json/fall.json
+    - assets/lottie_json/cups.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

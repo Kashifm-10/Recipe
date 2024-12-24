@@ -50,7 +50,7 @@ class _allState extends State<all> {
                         }
                       },
                       child: Text('Create',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -88,7 +88,7 @@ class _allState extends State<all> {
                         Navigator.pop(context);
                       },
                       child: Text('Update',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))

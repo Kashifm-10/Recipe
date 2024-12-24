@@ -3,7 +3,9 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/names.dart';
@@ -265,17 +267,19 @@ class _MyHomePageState extends State<MyHomePage> {
   TextEditingController textController = TextEditingController();
   String searchQuery = '';
   bool _isErrorDialogShown = false;
+  final FocusNode _focusNode = FocusNode();
+
   List<Color> colorList = [
-    const Color.fromARGB(255, 249, 168, 37), // #F9A825
-    const Color.fromARGB(255, 102, 187, 106), // #66BB6A
-    const Color.fromARGB(255, 183, 28, 28), // #B71C1C
-    const Color.fromARGB(255, 141, 110, 99), // #8D6E63
-    const Color.fromARGB(255, 255, 128, 171), // #FF80AB
-    const Color.fromARGB(255, 255, 112, 67), // #FF7043
-    const Color.fromARGB(255, 195, 176, 153), // #C3B099
-    const Color.fromARGB(255, 79, 195, 247), // #4FC3F7
-    const Color.fromARGB(255, 104, 159, 56), // #689F38
-    const Color.fromARGB(255, 179, 157, 219), // #B39DDB
+    Colors.orange.shade400,
+    Colors.green.shade400,
+    Colors.red.shade400,
+    Colors.brown.shade500,
+    Colors.red.shade200,
+    Colors.deepOrange.shade500,
+    Colors.yellow.shade900,
+    Colors.blue.shade600,
+    Colors.green.shade700,
+    Colors.deepPurple.shade300,
   ];
 
   @override
@@ -402,7 +406,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Color allColor = Color.fromARGB(255, 131, 106, 68);
+    Color allColor = Colors.teal.shade500;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool _isEditing = false;
@@ -422,6 +426,8 @@ class _MyHomePageState extends State<MyHomePage> {
         // When tapping anywhere outside the search bar, it unfocuses the search field and hides the keyboard.
         onTap: () {
           FocusScope.of(context).unfocus();
+          textController.clear();
+          _focusNode.unfocus();
         },
         child: Stack(
           children: [
@@ -460,12 +466,11 @@ class _MyHomePageState extends State<MyHomePage> {
               future: _categories,
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 7,
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    ),
-                  );
+                  return Center(
+                      child: Lottie.asset(
+                    'assets/lottie_json/burger.json',
+                    width: screenWidth * 0.6,
+                  ));
                 } else if (snapshot.hasError) {
                   if (!_isErrorDialogShown) {
                     _isErrorDialogShown = true;
@@ -481,10 +486,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   const Icon(Icons.wifi_off_rounded, size: 50),
-                                  const Text(
+                                  Text(
                                     "No Connection",
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -517,19 +522,22 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       // Title
                       Padding(
-                        padding: const EdgeInsets.only(top: 200.0),
-                        child: Text(
+                          padding: EdgeInsets.only(top: screenHeight * 0.1),
+                          child: /* Text(
                           "Categories",
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: screenWidth < 600 ? 24 : 60,
                             fontWeight: FontWeight.bold,
                             color: Colors.white,
                           ),
                           textAlign: TextAlign.center,
-                        ),
-                      ),
-                      const SizedBox(
-                        height: 70,
+                        ), */
+                              Image.asset(
+                            'assets/images/banner.png',
+                            width: screenWidth * 0.35,
+                          ),),
+                      SizedBox(
+                        height: screenHeight * 0.03,
                       ),
                       // Search Bar
                       Padding(
@@ -538,6 +546,7 @@ class _MyHomePageState extends State<MyHomePage> {
                         child: DropDownSearchField(
                           displayAllSuggestionWhenTap: true,
                           textFieldConfiguration: TextFieldConfiguration(
+                            focusNode: _focusNode, // Attach the focus node
                             controller: textController,
                             autofocus: false,
                             style: DefaultTextStyle.of(context).style.copyWith(
@@ -545,6 +554,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                             decoration: InputDecoration(
                               hintText: "Search Dishes",
+                              hintStyle: GoogleFonts.poppins(
+                                color: Colors
+                                    .grey, // Change to your preferred color
+                                fontSize: 16,
+                              ),
                               prefixIcon: const Icon(Icons.search),
                               suffixIcon: Stack(
                                 alignment: Alignment.centerRight,
@@ -614,7 +628,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         color: Colors.orange, size: 30),
                                     title: Text(
                                       suggestion.name,
-                                      style: const TextStyle(
+                                      style: GoogleFonts.poppins(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16),
                                     ),
@@ -649,7 +663,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                     }
                                                   }())
                                                 : 'Invalid duration',
-                                            style: const TextStyle(
+                                            style: GoogleFonts.poppins(
                                                 fontSize: 14,
                                                 color: Colors.grey),
                                           ),
@@ -775,8 +789,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                               child: Icon(
                                                 cardIcon,
                                                 size: iconSize,
-                                                color: const Color.fromARGB(
-                                                    255, 182, 143, 84),
+                                                color: Colors.teal.shade600,
                                               ),
                                             ),
                                           ),
@@ -793,7 +806,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 children: [
                                                   Text(
                                                     _currentLabel,
-                                                    style: const TextStyle(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: 20,
                                                       fontWeight:
                                                           FontWeight.w600,
@@ -803,7 +816,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                                   const SizedBox(height: 4),
                                                   /* const Text(
                                                     "Subtitle or Description",
-                                                    style: TextStyle(
+                                                    style: GoogleFonts.poppins(
                                                       fontSize: 14,
                                                       color: Colors.white70,
                                                     ),
@@ -899,7 +912,7 @@ class _MyHomePageState extends State<MyHomePage> {
               Expanded(
                 child: EditableCategoryCard(
                   initialIcon: categories[i]['icon'],
-                  color: categories[i]['color'], // Pass Color object directly
+                  color: colorList[i], // Pass Color object directly
                   initialLabel: categories[i]['label'],
                   type: categories[i]['type'],
                   veg: typeCategoryCountList[i]['category0']!,
@@ -992,9 +1005,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'Select an Icon',
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
@@ -1106,9 +1119,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   onPressed: () {
                     Navigator.of(context).pop();
                   },
-                  child: const Text(
+                  child: Text(
                     'Close',
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       fontSize: 18,
                       color: Color(0xFFFE9A8B), // Peach color
                     ),
@@ -1225,9 +1238,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
       builder: (context) {
         Color tempColor = Color(widget.color.value);
         return AlertDialog(
-          title: const Text(
+          title: Text(
             'Select a Color',
-            style: TextStyle(
+            style: GoogleFonts.poppins(
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
@@ -1254,9 +1267,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 Navigator.of(context)
                     .pop(tempColor); // Return the selected color
               },
-              child: const Text(
+              child: Text(
                 'Select',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 18,
                   color: Color(0xFFFE9A8B), // Peach color
                 ),
@@ -1266,9 +1279,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
               onPressed: () {
                 Navigator.of(context).pop(); // Dismiss without selecting
               },
-              child: const Text(
+              child: Text(
                 'Cancel',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontSize: 18,
                   color: Color(0xFFFE9A8B), // Peach color
                 ),
@@ -1356,7 +1369,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                     title: const Center(
                       child: Text(
                         "Edit Icon or Text",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
                           color: Colors.black87,
@@ -1373,7 +1386,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                             controller: dialogTextController,
                             decoration: InputDecoration(
                               labelText: "Edit Text",
-                              labelStyle: TextStyle(color: Colors.grey[700]),
+                              labelStyle: GoogleFonts.poppins(color: Colors.grey[700]),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide:
@@ -1387,7 +1400,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 16, horizontal: 12),
                             ),
-                            style: const TextStyle(fontSize: 16),
+                            style: GoogleFonts.poppins(fontSize: 16),
                           ),
                           const SizedBox(height: 20),
                           Row(
@@ -1462,7 +1475,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                               },
                               child: const Text(
                                 "Save",
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   color: Color(0xFFFE9A8B), // Peach color
                                 ),
@@ -1475,7 +1488,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                               },
                               child: const Text(
                                 "Cancel",
-                                style: TextStyle(
+                                style: GoogleFonts.poppins(
                                   fontSize: 18,
                                   color: Color(0xFFFE9A8B), // Peach color
                                 ),
@@ -1517,8 +1530,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(widget.color.value).withOpacity(0.8),
-                      Color(widget.color.value).withOpacity(0.8),
+                      Color(widget.color.value).withOpacity(0.9),
+                      Color(widget.color.value).withOpacity(0.9),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -1557,19 +1570,19 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                     onSubmitted: (_) => _saveText(),
                                     decoration: InputDecoration(
                                       hintText: "Enter label...",
-                                      hintStyle: TextStyle(
+                                      hintStyle: GoogleFonts.poppins(
                                         color: Colors.white.withOpacity(0.5),
                                       ),
                                       border: InputBorder.none,
                                     ),
-                                    style: const TextStyle(
+                                    style: GoogleFonts.poppins(
                                       color: Colors.white,
                                       fontSize: 16,
                                     ),
                                   )
                                 : Text(
                                     _currentLabel,
-                                    style: const TextStyle(
+                                    style: GoogleFonts.poppins(
                                       fontSize: 18,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -1587,9 +1600,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Veg: ', // Placeholder text
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontSize: 10,
                                             color: Colors.white,
                                           ),
@@ -1597,7 +1610,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                         Text(
                                           widget.non_veg
                                               .toString(), // Placeholder text
-                                          style: const TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontSize: 10,
                                             color: Colors.white,
                                           ),
@@ -1606,9 +1619,9 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                     ),
                                     Row(
                                       children: [
-                                        const Text(
+                                        Text(
                                           'Non-Veg: ', // Placeholder text
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontSize: 10,
                                             color: Colors.white,
                                           ),
@@ -1616,7 +1629,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                         Text(
                                           widget.veg
                                               .toString(), // Placeholder text
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                             fontSize: 10,
                                             color:
                                                 Colors.white.withOpacity(0.8),

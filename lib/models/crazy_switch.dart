@@ -1,4 +1,4 @@
-// This switch is inspired by https://github.com/pedromassango/crazy-switch
+/* // This switch is inspired by https://github.com/pedromassango/crazy-switch
 
 import 'package:animated_toggle_switch/animated_toggle_switch.dart';
 import 'package:flutter/material.dart';
@@ -72,3 +72,4 @@ class _CrazySwitchState extends State<CrazySwitch> {
     );
   }
 }
+ */

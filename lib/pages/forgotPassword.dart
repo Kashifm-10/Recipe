@@ -2,6 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mailer/mailer.dart';
 import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -282,7 +283,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           text: 'OK',
           iconData: Icons.done,
           color: Colors.blue,
-          textStyle: TextStyle(color: Colors.white),
+          textStyle: GoogleFonts.poppins(color: Colors.white),
           iconColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius:
@@ -312,9 +313,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         appBar: AppBar(
           foregroundColor: Colors.white,
           backgroundColor: Colors.transparent,
-          title: const Text(
+          title: Text(
             "",
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+            style:
+                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 40),
           ),
           leading: Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -362,38 +364,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               child: Padding(
                 padding: EdgeInsets.only(
                     top: screenWidth > 600
-                        ? screenWidth * 0.03
-                        : screenWidth * 0.5),
+                        ? screenWidth * 0.15
+                        : screenWidth * 0.2),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      padding: EdgeInsets.all(screenWidth > 600
-                          ? screenWidth * 0.03
-                          : screenWidth * 0.05),
-                      decoration: BoxDecoration(
-                        color: Color(0xFFF59E9E),
-                        borderRadius: BorderRadius.circular(50),
-                      ),
-                      child: Icon(
-                        Icons.restaurant_menu,
-                        size: screenWidth > 600
-                            ? screenWidth * 0.06
-                            : screenWidth * 0.1,
-                        color: Colors.white,
+                      child: Image.asset(
+                        'assets/images/banner.png',
+                        width: screenWidth > 600
+                            ? screenWidth * 0.3
+                            : screenWidth * 0.4,
                       ),
                     ),
-                    SizedBox(height: screenHeight * 0.02),
+                    /*  SizedBox(height: screenHeight * 0.09),
                     Text(
                       'Forgot Password',
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: screenWidth > 600
                             ? screenWidth * 0.05
                             : screenWidth * 0.07,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF5C2C2C),
                       ),
-                    ),
+                    ), */
                   ],
                 ),
               ),
@@ -420,6 +414,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
+                        Text(
+                          'Forgot Password',
+                          style: GoogleFonts.poppins(
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF5C2C2C),
+                          ),
+                        ),
                         SizedBox(height: screenHeight * 0.01),
                         TextField(
                           controller: _emailController,
@@ -460,7 +462,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ),
                           label: Text(
                             'Send Email',
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 fontSize: screenWidth > 600
                                     ? screenWidth * 0.02
@@ -494,7 +497,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                   child: Text(
                     "Back to Login",
-                    style: TextStyle(
+                    style: GoogleFonts.poppins(
                       color: Colors.white,
                       fontSize: screenWidth > 600
                           ? screenWidth * 0.02
@@ -538,7 +541,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderSide: BorderSide.none,
             ),
             prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-            labelStyle: const TextStyle(
+            labelStyle: GoogleFonts.poppins(
               color: Color(0xFF5C2C2C),
             ),
           ),
@@ -580,7 +583,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderSide: BorderSide.none,
             ),
             prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-            labelStyle: const TextStyle(
+            labelStyle: GoogleFonts.poppins(
               color: Color(0xFF5C2C2C),
             ),
           ),
@@ -619,7 +622,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderSide: BorderSide.none,
             ),
             prefixIcon: Icon(Icons.lock, color: Color(0xFF5C2C2C)),
-            labelStyle: const TextStyle(
+            labelStyle: GoogleFonts.poppins(
               color: Color(0xFF5C2C2C),
             ),
           ),

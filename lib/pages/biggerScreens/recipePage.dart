@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:isar/isar.dart';
+import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/links.dart';
 import 'package:recipe/collections/names.dart';
@@ -206,9 +207,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         "Manage Links",
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -245,7 +246,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               name.length > 20
                                   ? '${name.substring(0, 20)}...'
                                   : name,
-                              style: const TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
@@ -253,7 +254,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             ),
                             subtitle: Text(
                               link,
-                              style: TextStyle(
+                              style: GoogleFonts.poppins(
                                 fontSize: 14,
                                 color: Colors.grey.shade600,
                               ),
@@ -418,9 +419,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            title: const Text(
+            title: Text(
               'Add Ingredient',
-              style: TextStyle(
+              style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -435,7 +436,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     TextField(
                       controller: textController,
                       decoration: InputDecoration(
-                        labelStyle: TextStyle(color: Colors.black),
+                        labelStyle: GoogleFonts.poppins(color: Colors.black),
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -461,7 +462,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -470,109 +471,131 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     const SizedBox(height: 20),
 
                     // Quantity and Unit in One Row
-                    Row(
-                      children: [
-                        // Quantity Input
-                        Expanded(
-                          flex: 2,
-                          child: Column(
+                    Container(
+                      child: Column(
+                        children: [
+                          Row(
                             children: [
-                              TextField(
-                                controller: quantityController,
-                                decoration: InputDecoration(
-                                  labelStyle: TextStyle(color: Colors.black),
-                                  labelText: 'Quantity',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey[
-                                            300]!), // Default border color
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey[
-                                            300]!), // Border color when focused
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey[
-                                            300]!), // Border color when not focused
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
+                              // Quantity Input
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: quantityController,
+                                      decoration: InputDecoration(
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
+                                        labelText: 'Quantity',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[
+                                                  300]!), // Default border color
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[
+                                                  300]!), // Border color when focused
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[
+                                                  300]!), // Border color when not focused
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ],
                                 ),
-                                keyboardType: TextInputType.number,
                               ),
-                              if (isQuantity)
-                                Text(
-                                  'Please enter quantity.',
-                                  style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
+                              const SizedBox(width: 12),
 
-                        // Unit Dropdown
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            children: [
-                              DropdownButtonFormField<String>(
-                                decoration: InputDecoration(
-                                  labelStyle: TextStyle(color: Colors.black),
-                                  labelText: 'Unit',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey[
-                                            300]!), // Default border color
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey[
-                                            300]!), // Border color when focused
-                                  ),
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                    borderSide: BorderSide(
-                                        color: Colors.grey[
-                                            300]!), // Border color when not focused
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[50],
+                              // Unit Dropdown
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  children: [
+                                    DropdownButtonFormField<String>(
+                                      decoration: InputDecoration(
+                                        labelStyle:
+                                            TextStyle(color: Colors.black),
+                                        labelText: 'Unit',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[
+                                                  300]!), // Default border color
+                                        ),
+                                        focusedBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[
+                                                  300]!), // Border color when focused
+                                        ),
+                                        enabledBorder: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[
+                                                  300]!), // Border color when not focused
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
+                                      ),
+                                      isExpanded: true,
+                                      items: unitOptions.map((String unit) {
+                                        return DropdownMenuItem<String>(
+                                          value: unit,
+                                          child: Text(unit),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? value) {
+                                        setState(() => selectedUnit = value);
+                                      },
+                                      value: selectedUnit,
+                                      hint: const Text('Select'),
+                                    ),
+                                  ],
                                 ),
-                                isExpanded: true,
-                                items: unitOptions.map((String unit) {
-                                  return DropdownMenuItem<String>(
-                                    value: unit,
-                                    child: Text(unit),
-                                  );
-                                }).toList(),
-                                onChanged: (String? value) {
-                                  setState(() => selectedUnit = value);
-                                },
-                                value: selectedUnit,
-                                hint: const Text('Select'),
                               ),
-                              if (isUOM)
-                                Text(
-                                  'Please select UOM.',
-                                  style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
                             ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          Text(
+                            'Note: For quantity 1/2 enter 0.5 and for 1/4 enter 0.25',
+                            style: GoogleFonts.poppins(
+                                color: Colors.grey.shade600,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          if (isQuantity)
+                            Text(
+                              'Please enter quantity.',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.red.shade700,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          if (isUOM)
+                            Text(
+                              'Please select UOM.',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.red.shade700,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -591,7 +614,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -601,7 +624,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 onPressed: () async {
                   final ingredientName = textController.text.trim();
                   final quantityText = quantityController.text.trim();
-                  final quantity = int.tryParse(quantityText);
+                  final quantity = double.tryParse(quantityText);
 
                   if (ingredientName.isEmpty) {
                     setState(() {
@@ -617,14 +640,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isName = false;
                     });
                   }
-                  if (quantity == null || quantity <= 0) {
+                  if (quantity == null ||
+                      quantity <= 0 ||
+                      (quantity < 1 && quantity != 0.25 && quantity != 0.5)) {
                     setState(() {
-                      // Check if the text field is empty
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('Please enter a valid quantity.')),
+                          content: Text(
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).')),
                     );
                     return;
                   } else {
@@ -632,6 +657,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isQuantity = false;
                     });
                   }
+
                   if (selectedUnit == null) {
                     setState(() {
                       // Check if the text field is empty
@@ -648,7 +674,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   }
 
                   // Adjust unit for quantity
-                  final adjustedUnit = pluralizeUnit(selectedUnit!, quantity);
+                  final adjustedUnit =
+                      pluralizeUnit(selectedUnit!, quantity.toInt());
 
                   // Assuming addIngredient method is available in the database provider
                   await context.read<database>().addIngredient(
@@ -673,7 +700,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Create'),
               ),
@@ -732,9 +759,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   'Edit Ingredient',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -783,15 +810,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
                         ),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: Colors.grey[50],
                       ),
                     ),
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -800,77 +828,97 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     const SizedBox(height: 20),
 
                     // Quantity and Unit in One Row
-                    Row(
-                      children: [
-                        // Quantity Input
-                        Expanded(
-                          flex: 2,
-                          child: Column(
+                    Container(
+                      child: Column(
+                        children: [
+                          Row(
                             children: [
-                              TextField(
-                                controller: quantityController,
-                                decoration: InputDecoration(
-                                  labelText: 'Quantity',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[100],
+                              // Quantity Input
+                              Expanded(
+                                flex: 2,
+                                child: Column(
+                                  children: [
+                                    TextField(
+                                      controller: quantityController,
+                                      decoration: InputDecoration(
+                                        labelText: 'Quantity',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[300]!),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
+                                      ),
+                                      keyboardType: TextInputType.number,
+                                    ),
+                                  ],
                                 ),
-                                keyboardType: TextInputType.number,
                               ),
-                              if (isQuantity)
-                                Text(
-                                  'Please enter quantity.',
-                                  style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
+                              const SizedBox(width: 12),
 
-                        // Unit Dropdown
-                        Expanded(
-                          flex: 3,
-                          child: Column(
-                            children: [
-                              DropdownButtonFormField<String>(
-                                decoration: InputDecoration(
-                                  labelText: 'Unit',
-                                  border: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  filled: true,
-                                  fillColor: Colors.grey[100],
+                              // Unit Dropdown
+                              Expanded(
+                                flex: 3,
+                                child: Column(
+                                  children: [
+                                    DropdownButtonFormField<String>(
+                                      decoration: InputDecoration(
+                                        labelText: 'Unit',
+                                        border: OutlineInputBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          borderSide: BorderSide(
+                                              color: Colors.grey[300]!),
+                                        ),
+                                        filled: true,
+                                        fillColor: Colors.grey[50],
+                                      ),
+                                      isExpanded: true,
+                                      items: unitOptions.map((String unit) {
+                                        return DropdownMenuItem<String>(
+                                          value: unit,
+                                          child: Text(unit),
+                                        );
+                                      }).toList(),
+                                      onChanged: (String? value) {
+                                        setState(() => selectedUnit = value);
+                                      },
+                                      value: selectedUnit,
+                                      hint: const Text('Select'),
+                                    ),
+                                  ],
                                 ),
-                                isExpanded: true,
-                                items: unitOptions.map((String unit) {
-                                  return DropdownMenuItem<String>(
-                                    value: unit,
-                                    child: Text(unit),
-                                  );
-                                }).toList(),
-                                onChanged: (String? value) {
-                                  setState(() => selectedUnit = value);
-                                },
-                                value: selectedUnit,
-                                hint: const Text('Select'),
                               ),
-                              if (isUOM)
-                                Text(
-                                  'Please select UOM.',
-                                  style: TextStyle(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
                             ],
                           ),
-                        ),
-                      ],
+                          SizedBox(height: 10),
+                          Text(
+                            'Note: For quantity 1/2 enter 0.5 and for 1/4 enter 0.25',
+                            style: GoogleFonts.poppins(
+                                color: Colors.grey.shade600,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500),
+                          ),
+                          if (isQuantity)
+                            Text(
+                              'Please enter quantity.',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.red.shade700,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          if (isUOM)
+                            Text(
+                              'Please select UOM.',
+                              style: GoogleFonts.poppins(
+                                  color: Colors.red.shade700,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -888,7 +936,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -898,7 +946,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 onPressed: () async {
                   final ingredientName = textController.text.trim();
                   final quantityText = quantityController.text.trim();
-                  final quantity = int.tryParse(quantityText);
+                  final quantity = double.tryParse(quantityText);
 
                   if (ingredientName.isEmpty) {
                     setState(() {
@@ -914,14 +962,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isName = false;
                     });
                   }
-                  if (quantity == null || quantity <= 0) {
+                  if (quantity == null ||
+                      quantity <= 0 ||
+                      (quantity < 1 && quantity != 0.25 && quantity != 0.5)) {
                     setState(() {
-                      // Check if the text field is empty
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                          content: Text('Please enter a valid quantity.')),
+                          content: Text(
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).')),
                     );
                     return;
                   } else {
@@ -929,6 +979,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isQuantity = false;
                     });
                   }
+
                   if (selectedUnit == null) {
                     setState(() {
                       // Check if the text field is empty
@@ -986,7 +1037,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Update'),
               ),
@@ -1044,7 +1095,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         }
                       },
                       child: Text('Create',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -1064,7 +1115,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             title: Center(
               child: Text(
                 'Add Recipe',
-                style: TextStyle(
+                style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
                   color: widget.background,
@@ -1076,7 +1127,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               children: [
                 Text(
                   'Write your recipe details below:',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 16,
                     color: Colors.grey[600],
                   ),
@@ -1091,7 +1142,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     textInputAction: TextInputAction.newline,
                     decoration: InputDecoration(
                       hintText: 'Enter your recipe...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1117,7 +1168,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Recipe cannot be empty!',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.redAccent,
                             fontSize: 14,
                           ),
@@ -1131,7 +1182,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
@@ -1211,7 +1262,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 Text(" "),
                 Text(
                   'Edit Recipe',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: widget.background),
@@ -1225,9 +1276,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
-                        title: const Text(
+                        title: Text(
                           "Confirm Action",
-                          style: TextStyle(fontWeight: FontWeight.bold),
+                          style:
+                              GoogleFonts.poppins(fontWeight: FontWeight.bold),
                         ),
                         content: const Text(
                           "Are you sure you want to delete this recipe?",
@@ -1240,9 +1292,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   context); // Close confirmation dialog
                               Navigator.pop(context); // Close edit dialog
                             },
-                            child: const Text(
+                            child: Text(
                               "Yes, Delete",
-                              style: TextStyle(color: Colors.red),
+                              style: GoogleFonts.poppins(color: Colors.red),
                             ),
                           ),
                           TextButton(
@@ -1271,7 +1323,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     maxLines: 6,
                     decoration: InputDecoration(
                       hintText: 'Edit your recipe here...',
-                      hintStyle: TextStyle(color: Colors.grey[400]),
+                      hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1297,7 +1349,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Recipe cannot be empty!',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.redAccent,
                             fontSize: 14,
                           ),
@@ -1311,7 +1363,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
@@ -1390,9 +1442,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        title: const Text(
+        title: Text(
           'Add Link',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1443,7 +1495,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey.shade600,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Cancel'),
           ),
@@ -1474,7 +1526,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Create'),
           ),
@@ -1515,9 +1567,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
         ),
-        title: const Text(
+        title: Text(
           'New Link',
-          style: TextStyle(
+          style: GoogleFonts.poppins(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1568,7 +1620,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey.shade600,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Cancel'),
           ),
@@ -1599,7 +1651,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: const TextStyle(fontSize: 16),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
             child: const Text('Update'),
           ),
@@ -1634,7 +1686,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         Navigator.pop(context);
                       },
                       child: Text('Update',
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -1764,7 +1816,11 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     final noteDatabase = context.watch<database>();
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-
+    double fontSize =
+        screenWidth * 0.04; // Adjust font size based on screen width
+    double paddingValue =
+        screenWidth * 0.02; // Adjust padding based on screen width
+    double cellPadding = screenWidth * 0.01; // Padding for table cells
     // Adjust sizes dynamically
     final iconSize =
         screenWidth * 0.08; // Adjust icon size based on screen width
@@ -1955,7 +2011,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       children: [
                         Text(
                           "Calculator : ",
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: MediaQuery.of(context).size.width > 600
                                 ? 20
                                 : 15,
@@ -1981,7 +2037,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                 Expanded(
                                   child: Text(
                                     '1',
-                                    style: TextStyle(
+                                    style: GoogleFonts.poppins(
                                       fontSize:
                                           MediaQuery.of(context).size.width >
                                                   600
@@ -2000,7 +2056,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                       value: item,
                                       child: Text(
                                         item,
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                           fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width >
@@ -2069,30 +2125,49 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   Padding(
                     padding: const EdgeInsets.only(left: 20.0),
                     child: _isLoading
-                        ? const Center(
-                            child: CircularProgressIndicator(),
-                          ) // Show loading indicator
+                        ? Center(
+                            child: ColorFiltered(
+                            colorFilter:
+                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                            child: Lottie.asset(
+                              'assets/lottie_json/loadingspoons.json',
+                              width: screenWidth * 0.3,
+                            ),
+                          )) // Show loading indicator
                         : currentNotes.isEmpty
                             ? Center(
                                 child: Padding(
                                   padding: EdgeInsets.symmetric(
-                                      vertical: screenWidth * 0.2),
-                                  child: Column(
-                                    children: [
-                                      Image.asset("assets/icons/no_items.png",
-                                          width: 400),
-                                      const SizedBox(
-                                        height: 10,
-                                      ),
-                                      Text(
-                                        'Add ingredients using +',
-                                        style: GoogleFonts.aclonica(
-                                          fontSize: 30.0,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.white,
+                                      vertical: screenWidth * 0.3),
+                                  child: GestureDetector(
+                                    onTap: createIngredient,
+                                    child: Column(
+                                      children: [
+                                        Lottie.asset(
+                                          'assets/lottie_json/noingredients.json',
+                                          width: screenWidth * 0.4,
                                         ),
-                                      ),
-                                    ],
+                                        const SizedBox(
+                                          height: 10,
+                                        ),
+                                        Text(
+                                          'No Ingredients Added',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: screenWidth * 0.04,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Tap to Add',
+                                          style: GoogleFonts.poppins(
+                                            fontSize: screenWidth * 0.03,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
                                   ),
                                 ), // Show this if list is empty
                               )
@@ -2106,91 +2181,88 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                                 ? 10
                                                 : 0,
                                         right: 15),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
+                                    child: Table(
+                                      columnWidths: {
+                                        0: FlexColumnWidth(
+                                            MediaQuery.of(context).size.width *
+                                                0.085),
+                                        1: FlexColumnWidth(
+                                            MediaQuery.of(context).size.width *
+                                                0.015),
+                                        2: FlexColumnWidth(
+                                            MediaQuery.of(context).size.width *
+                                                0.025),
+                                        3: FlexColumnWidth(
+                                            MediaQuery.of(context).size.width *
+                                                0.025),
+                                        // 4: FlexColumnWidth(.1),
+                                      },
                                       children: [
-                                        if (MediaQuery.of(context).size.width >
-                                            600) ...[
-                                          Text(
-                                            "Ingredient",
-                                            style: GoogleFonts.montserrat(
-                                              fontSize: 25.0,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                left: 100.0),
-                                            child: Text("Quantity",
-                                                style: GoogleFonts.montserrat(
-                                                  fontSize: 25.0,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
-                                                )),
-                                          ),
-                                          Text("Calculated Quantity",
-                                              style: GoogleFonts.montserrat(
-                                                fontSize: 25.0,
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              )),
-                                        ] else ...[
-                                          // Ingredient Text
-                                          Flexible(
-                                            flex: 1,
-                                            child: Text(
-                                              "Ingredient",
-                                              style: GoogleFonts.montserrat(
-                                                fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.04, // Responsive font size
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
-                                              ),
-                                            ),
-                                          ),
-                                          // Quantity Text
-                                          Flexible(
-                                            flex: 0,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                  left: MediaQuery.of(context)
-                                                          .size
-                                                          .width *
-                                                      0.155), // Dynamic padding
-                                              child: Text(
-                                                "Qty",
-                                                style: GoogleFonts.montserrat(
-                                                  fontSize: MediaQuery.of(
-                                                              context)
-                                                          .size
-                                                          .width *
-                                                      0.04, // Responsive font size
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.white,
+                                        TableRow(
+                                          children: [
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: cellPadding),
+                                                child: Text(
+                                                  "INGREDIENTS",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: fontSize,
+                                                    color: Colors.grey[850],
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  textAlign: TextAlign.left,
                                                 ),
                                               ),
                                             ),
-                                          ),
-                                          // Calculated Quantity Text
-                                          Flexible(
-                                            flex: 2,
-                                            child: Text(
-                                              "Calculated Qty",
-                                              style: GoogleFonts.montserrat(
-                                                fontSize: MediaQuery.of(context)
-                                                        .size
-                                                        .width *
-                                                    0.04, // Responsive font size
-                                                fontWeight: FontWeight.bold,
-                                                color: Colors.white,
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 0, top: cellPadding),
+                                                child: Text(
+                                                  'Qty',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: fontSize,
+                                                    color: Colors.grey[850],
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
                                               ),
                                             ),
-                                          ),
-                                        ],
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 0, top: cellPadding),
+                                                child: Text(
+                                                  'Calc',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: fontSize,
+                                                    color: Colors.grey[850],
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  textAlign: TextAlign.center,
+                                                ),
+                                              ),
+                                            ),
+                                            TableCell(
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                    top: cellPadding,
+                                                    left: cellPadding),
+                                                child: Text(
+                                                  "Unit",
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize: fontSize,
+                                                    color: Colors.grey[850],
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                  textAlign: TextAlign.left,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ],
                                     ),
                                   ),
@@ -2227,30 +2299,49 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
 
             SingleChildScrollView(
               child: _isLoading
-                  ? const Center(
-                      child:
-                          CircularProgressIndicator()) // Show loading indicator
+                  ? Center(
+                      child: ColorFiltered(
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      child: Lottie.asset(
+                        'assets/lottie_json/loadingspoons.json',
+                        width: screenWidth * 0.3,
+                      ),
+                    )) // Show loading indicator
                   : currentRecipe.isEmpty
                       ? Center(
                           child: Padding(
                             padding: EdgeInsets.symmetric(
-                                vertical: screenWidth * 0.27),
-                            child: Column(
-                              children: [
-                                Image.asset("assets/icons/no_recipe.png",
-                                    width: 400),
-                                const SizedBox(
-                                  height: 10,
-                                ),
-                                Text(
-                                  'Add recipe using +',
-                                  style: GoogleFonts.aclonica(
-                                    fontSize: 30.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                vertical: screenWidth * 0.17),
+                            child: GestureDetector(
+                              onTap: createRecipe,
+                              child: Column(
+                                children: [
+                                  Lottie.asset(
+                                    'assets/lottie_json/norecipe.json',
+                                    width: screenWidth * 1,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(
+                                    height: 10,
+                                  ),
+                                  Text(
+                                    'No Recipe Found',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: screenWidth * 0.04,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    'Tap to Add',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: screenWidth * 0.03,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
                           ), // Show this if list is empty
                         )
@@ -2260,12 +2351,12 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               padding: EdgeInsets.all(20.0),
                               child: Text(
                                 "How to Cook",
-                                style: TextStyle(
-                                  fontSize:
-                                      MediaQuery.of(context).size.width > 600
-                                          ? 22
-                                          : MediaQuery.of(context).size.width *
-                                              0.05,
+                                style: GoogleFonts.poppins(
+                                  fontSize: MediaQuery.of(context).size.width >
+                                          600
+                                      ? MediaQuery.of(context).size.width * 0.05
+                                      : MediaQuery.of(context).size.width *
+                                          0.05,
                                   fontWeight: FontWeight.w600,
                                   color: Colors.black87,
                                 ),

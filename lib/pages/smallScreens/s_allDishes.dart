@@ -878,21 +878,21 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                       DropDown(
                                         isDismissible: true,
                                         isSearchVisible: false,
-                                        bottomSheetTitle: const Text(
+                                        bottomSheetTitle:   Text(
                                           'Sort Options',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20.0),
                                         ),
-                                        submitButtonChild: const Text(
+                                        submitButtonChild:   Text(
                                           'Done',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        clearButtonChild: const Text(
+                                        clearButtonChild:   Text(
                                           'Clear',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -918,7 +918,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                         ),
                                       ],
                                     ),
-                                    child: const Padding(
+                                    child:   Padding(
                                       padding: EdgeInsets.only(left: 5.0),
                                       child: Row(
                                         mainAxisAlignment:
@@ -927,7 +927,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                           //Text(dropdownValue),
                                           Text(
                                             "Sort By",
-                                            style: TextStyle(
+                                            style: GoogleFonts.poppins(
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Icon(Icons.arrow_drop_down, size: 30),
@@ -1006,9 +1006,9 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                       minimumSize: const Size(50,
                                           30), // Ensures the button has a small size
                                     ),
-                                    child: const Text(
+                                    child:  Text(
                                       'Reset All',
-                                      style: TextStyle(
+                                      style: GoogleFonts.poppins(
                                           fontSize: 12), // Smaller font size
                                     ),
                                   ),

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:recipe/pages/biggerScreens/home.dart';
 import 'package:recipe/pages/loginPage.dart';
+import 'package:recipe/pages/smallScreens/s_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -95,11 +96,14 @@ class AuthService {
           await prefs.setString('user_name', userName);
 
           // Optionally navigate to home screen
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => MyHomePage()),
-            (Route<dynamic> route) => false,
-          );
+         Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MediaQuery.of(context).size.width > 600
+                  ? const MyHomePage()
+                  : const MySmallHomePage()),
+          (Route<dynamic> route) => false,
+        );
         } catch (e) {
           print('Error: $e');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -108,11 +112,14 @@ class AuthService {
         }
       }
       // Navigate to a new page after successful login
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (context) => MyHomePage()),
-        (Route<dynamic> route) => false,
-      );
+     Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(
+              builder: (context) => MediaQuery.of(context).size.width > 600
+                  ? const MyHomePage()
+                  : const MySmallHomePage()),
+          (Route<dynamic> route) => false,
+        );
     } catch (e) {
       print("Google sign-in error: $e");
       ScaffoldMessenger.of(context).showSnackBar(

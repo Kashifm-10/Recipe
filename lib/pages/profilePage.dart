@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recipe/pages/loginPage.dart';
@@ -41,9 +42,9 @@ class _ProfilePageState extends State<ProfilePage> {
       appBar: AppBar(
         foregroundColor: Colors.white,
         backgroundColor: Colors.transparent,
-        title: const Text(
+        title: Text(
           "",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 40),
+          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 40),
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -101,10 +102,10 @@ class _ProfilePageState extends State<ProfilePage> {
                 CircleAvatar(
                   radius: 60,
                   backgroundImage: NetworkImage(user?.photoURL ??
-                      'https://cdn-icons-png.flaticon.com/512/6717/6717652.png'),
+                      'https://images.deepai.org/art-image/d02f0423812a476e90df7368aafb8062/cookbook-minimalist-logo-b477d8-thumb.jpg'),
                   backgroundColor: Colors.white.withOpacity(0.3),
                 ),
-                SizedBox(height: MediaQuery.of(context).size.height * 0.05),
+                SizedBox(height: MediaQuery.of(context).size.height * 0.03),
 
                 // User Name
                 Container(
@@ -125,7 +126,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         children: [
                           Text(
                             user?.displayName ?? username!,
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.09,
@@ -133,7 +134,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Text(
                             user?.email ?? email!,
-                            style: TextStyle(
+                            style: GoogleFonts.poppins(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
                                 color: Colors.grey[500]),
@@ -193,7 +194,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: const TextStyle(
+                                            labelStyle: GoogleFonts.poppins(
                                               color: Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
@@ -225,7 +226,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: const TextStyle(
+                                            labelStyle: GoogleFonts.poppins(
                                               color: Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
@@ -267,7 +268,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: const TextStyle(
+                                            labelStyle: GoogleFonts.poppins(
                                               color: Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
@@ -357,15 +358,17 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         child: Text(
                           'Change Password',
-                          style:  TextStyle(
+                          style: GoogleFonts.poppins(
                             fontSize: MediaQuery.of(context).size.width * 0.035,
                             color: Colors.white,
+                            fontWeight: FontWeight.bold
                           ),
                         ),
                       ),
 /*                       SizedBox(
                           height: MediaQuery.of(context).size.height * 0.01),
- */                      ElevatedButton(
+ */
+                      ElevatedButton(
                         onPressed: () async {
                           bool confirmLogout = await showDialog<bool>(
                                 context: context,
@@ -411,8 +414,9 @@ class _ProfilePageState extends State<ProfilePage> {
                           }
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color.fromARGB(
-                              255, 241, 128, 181).withOpacity(0.3), // Blue color
+                          backgroundColor:
+                              const Color.fromARGB(255, 241, 128, 181)
+                                  .withOpacity(0.3), // Blue color
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8),
                           ),
@@ -421,11 +425,12 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         child: Text(
                           "Logout",
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Colors.white,
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.bold
+                              ),
                         ),
                       ),
                       SizedBox(
@@ -559,7 +564,7 @@ class ProfilePage extends StatelessWidget {
               ),
               child: Text(
                 "Log Out",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -578,8 +583,8 @@ class ProfilePage extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 5),
       child: ListTile(
         leading: Icon(icon, color: Color(0xFF5D4B8E)),
-        title: Text(title, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: TextStyle(fontSize: 14, color: Colors.grey[600])),
+        title: Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle, style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600])),
         onTap: onTap,
       ),
     );

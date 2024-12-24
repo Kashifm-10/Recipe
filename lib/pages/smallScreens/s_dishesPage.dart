@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -71,7 +73,7 @@ class _smalldishesListState extends State<smalldishesList> {
     SelectedListItem(name: 'Oldest', value: 'Oldest'),
   ];
   List<Color> colorList = [
-    const Color.fromARGB(255, 249, 168, 37), // #F9A825
+    const Color.fromARGB(255, 255, 185, 35), // #F9A825
     const Color.fromARGB(255, 102, 187, 106), // #66BB6A
     const Color.fromARGB(255, 183, 28, 28), // #B71C1C
     const Color.fromARGB(255, 141, 110, 99), // #8D6E63
@@ -94,10 +96,19 @@ class _smalldishesListState extends State<smalldishesList> {
     }
   }
 
+  final Random _random = Random();
+  final List<String> _lottieFiles = [
+    'assets/lottie_json/cat.json',
+    'assets/lottie_json/ghost.json',
+    'assets/lottie_json/fall.json',
+    'assets/lottie_json/cups.json'
+  ];
+  late final String selectedLottie;
+
   @override
   void initState() {
     super.initState();
-
+    selectedLottie = _lottieFiles[_random.nextInt(_lottieFiles.length)];
     _createTutorial();
     Timer(const Duration(seconds: 2), () {
       setState(() {
@@ -198,9 +209,9 @@ class _smalldishesListState extends State<smalldishesList> {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text(
+                Text(
                   "New Dish",
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -280,7 +291,7 @@ class _smalldishesListState extends State<smalldishesList> {
                       controller: textController,
                       decoration: InputDecoration(
                         hintText: 'Dish name',
-                        hintStyle: TextStyle(
+                        hintStyle: GoogleFonts.poppins(
                             fontSize: 16, color: Colors.grey.shade600),
                         filled: true,
                         fillColor: Colors.grey.shade200,
@@ -289,7 +300,7 @@ class _smalldishesListState extends State<smalldishesList> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                           fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -299,7 +310,7 @@ class _smalldishesListState extends State<smalldishesList> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Text(
                         'Please enter a dish name.',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -344,7 +355,7 @@ class _smalldishesListState extends State<smalldishesList> {
                               return '0 min';
                             }
                           }(),
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                               color: Colors.grey.shade700, fontSize: 16),
                         ),
                       ),
@@ -360,7 +371,7 @@ class _smalldishesListState extends State<smalldishesList> {
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -405,9 +416,9 @@ class _smalldishesListState extends State<smalldishesList> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 12.0),
                 ),
-                child: const Text(
+                child: Text(
                   'Create',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -454,9 +465,9 @@ class _smalldishesListState extends State<smalldishesList> {
               children: [
                 Row(
                   children: [
-                    const Text(
+                    Text(
                       "Update Dish",
-                      style: TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors
@@ -582,7 +593,7 @@ class _smalldishesListState extends State<smalldishesList> {
                       controller: textController,
                       decoration: InputDecoration(
                         hintText: 'Dish name',
-                        hintStyle: TextStyle(
+                        hintStyle: GoogleFonts.poppins(
                           fontSize: 16,
                           color: Colors.grey.shade600,
                         ),
@@ -593,7 +604,7 @@ class _smalldishesListState extends State<smalldishesList> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: const TextStyle(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -604,7 +615,7 @@ class _smalldishesListState extends State<smalldishesList> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Text(
                         'Please enter a dish name.',
-                        style: TextStyle(
+                        style: GoogleFonts.poppins(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -650,7 +661,7 @@ class _smalldishesListState extends State<smalldishesList> {
                               return '0 min';
                             }
                           }(),
-                          style: TextStyle(
+                          style: GoogleFonts.poppins(
                             color: Colors.grey.shade700,
                             fontSize: 16,
                           ),
@@ -669,7 +680,7 @@ class _smalldishesListState extends State<smalldishesList> {
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: const TextStyle(fontSize: 16),
+                  textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
                 child: const Text('Cancel'),
               ),
@@ -710,9 +721,9 @@ class _smalldishesListState extends State<smalldishesList> {
                   padding: const EdgeInsets.symmetric(
                       horizontal: 20.0, vertical: 12.0),
                 ),
-                child: const Text(
+                child: Text(
                   'Update',
-                  style: TextStyle(
+                  style: GoogleFonts.poppins(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -975,6 +986,7 @@ class _smalldishesListState extends State<smalldishesList> {
     readDishes(widget.type!);
 
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: colorList[int.parse(widget.type!) - 1],
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(screenHeight * 0.075),
@@ -1026,6 +1038,9 @@ class _smalldishesListState extends State<smalldishesList> {
           FocusScope.of(context)
               .unfocus(); // Dismiss the keyboard and unfocus the search bar
         },
+        /* onVerticalDragDown: (DragDownDetails details) {
+          Navigator.pop(context);
+        }, */
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -1279,21 +1294,21 @@ class _smalldishesListState extends State<smalldishesList> {
                                       DropDown(
                                         isDismissible: true,
                                         isSearchVisible: false,
-                                        bottomSheetTitle: const Text(
+                                        bottomSheetTitle: Text(
                                           'Sort Options',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20.0),
                                         ),
-                                        submitButtonChild: const Text(
+                                        submitButtonChild: Text(
                                           'Done',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
-                                        clearButtonChild: const Text(
+                                        clearButtonChild: Text(
                                           'Clear',
-                                          style: TextStyle(
+                                          style: GoogleFonts.poppins(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -1319,7 +1334,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                         ),
                                       ],
                                     ),
-                                    child: const Padding(
+                                    child: Padding(
                                       padding: EdgeInsets.only(left: 5.0),
                                       child: Row(
                                         mainAxisAlignment:
@@ -1328,7 +1343,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                           //Text(dropdownValue),
                                           Text(
                                             "Sort By",
-                                            style: TextStyle(
+                                            style: GoogleFonts.poppins(
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Icon(Icons.arrow_drop_down, size: 30),
@@ -1360,9 +1375,9 @@ class _smalldishesListState extends State<smalldishesList> {
                                             vertical:
                                                 0), // Adjust padding for height
                                       ),
-                                      child: const Text(
+                                      child: Text(
                                         "Add Dishes",
-                                        style: TextStyle(
+                                        style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.bold),
                                       )),
                                 )
@@ -1390,53 +1405,94 @@ class _smalldishesListState extends State<smalldishesList> {
                         ),
                       ),
                     ) // Show loading indicator
-                  : Padding(
-                      padding: const EdgeInsets.only(top: 10.0),
-                      child: ListView.builder(
-                        itemCount: _sortededNotes.length,
-                        itemBuilder: (context, index) {
-                          final note = _sortededNotes[index];
-
-                          return GestureDetector(
-                            onLongPress: () {
-                              // Call your update function when a long press is detected
-                              updateDish(note, widget.type!, note.name);
-                            },
-                            onTap: () {
-                              setState(() {
-                                Navigator.of(context).push(PageTransition(
-                                    curve: Curves.linear,
-                                    type: PageTransitionType.rightToLeft,
-                                    duration: const Duration(
-                                        milliseconds:
-                                            300), // Adjust duration to slow down the transition
-                                    child: smallrecipe(
-                                      serial: note.serial,
-                                      type: widget.type,
-                                      dish: note.name,
-                                      category: note.category,
-                                      access: true,
-                                      background: colorList[
-                                          int.parse(widget.type!) - 1],
-                                    )));
-                              });
-                            },
-                            child: DishTile(
-                              duration: note.duration,
-                              category: note.category,
-                              dish: note.name,
-                              type: widget.type,
-                              text: note.name,
-                              fromType: 'no',
-                              onEditPressed: () =>
-                                  updateDish(note, widget.type!, note.name!),
-                              onDeletePressed: () =>
-                                  deleteNote(note.id, widget.type!, note.name),
+                  : _sortededNotes.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenWidth * 0.3),
+                            child: GestureDetector(
+                              onTap: _searchController.text.isEmpty
+                                  ? createDish
+                                  : null,
+                              child: Column(
+                                children: [
+                                  Lottie.asset(
+                                    selectedLottie,
+                                    width: screenWidth * 0.5,
+                                  ),
+                                  const SizedBox(
+                                    height: 0,
+                                  ),
+                                  Text(
+                                    'No Dishes Found',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: screenWidth * 0.05,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  Text(
+                                    _searchController.text.isEmpty
+                                        ? 'Tap to Add'
+                                        : '',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: screenWidth * 0.03,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
+                          ), // Show this if list is empty
+                        )
+                      : Padding(
+                          padding: const EdgeInsets.only(top: 10.0),
+                          child: ListView.builder(
+                            itemCount: _sortededNotes.length,
+                            itemBuilder: (context, index) {
+                              final note = _sortededNotes[index];
+
+                              return GestureDetector(
+                                onLongPress: () {
+                                  // Call your update function when a long press is detected
+                                  updateDish(note, widget.type!, note.name);
+                                },
+                                onTap: () {
+                                  setState(() {
+                                    Navigator.of(context).push(PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.rightToLeft,
+                                        duration: const Duration(
+                                            milliseconds:
+                                                300), // Adjust duration to slow down the transition
+                                        child: smallrecipe(
+                                          serial: note.serial,
+                                          type: widget.type,
+                                          dish: note.name,
+                                          category: note.category,
+                                          access: true,
+                                          background: colorList[
+                                              int.parse(widget.type!) - 1],
+                                        )));
+                                  });
+                                },
+                                child: DishTile(
+                                  duration: note.duration,
+                                  category: note.category,
+                                  dish: note.name,
+                                  type: widget.type,
+                                  text: note.name,
+                                  fromType: 'no',
+                                  onEditPressed: () => updateDish(
+                                      note, widget.type!, note.name!),
+                                  onDeletePressed: () => deleteNote(
+                                      note.id, widget.type!, note.name),
+                                ),
+                              );
+                            },
+                          ),
+                        ),
             ),
           ],
         ),
