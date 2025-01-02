@@ -285,18 +285,17 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
     const Color.fromARGB(255, 179, 157, 219), // #B39DDB
   ]; */
   List<Color> colorList = [
-    const Color.fromARGB(255, 255, 185, 35), // #F9A825
-    const Color.fromARGB(255, 102, 187, 106), // #66BB6A
-    const Color.fromARGB(255, 183, 28, 28), // #B71C1C
-    const Color.fromARGB(255, 141, 110, 99), // #8D6E63
-    const Color.fromARGB(255, 255, 128, 171), // #FF80AB
-    const Color.fromARGB(255, 255, 112, 67), // #FF7043
-    const Color.fromARGB(255, 195, 176, 153), // #C3B099
-    const Color.fromARGB(255, 79, 195, 247), // #4FC3F7
-    const Color.fromARGB(255, 104, 159, 56), // #689F38
-    const Color.fromARGB(255, 179, 157, 219), // #B39DDB
+    Colors.orange.shade400,
+    Colors.green.shade400,
+    Colors.red.shade400,
+    Colors.lime.shade100,
+    Colors.red.shade200,
+    Colors.deepOrange.shade500,
+    Colors.yellow.shade900,
+    Colors.blue.shade300,
+    Colors.green.shade700,
+    Colors.deepPurple.shade300,
   ];
-
   @override
   void initState() {
     super.initState();
@@ -953,7 +952,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
               Expanded(
                 child: EditableCategoryCard(
                   initialIcon: categories[i]['icon'],
-                  color: categories[i]['color'], // Pass Color object directly
+                  color: colorList[i], // Pass Color object directly
                   initialLabel: categories[i]['label'],
                   type: categories[i]['type'],
                   veg: typeCategoryCountList[i]['category0']!,
@@ -1559,8 +1558,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: [
-                      Color(widget.color.value).withOpacity(0.8),
-                      Color(widget.color.value).withOpacity(0.8),
+                      Color(widget.color.value).withOpacity(0.9),
+                      Color(widget.color.value).withOpacity(0.9),
                     ],
                     begin: Alignment.centerLeft,
                     end: Alignment.centerRight,
@@ -1613,7 +1612,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                 : Text(
                                     _currentLabel,
                                     style: GoogleFonts.poppins(
-                                      fontSize: screenWidth * 0.04,
+                                      fontSize: screenWidth * 0.03,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),

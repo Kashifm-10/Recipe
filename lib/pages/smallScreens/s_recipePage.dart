@@ -208,7 +208,7 @@ class _smallrecipeState extends State<smallrecipe>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                        Text(
+                      Text(
                         "Manage Links",
                         style: GoogleFonts.poppins(
                           fontSize: 20,
@@ -383,7 +383,8 @@ class _smallrecipeState extends State<smallrecipe>
       'nos',
       'pcs',
       'cup',
-      'spoon'
+      'tsp',
+      'tbsp'
     ];
 
     void clearInputs() {
@@ -398,9 +399,12 @@ class _smallrecipeState extends State<smallrecipe>
         case 'cup':
           // return 'cups';
           return 'cup';
-        case 'spoon':
+        case 'tsp':
           //return 'spoons';
-          return 'spoon';
+          return 'tsp';
+        case 'tbsp':
+          //return 'spoons';
+          return 'tbsp';
         case 'pc':
           return 'pcs';
         case 'gm':
@@ -422,7 +426,7 @@ class _smallrecipeState extends State<smallrecipe>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
-            title:   Text(
+            title: Text(
               'Add Ingredient',
               style: GoogleFonts.poppins(
                 fontWeight: FontWeight.bold,
@@ -484,7 +488,8 @@ class _smallrecipeState extends State<smallrecipe>
                               TextField(
                                 controller: quantityController,
                                 decoration: InputDecoration(
-                                  labelStyle: GoogleFonts.poppins(color: Colors.black),
+                                  labelStyle:
+                                      GoogleFonts.poppins(color: Colors.black),
                                   labelText: 'Quantity',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -529,7 +534,8 @@ class _smallrecipeState extends State<smallrecipe>
                             children: [
                               DropdownButtonFormField<String>(
                                 decoration: InputDecoration(
-                                  labelStyle: GoogleFonts.poppins(color: Colors.black),
+                                  labelStyle:
+                                      GoogleFonts.poppins(color: Colors.black),
                                   labelText: 'Unit',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -725,12 +731,22 @@ class _smallrecipeState extends State<smallrecipe>
       'nos': 'nos',
       'pcs': 'pc',
       'cups': 'cup',
-      'spoons': 'spoon',
+      'tsp': 'tsp',
+      'tbsp': 'tbsp',
     };
 
     String? selectedUnit = unitMap[ingredient.uom] ?? ingredient.uom;
 
-    List<String> unitOptions = ['nos', 'pc', 'gm', 'kg', 'ltr', 'cup', 'spoon'];
+    List<String> unitOptions = [
+      'nos',
+      'pc',
+      'gm',
+      'kg',
+      'ltr',
+      'cup',
+      'tsp',
+      'tbsp'
+    ];
 
     await showDialog(
       context: context,
@@ -743,7 +759,7 @@ class _smallrecipeState extends State<smallrecipe>
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                  Text(
+                Text(
                   'Edit Ingredient',
                   style: GoogleFonts.poppins(
                     fontWeight: FontWeight.bold,
@@ -984,13 +1000,15 @@ class _smallrecipeState extends State<smallrecipe>
                     if (quantity > 1) {
                       adjustedUnit = {
                             /* 'cup': 'cups',
-                            'spoon': 'spoons',
+                            'tsp'
+'tbsp': 'spoons',
                             'pc': 'pcs',
                             'gm': 'gms',
                             'kg': 'kgs',
                             'ltr': 'ltrs' */
                             'cup': 'cup',
-                            'spoon': 'spoon',
+                            'tsp': 'tsp',
+                            'tbsp': 'tbsp',
                             'pc': 'pcs',
                             'gm': 'gm',
                             'kg': 'kg',
@@ -1262,9 +1280,10 @@ class _smallrecipeState extends State<smallrecipe>
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                         ),
-                        title:   Text(
+                        title: Text(
                           "Confirm Action",
-                          style: GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                          style:
+                              GoogleFonts.poppins(fontWeight: FontWeight.bold),
                         ),
                         content: const Text(
                           "Are you sure you want to delete this recipe?",
@@ -1277,7 +1296,7 @@ class _smallrecipeState extends State<smallrecipe>
                                   context); // Close confirmation dialog
                               Navigator.pop(context); // Close edit dialog
                             },
-                            child:   Text(
+                            child: Text(
                               "Yes, Delete",
                               style: GoogleFonts.poppins(color: Colors.red),
                             ),
@@ -1418,107 +1437,130 @@ class _smallrecipeState extends State<smallrecipe>
     readRecipe(widget.dish!, widget.type!, widget.serial!);
   }
 
-  void createLink() async {
-    TextEditingController titleController = TextEditingController();
+ void createLink() async {
+  TextEditingController titleController = TextEditingController();
+  TextEditingController textController = TextEditingController();
 
-    await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title:   Text(
-          'Add Link',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Container(
-          width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Title Input
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'Enter title',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-              ),
-              const SizedBox(height: 16),
+  // Regular expression for URL validation
+  RegExp urlRegExp = RegExp(
+    r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$', // Simple URL regex
+  );
 
-              // Link Input
-              TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                  labelText: 'Link',
-                  hintText: 'www.youtube.com',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actionsPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        actions: [
-          // Cancel Button
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey.shade600,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
-            ),
-            child: const Text('Cancel'),
-          ),
-
-          // Create Button
-          ElevatedButton(
-            onPressed: () async {
-              if (textController.text.isNotEmpty &&
-                  titleController.text.isNotEmpty) {
-                await context.read<database>().addLink(
-                    titleController.text,
-                    textController.text,
-                    widget.serial!,
-                    widget.type!,
-                    widget.dish!); // Pass additional data
-                Navigator.pop(context);
-                readRecipe(widget.dish!, widget.type!, widget.serial!);
-                readLink(widget.serial!);
-
-                textController.clear();
-                titleController.clear();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: widget.background,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
-            ),
-            child: const Text('Create'),
-          ),
-        ],
+  await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
+      title: Text(
+        'Add Link',
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Container(
+        width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title Input
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Title',
+                hintText: 'Enter title',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Link Input with URL validation
+            TextField(
+              controller: textController,
+              decoration: InputDecoration(
+                labelText: 'Link',
+                hintText: 'www.youtube.com',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+                errorText: textController.text.isNotEmpty &&
+                        !urlRegExp.hasMatch(textController.text)
+                    ? 'Enter a valid URL'
+                    : null, // Show error message if URL is invalid
+              ),
+            ),
+          ],
+        ),
+      ),
+      actionsPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      actions: [
+        // Cancel Button
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey.shade600,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            textStyle: GoogleFonts.poppins(fontSize: 16),
+          ),
+          child: const Text('Cancel'),
+        ),
+
+        // Create Button
+        ElevatedButton(
+          onPressed: () async {
+            // Validate the URL before proceeding
+            if (textController.text.isNotEmpty &&
+                titleController.text.isNotEmpty &&
+                urlRegExp.hasMatch(textController.text)) {
+              await context.read<database>().addLink(
+                  titleController.text,
+                  textController.text,
+                  widget.serial!,
+                  widget.type!,
+                  widget.dish!); // Pass additional data
+              Navigator.pop(context);
+              readRecipe(widget.dish!, widget.type!, widget.serial!);
+              readLink(widget.serial!);
+
+              textController.clear();
+              titleController.clear();
+            } else {
+              // Optionally, show an error message for invalid input
+              if (!urlRegExp.hasMatch(textController.text)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please enter a valid URL'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: widget.background,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: GoogleFonts.poppins(fontSize: 16),
+          ),
+          child: const Text('Create'),
+        ),
+      ],
+    ),
+  );
+}
+
 
   //read notes
   void readLink(String serial) async {
@@ -1543,107 +1585,130 @@ class _smallrecipeState extends State<smallrecipe>
     }
   }
 
-  void newLink() {
-    TextEditingController titleController = TextEditingController();
+  void newLink() async {
+  TextEditingController titleController = TextEditingController();
+  TextEditingController textController = TextEditingController();
 
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
-        ),
-        title:   Text(
-          'New Link',
-          style: GoogleFonts.poppins(
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-        content: Container(
-          width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Title Input
-              TextField(
-                controller: titleController,
-                decoration: InputDecoration(
-                  labelText: 'Title',
-                  hintText: 'Enter title',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-              ),
-              const SizedBox(height: 16),
+  // Regular expression for URL validation
+  RegExp urlRegExp = RegExp(
+    r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$', // Simple URL regex
+  );
 
-              // Link Input
-              TextField(
-                controller: textController,
-                decoration: InputDecoration(
-                  labelText: 'Link',
-                  hintText: 'www.youtube.com',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  filled: true,
-                  fillColor: Colors.grey[100],
-                ),
-              ),
-            ],
-          ),
-        ),
-        actionsPadding:
-            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        actions: [
-          // Cancel Button
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-            },
-            style: TextButton.styleFrom(
-              foregroundColor: Colors.grey.shade600,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
-            ),
-            child: const Text('Cancel'),
-          ),
-
-          // Update Button
-          ElevatedButton(
-            onPressed: () async {
-              if (textController.text.isNotEmpty &&
-                  titleController.text.isNotEmpty) {
-                await context.read<database>().addLink(
-                      titleController.text,
-                      textController.text,
-                      widget.serial!,
-                      widget.type!,
-                      widget.dish!,
-                    ); // Pass title and description
-                Navigator.pop(context);
-                readRecipe(widget.dish!, widget.type!, widget.serial!);
-                readLink(widget.serial!);
-                textController.clear();
-                titleController.clear();
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: widget.background,
-              foregroundColor: Colors.white,
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
-            ),
-            child: const Text('Update'),
-          ),
-        ],
+  await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
       ),
-    );
-  }
+      title: Text(
+        'New Link',
+        style: GoogleFonts.poppins(
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+      content: Container(
+        width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Title Input
+            TextField(
+              controller: titleController,
+              decoration: InputDecoration(
+                labelText: 'Title',
+                hintText: 'Enter title',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+              ),
+            ),
+            const SizedBox(height: 16),
+
+            // Link Input with URL validation
+            TextField(
+              controller: textController,
+              decoration: InputDecoration(
+                labelText: 'Link',
+                hintText: 'www.youtube.com',
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                filled: true,
+                fillColor: Colors.grey[100],
+                errorText: textController.text.isNotEmpty &&
+                        !urlRegExp.hasMatch(textController.text)
+                    ? 'Enter a valid URL'
+                    : null, // Show error message if URL is invalid
+              ),
+            ),
+          ],
+        ),
+      ),
+      actionsPadding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+      actions: [
+        // Cancel Button
+        TextButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          style: TextButton.styleFrom(
+            foregroundColor: Colors.grey.shade600,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            textStyle: GoogleFonts.poppins(fontSize: 16),
+          ),
+          child: const Text('Cancel'),
+        ),
+
+        // Update Button
+        ElevatedButton(
+          onPressed: () async {
+            // Validate the URL before proceeding
+            if (textController.text.isNotEmpty &&
+                titleController.text.isNotEmpty &&
+                urlRegExp.hasMatch(textController.text)) {
+              await context.read<database>().addLink(
+                  titleController.text,
+                  textController.text,
+                  widget.serial!,
+                  widget.type!,
+                  widget.dish!); // Pass additional data
+              Navigator.pop(context);
+              readRecipe(widget.dish!, widget.type!, widget.serial!);
+              readLink(widget.serial!);
+
+              textController.clear();
+              titleController.clear();
+            } else {
+              // Optionally, show an error message for invalid input
+              if (!urlRegExp.hasMatch(textController.text)) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Please enter a valid URL'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
+            }
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: widget.background,
+            foregroundColor: Colors.white,
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            textStyle: GoogleFonts.poppins(fontSize: 16),
+          ),
+          child: const Text('Create'),
+        ),
+      ],
+    ),
+  );
+}
+
 
   //update note
   /* void updateLink(Recipe name) async {
@@ -1783,16 +1848,16 @@ class _smallrecipeState extends State<smallrecipe>
   String? selectedValue = "1";
 
   List<Color> colorList = [
-    const Color.fromARGB(255, 249, 168, 37), // #F9A825
-    const Color.fromARGB(255, 102, 187, 106), // #66BB6A
-    const Color.fromARGB(255, 183, 28, 28), // #B71C1C
-    const Color.fromARGB(255, 141, 110, 99), // #8D6E63
-    const Color.fromARGB(255, 255, 128, 171), // #FF80AB
-    const Color.fromARGB(255, 255, 112, 67), // #FF7043
-    const Color.fromARGB(255, 195, 176, 153), // #C3B099
-    const Color.fromARGB(255, 79, 195, 247), // #4FC3F7
-    const Color.fromARGB(255, 104, 159, 56), // #689F38
-    const Color.fromARGB(255, 179, 157, 219), // #B39DDB
+    Colors.orange.shade400,
+    Colors.green.shade400,
+    Colors.red.shade400,
+    Colors.brown.shade500,
+    Colors.red.shade200,
+    Colors.deepOrange.shade500,
+    Colors.yellow.shade900,
+    Colors.blue.shade300,
+    Colors.green.shade700,
+    Colors.deepPurple.shade300,
   ];
 
   @override
@@ -1922,9 +1987,7 @@ class _smallrecipeState extends State<smallrecipe>
                                   fetchedlinkNames);
                             }
                           },
-                          onLongPress: () {
-                            if (widget.access!) newLink;
-                          },
+                          onLongPress: widget.access! ? newLink : null,
                           child: SvgPicture.asset(
                             'assets/icons/youtube.svg',
                             color: Colors
@@ -2125,9 +2188,9 @@ class _smallrecipeState extends State<smallrecipe>
                                     child: Column(
                                       children: [
                                         Lottie.asset(
-                                    'assets/lottie_json/noingredients.json',
-                                    width: screenWidth * 0.5,
-                                  ),
+                                          'assets/lottie_json/noingredients.json',
+                                          width: screenWidth * 0.5,
+                                        ),
                                         const SizedBox(
                                           height: 10,
                                         ),
@@ -2304,14 +2367,14 @@ class _smallrecipeState extends State<smallrecipe>
             SingleChildScrollView(
               child: _isLoading
                   ? Center(
-                            child: ColorFiltered(
-                            colorFilter:
-                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                            child: Lottie.asset(
-                              'assets/lottie_json/loadingspoons.json',
-                              width: screenWidth * 0.4,
-                            ),
-                          )) // Show loading indicator
+                      child: ColorFiltered(
+                      colorFilter:
+                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                      child: Lottie.asset(
+                        'assets/lottie_json/loadingspoons.json',
+                        width: screenWidth * 0.4,
+                      ),
+                    )) // Show loading indicator
                   : currentRecipe.isEmpty
                       ? Center(
                           child: Padding(

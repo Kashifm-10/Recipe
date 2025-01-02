@@ -23,8 +23,12 @@ class _LoginScreenState extends State<LoginScreen> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isGoogleSignInInProgress = false;
+  bool _isEmailSignInInProgress = false;
 
   Future<void> _signInWithEmailPassword() async {
+    setState(() {
+      _isEmailSignInInProgress = true;
+    });
     try {
       final response = await Supabase.instance.client
           .from('users')
@@ -60,6 +64,9 @@ class _LoginScreenState extends State<LoginScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Login failed: No Internet Connection')));
     }
+    setState(() {
+      _isEmailSignInInProgress = false;
+    });
   }
 
   Future<void> _signInWithGoogle() async {
@@ -114,7 +121,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Image.asset(
                       'assets/images/banner.png',
                       width: screenWidth > 600
-                        ?screenWidth * 0.3 : screenWidth * 0.4,
+                          ? screenWidth * 0.3
+                          : screenWidth * 0.4,
                     )),
                     SizedBox(height: screenHeight * 0.02),
                     /* Text(
@@ -197,16 +205,22 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          child: Text(
-                            'Login',
-                            style: GoogleFonts.poppins(
-                              fontSize: screenWidth > 600
-                                  ? screenWidth * 0.02
-                                  : screenWidth * 0.025,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white,
-                            ),
-                          ),
+                          child:
+                              _isEmailSignInInProgress // Add the condition for loading state
+                                  ? LoadingAnimationWidget.inkDrop(
+                                      size: screenWidth * 0.04,
+                                      color: Colors.white,
+                                    )
+                                  : Text(
+                                      'Login',
+                                      style: GoogleFonts.poppins(
+                                        fontSize: screenWidth > 600
+                                            ? screenWidth * 0.02
+                                            : screenWidth * 0.025,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                         ),
                       ),
                       Text(

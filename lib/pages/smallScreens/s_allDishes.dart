@@ -19,6 +19,7 @@ import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/list_view/dish_tile.dart';
 import 'package:recipe/pages/biggerScreens/home.dart';
 import 'package:animated_switch/animated_switch.dart';
+import 'package:recipe/pages/smallScreens/s_recipePage.dart';
 import 'package:simple_gesture_detector/simple_gesture_detector.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:toggle_switch/toggle_switch.dart';
@@ -1089,7 +1090,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                         duration: const Duration(
                                             milliseconds:
                                                 300), // Adjust duration to slow down the transition
-                                        child: recipe(
+                                        child: smallrecipe(
                                           serial: note.serial,
                                           type: note.type,
                                           dish: note.name,

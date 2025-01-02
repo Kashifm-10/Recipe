@@ -33,7 +33,7 @@ class RecipeList extends StatelessWidget {
       leading:  Padding(
         padding: const EdgeInsets.only(left: 8.0),
         child: Icon(Icons.circle,
-            size: 10, color: Colors.grey[850]),
+            size: MediaQuery.of(context).size.width * 0.02, color: Colors.grey[850]),
       ), // Small circle as a point
       title: GestureDetector(
         onLongPress: () {

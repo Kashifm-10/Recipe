@@ -277,7 +277,7 @@ class _MyHomePageState extends State<MyHomePage> {
     Colors.red.shade200,
     Colors.deepOrange.shade500,
     Colors.yellow.shade900,
-    Colors.blue.shade600,
+    Colors.blue.shade300,
     Colors.green.shade700,
     Colors.deepPurple.shade300,
   ];

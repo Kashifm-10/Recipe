@@ -15,7 +15,6 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
-import 'package:recipe/models/crazy_switch.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/list_view/dish_tile.dart';
@@ -600,7 +599,7 @@ class _dishesListState extends State<dishesList> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                     style: GoogleFonts.poppins(
+                      style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1285,7 +1284,10 @@ class _dishesListState extends State<dishesList> {
                               0.16, // Set the width of the button
                           child: ElevatedButton(
                               key: _floatingButtonKey,
-                              onPressed: createDish,
+                              onPressed: () async {
+                                await loadSerial();
+                                createDish();
+                              },
                               style: ElevatedButton.styleFrom(
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(

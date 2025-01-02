@@ -15,7 +15,6 @@ import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/names.dart';
 import 'package:recipe/models/br_database.dart';
-import 'package:recipe/models/crazy_switch.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/list_view/dish_tile.dart';
@@ -73,16 +72,16 @@ class _smalldishesListState extends State<smalldishesList> {
     SelectedListItem(name: 'Oldest', value: 'Oldest'),
   ];
   List<Color> colorList = [
-    const Color.fromARGB(255, 255, 185, 35), // #F9A825
-    const Color.fromARGB(255, 102, 187, 106), // #66BB6A
-    const Color.fromARGB(255, 183, 28, 28), // #B71C1C
-    const Color.fromARGB(255, 141, 110, 99), // #8D6E63
-    const Color.fromARGB(255, 255, 128, 171), // #FF80AB
-    const Color.fromARGB(255, 255, 112, 67), // #FF7043
-    const Color.fromARGB(255, 195, 176, 153), // #C3B099
-    const Color.fromARGB(255, 79, 195, 247), // #4FC3F7
-    const Color.fromARGB(255, 104, 159, 56), // #689F38
-    const Color.fromARGB(255, 179, 157, 219), // #B39DDB
+    Colors.orange.shade400,
+    Colors.green.shade400,
+    Colors.red.shade400,
+    Colors.lime.shade400,
+    Colors.red.shade200,
+    Colors.deepOrange.shade500,
+    Colors.yellow.shade900,
+    Colors.blue.shade300,
+    Colors.green.shade700,
+    Colors.deepPurple.shade300,
   ];
 
   void _onSortChanged(List<dynamic> selectedList) {
@@ -116,7 +115,6 @@ class _smalldishesListState extends State<smalldishesList> {
       });
     });
     readDishes(widget.type!);
-    loadSerial();
     _speech = stt.SpeechToText();
   }
 
@@ -1334,21 +1332,20 @@ class _smalldishesListState extends State<smalldishesList> {
                                         ),
                                       ],
                                     ),
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 5.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          //Text(dropdownValue),
-                                          Text(
-                                            "Sort By",
-                                            style: GoogleFonts.poppins(
-                                                fontWeight: FontWeight.bold),
-                                          ),
-                                          Icon(Icons.arrow_drop_down, size: 30),
-                                        ],
-                                      ),
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        //Text(dropdownValue),
+                                        Text(
+                                          "Sort By",
+                                          style: GoogleFonts.poppins(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: screenWidth * 0.03),
+                                        ),
+                                        const Icon(Icons.arrow_drop_down,
+                                            size: 30),
+                                      ],
                                     ),
                                   ),
                                 ),
@@ -1363,7 +1360,10 @@ class _smalldishesListState extends State<smalldishesList> {
                                       0.2, // Set the width of the button
                                   child: ElevatedButton(
                                       key: _floatingButtonKey,
-                                      onPressed: createDish,
+                                      onPressed: () async{
+                                        await loadSerial();
+                                        createDish();
+                                      },
                                       style: ElevatedButton.styleFrom(
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
@@ -1378,7 +1378,8 @@ class _smalldishesListState extends State<smalldishesList> {
                                       child: Text(
                                         "Add Dishes",
                                         style: GoogleFonts.poppins(
-                                            fontWeight: FontWeight.bold),
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: screenWidth * 0.03),
                                       )),
                                 )
                               ],
