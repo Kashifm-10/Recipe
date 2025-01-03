@@ -124,6 +124,18 @@ flutter:
     - assets/icons/steak_icon.svg
     - assets/icons/no_items.png
     - assets/icons/no_recipe.png
+    - assets/icons/all.png
+    - assets/icons/breakfast.png
+    - assets/icons/gravy.png
+    - assets/icons/lunch.png
+    - assets/icons/dinner.png
+    - assets/icons/starters.png
+    - assets/icons/snacks.png
+    - assets/icons/sweets.png
+    - assets/icons/others.png
+    - assets/icons/beverages.png
+    - assets/icons/salads.png
+    - assets/icons/ingredients.png
     - assets/lottie_json/mail_sent.json
     - assets/lottie_json/nothing.json
     - assets/lottie_json/norecipe.json

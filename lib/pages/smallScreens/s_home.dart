@@ -288,13 +288,25 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
     Colors.orange.shade400,
     Colors.green.shade400,
     Colors.red.shade400,
-    Colors.lime.shade100,
+    Colors.brown.shade500,
     Colors.red.shade200,
     Colors.deepOrange.shade500,
     Colors.yellow.shade900,
     Colors.blue.shade300,
     Colors.green.shade700,
     Colors.deepPurple.shade300,
+  ];
+  List<String> homeIcons = [
+    'assets/icons/breakfast.png',
+    'assets/icons/lunch.png',
+    'assets/icons/dinner.png',
+    'assets/icons/gravy.png',
+    'assets/icons/sweets.png',
+    'assets/icons/starters.png',
+    'assets/icons/snacks.png',
+    'assets/icons/beverages.png',
+    'assets/icons/salads.png',
+    'assets/icons/others.png',
   ];
   @override
   void initState() {
@@ -420,7 +432,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Color allColor = Colors.teal.shade600;
+    Color allColor = Colors.teal;
     double screenHeight = MediaQuery.of(context).size.height;
     double screenWidth = MediaQuery.of(context).size.width;
     bool _isEditing = false;
@@ -529,18 +541,18 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                   return const Center(child: Text(''));
                 } else {
                   return Padding(
-                    padding: EdgeInsets.symmetric(vertical: screenHeight * 0.07),
+                    padding:
+                        EdgeInsets.symmetric(vertical: screenHeight * 0.07),
                     child: Column(
                       children: [
                         // Title
                         Padding(
-                          padding: EdgeInsets.only(top: 0.0),
-                          child: Image.asset(
-                      'assets/images/banner.png',
-                      width: screenWidth * 0.4,
-                    )
-                        ),
-                         SizedBox(
+                            padding: EdgeInsets.only(top: 0.0),
+                            child: Image.asset(
+                              'assets/images/banner.png',
+                              width: screenWidth * 0.4,
+                            )),
+                        SizedBox(
                           height: screenHeight * 0.03,
                         ),
                         // Search Bar
@@ -625,8 +637,14 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                     padding: const EdgeInsets.only(
                                         bottom: 5.0, left: 10.0, right: 10.0),
                                     child: ListTile(
-                                      leading: const Icon(Icons.fastfood,
-                                          color: Colors.orange, size: 30),
+                                      leading: /* const Icon(Icons.fastfood,
+                                          color: Colors.orange, size: 30), */
+                                          Padding(
+                                        padding:
+                                            EdgeInsets.all(screenWidth * 0.0),
+                                        child: Image.asset(homeIcons[
+                                            int.parse(suggestion.type!) - 1]),
+                                      ),
                                       title: Text(
                                         suggestion.name,
                                         style: GoogleFonts.poppins(
@@ -671,11 +689,11 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                           ),
                                         ],
                                       ),
-                                      tileColor: Colors.white,
+                                      tileColor: Colors.transparent,
                                       shape: RoundedRectangleBorder(
                                         borderRadius: BorderRadius.circular(10),
                                         side: const BorderSide(
-                                            color: Colors.white),
+                                            color: Colors.transparent),
                                       ),
                                       trailing: CircleAvatar(
                                         radius: 10,
@@ -820,10 +838,16 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                                   color: Colors.white
                                                       .withOpacity(0.8),
                                                 ),
-                                                child: Icon(
+                                                child: /* Icon(
                                                   cardIcon,
                                                   size: iconSize,
                                                   color: Colors.teal.shade600,
+                                                ), */
+                                                    Padding(
+                                                  padding: EdgeInsets.all(
+                                                      screenWidth * 0.01),
+                                                  child: Image.asset(
+                                                      'assets/icons/ingredients.png'),
                                                 ),
                                               ),
                                             ),
@@ -957,6 +981,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                   type: categories[i]['type'],
                   veg: typeCategoryCountList[i]['category0']!,
                   non_veg: typeCategoryCountList[i]['category1']!,
+                  homeIcons: homeIcons[i],
                 ),
               ),
               SizedBox(width: MediaQuery.of(context).size.width * 0.02),
@@ -965,12 +990,15 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                 Expanded(
                   child: EditableCategoryCard(
                     initialIcon: categories[i + 1]['icon'],
-                    color: categories[i + 1]
-                        ['color'], // Pass Color object directly
+                    color: colorList[i +
+                        1] /* categories[i + 1]
+                        ['color'] */
+                    , // Pass Color object directly
                     initialLabel: categories[i + 1]['label'],
                     type: categories[i + 1]['type'],
                     veg: typeCategoryCountList[i + 1]['category0']!,
                     non_veg: typeCategoryCountList[i + 1]['category1']!,
+                    homeIcons: homeIcons[i + 1],
                   ),
                 )
               else
@@ -992,6 +1020,7 @@ class EditableCategoryCard extends StatefulWidget {
   final String type;
   final int veg;
   final int non_veg;
+  final String homeIcons;
 
   EditableCategoryCard({
     required this.initialIcon,
@@ -1000,6 +1029,7 @@ class EditableCategoryCard extends StatefulWidget {
     required this.type,
     required this.veg,
     required this.non_veg,
+    required this.homeIcons,
     Key? key,
   }) : super(key: key);
 
@@ -1577,11 +1607,15 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                           shape: BoxShape.circle,
                           color: Colors.white.withOpacity(0.8),
                         ),
-                        child: Icon(
+                        child: /* Icon(
                           _currentIcon,
                           size: screenWidth *
                               0.05, // Adjusted icon size for horizontal layout
                           color: Color(widget.color.value),
+                        ), */
+                            Padding(
+                          padding: EdgeInsets.all(screenWidth * 0.01),
+                          child: Image.asset(widget.homeIcons),
                         ),
                       ),
                     ),

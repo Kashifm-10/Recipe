@@ -822,6 +822,14 @@ class _dishesListState extends State<dishesList> {
             ? iconColorBuilder(value!)
             : Colors.grey, // Adjust color
       );
+    } else if (icon is String && icon == 'all') {
+      // Show SVG if icon is a string that indicates SVG
+      return Image.asset(
+        'assets/icons/all.png', // Path to custom SVG
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: 25.0,
+        color: _currentIndex == value ? null : Colors.grey, // Adjust color
+      );
     } else if (icon is IconData) {
       // Default: Show IconData if it's an IconData instance
       return Icon(
@@ -843,7 +851,8 @@ class _dishesListState extends State<dishesList> {
   dynamic iconDataByValue(int? value) {
     switch (value) {
       case 0:
-        return FontAwesomeIcons.bowlRice; // Default FontAwesome icon
+        // return FontAwesomeIcons.bowlRice; // Default FontAwesome icon
+        return 'all';
       case 1:
         return 'svg_meat'; // Special case for SVG meat icon
       case 2:

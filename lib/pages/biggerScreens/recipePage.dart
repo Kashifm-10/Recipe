@@ -1706,7 +1706,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             ),
             textStyle: GoogleFonts.poppins(fontSize: 16),
           ),
-          child: const Text('Update'),
+          child: const Text('Create'),
         ),
       ],
     ),

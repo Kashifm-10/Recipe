@@ -281,6 +281,18 @@ class _MyHomePageState extends State<MyHomePage> {
     Colors.green.shade700,
     Colors.deepPurple.shade300,
   ];
+  List<String> homeIcons = [
+    'assets/icons/breakfast.png',
+    'assets/icons/lunch.png',
+    'assets/icons/dinner.png',
+    'assets/icons/gravy.png',
+    'assets/icons/sweets.png',
+    'assets/icons/starters.png',
+    'assets/icons/snacks.png',
+    'assets/icons/beverages.png',
+    'assets/icons/salads.png',
+    'assets/icons/others.png',
+  ];
 
   @override
   void initState() {
@@ -522,8 +534,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     children: [
                       // Title
                       Padding(
-                          padding: EdgeInsets.only(top: screenHeight * 0.1),
-                          child: /* Text(
+                        padding: EdgeInsets.only(top: screenHeight * 0.1),
+                        child: /* Text(
                           "Categories",
                           style: GoogleFonts.poppins(
                             fontSize: screenWidth < 600 ? 24 : 60,
@@ -532,10 +544,11 @@ class _MyHomePageState extends State<MyHomePage> {
                           ),
                           textAlign: TextAlign.center,
                         ), */
-                              Image.asset(
-                            'assets/images/banner.png',
-                            width: screenWidth * 0.35,
-                          ),),
+                            Image.asset(
+                          'assets/images/banner.png',
+                          width: screenWidth * 0.35,
+                        ),
+                      ),
                       SizedBox(
                         height: screenHeight * 0.03,
                       ),
@@ -624,8 +637,14 @@ class _MyHomePageState extends State<MyHomePage> {
                                   padding: const EdgeInsets.only(
                                       bottom: 5.0, left: 10.0, right: 10.0),
                                   child: ListTile(
-                                    leading: const Icon(Icons.fastfood,
-                                        color: Colors.orange, size: 30),
+                                    leading: /* const Icon(Icons.fastfood,
+                                        color: Colors.orange, size: 30), */
+                                        Padding(
+                                      padding:
+                                          EdgeInsets.all(screenWidth * 0.0),
+                                      child: Image.asset(homeIcons[
+                                          int.parse(suggestion.type!)-1]),
+                                    ),
                                     title: Text(
                                       suggestion.name,
                                       style: GoogleFonts.poppins(
@@ -670,11 +689,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                         ),
                                       ],
                                     ),
-                                    tileColor: Colors.white,
+                                    tileColor: Colors.transparent,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
                                       side:
-                                          const BorderSide(color: Colors.white),
+                                          const BorderSide(color: Colors.transparent),
                                     ),
                                     trailing: CircleAvatar(
                                       radius: 10,
@@ -786,10 +805,16 @@ class _MyHomePageState extends State<MyHomePage> {
                                                 color: Colors.white
                                                     .withOpacity(0.8),
                                               ),
-                                              child: Icon(
+                                              child: /* Icon(
                                                 cardIcon,
                                                 size: iconSize,
                                                 color: Colors.teal.shade600,
+                                              ), */
+                                                  Padding(
+                                                padding: EdgeInsets.all(
+                                                    screenWidth * 0.01),
+                                                child: Image.asset(
+                                                    'assets/icons/ingredients.png'),
                                               ),
                                             ),
                                           ),
@@ -917,6 +942,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   type: categories[i]['type'],
                   veg: typeCategoryCountList[i]['category0']!,
                   non_veg: typeCategoryCountList[i]['category1']!,
+                  homeIcons: homeIcons[i],
                 ),
               ),
               SizedBox(width: MediaQuery.of(context).size.width * 0.02),
@@ -925,12 +951,12 @@ class _MyHomePageState extends State<MyHomePage> {
                 Expanded(
                   child: EditableCategoryCard(
                     initialIcon: categories[i + 1]['icon'],
-                    color: categories[i + 1]
-                        ['color'], // Pass Color object directly
+                    color: colorList[i + 1], // Pass Color object directly
                     initialLabel: categories[i + 1]['label'],
                     type: categories[i + 1]['type'],
                     veg: typeCategoryCountList[i + 1]['category0']!,
                     non_veg: typeCategoryCountList[i + 1]['category1']!,
+                    homeIcons: homeIcons[i + 1],
                   ),
                 )
               else
@@ -952,6 +978,7 @@ class EditableCategoryCard extends StatefulWidget {
   final String type;
   final int veg;
   final int non_veg;
+  final String homeIcons;
 
   EditableCategoryCard({
     required this.initialIcon,
@@ -960,6 +987,7 @@ class EditableCategoryCard extends StatefulWidget {
     required this.type,
     required this.veg,
     required this.non_veg,
+    required this.homeIcons,
     Key? key,
   }) : super(key: key);
 
@@ -1549,10 +1577,14 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                           shape: BoxShape.circle,
                           color: Colors.white.withOpacity(0.8),
                         ),
-                        child: Icon(
+                        child: /* Icon(
                           _currentIcon,
                           size: 32, // Adjusted icon size for horizontal layout
                           color: Color(widget.color.value),
+                        ), */
+                            Padding(
+                          padding: EdgeInsets.all(screenWidth * 0.01),
+                          child: Image.asset(widget.homeIcons),
                         ),
                       ),
                     ),

@@ -75,7 +75,7 @@ class _smalldishesListState extends State<smalldishesList> {
     Colors.orange.shade400,
     Colors.green.shade400,
     Colors.red.shade400,
-    Colors.lime.shade400,
+    Colors.brown.shade500,
     Colors.red.shade200,
     Colors.deepOrange.shade500,
     Colors.yellow.shade900,
@@ -825,6 +825,16 @@ class _smalldishesListState extends State<smalldishesList> {
             ? iconColorBuilder(value!)
             : Colors.grey, // Adjust color
       );
+    } else if (icon is String && icon == 'all') {
+      // Show SVG if icon is a string that indicates SVG
+      return Image.asset(
+        'assets/icons/all.png', // Path to custom SVG
+        width: MediaQuery.of(context).size.width * 0.04,
+        height: 25.0,
+        color: _currentIndex == value
+            ? null
+            : Colors.grey, // Adjust color
+      );
     } else if (icon is IconData) {
       // Default: Show IconData if it's an IconData instance
       return Icon(
@@ -846,7 +856,9 @@ class _smalldishesListState extends State<smalldishesList> {
   dynamic iconDataByValue(int? value) {
     switch (value) {
       case 0:
-        return FontAwesomeIcons.bowlRice; // Default FontAwesome icon
+/*         return FontAwesomeIcons.bowlRice; // Default FontAwesome icon
+ */
+        return 'all';
       case 1:
         return 'svg_meat'; // Special case for SVG meat icon
       case 2:
@@ -1094,34 +1106,41 @@ class _smalldishesListState extends State<smalldishesList> {
                               ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      _isSearchVisible
-                                          ? Icons.arrow_back
-                                          : Icons.search,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.05,
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isSearchVisible = !_isSearchVisible;
+                                  Padding(
+                                    padding: EdgeInsets.all(
+                                        MediaQuery.of(context).size.width *
+                                            0.001),
+                                    child: IconButton(
+                                      icon: Icon(
+                                        _isSearchVisible
+                                            ? Icons.arrow_back
+                                            : Icons.search,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.05,
+                                      ),
+                                      onPressed: () {
+                                        setState(() {
+                                          _isSearchVisible = !_isSearchVisible;
 
-                                        if (!_isSearchVisible) {
-                                          _searchController.clear();
-                                          searchQuery = '';
-                                          _filterAndSortNotes();
-                                        }
-                                      });
-
-                                      if (_isSearchVisible) {
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback((_) {
-                                          FocusScope.of(context)
-                                              .requestFocus(_focusNode);
+                                          if (!_isSearchVisible) {
+                                            _searchController.clear();
+                                            searchQuery = '';
+                                            _filterAndSortNotes();
+                                          }
                                         });
-                                      }
-                                    },
+
+                                        if (_isSearchVisible) {
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            FocusScope.of(context)
+                                                .requestFocus(_focusNode);
+                                          });
+                                        }
+                                      },
+                                    ),
                                   ),
                                 ],
                               ),
@@ -1141,13 +1160,29 @@ class _smalldishesListState extends State<smalldishesList> {
                                         height:
                                             MediaQuery.of(context).size.height *
                                                 0.035,
-                                        decoration: const BoxDecoration(
+                                        decoration: BoxDecoration(
                                           color: Colors.white,
                                           borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(15.0),
-                                            bottomRight: Radius.circular(15.0),
-                                            topLeft: Radius.circular(15.0),
-                                            bottomLeft: Radius.circular(15.0),
+                                            topRight: Radius.circular(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
+                                            bottomRight: Radius.circular(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
+                                            topLeft: Radius.circular(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
+                                            bottomLeft: Radius.circular(
+                                                MediaQuery.of(context)
+                                                        .size
+                                                        .width *
+                                                    0.03),
                                           ),
                                           boxShadow: [
                                             BoxShadow(
@@ -1261,7 +1296,9 @@ class _smalldishesListState extends State<smalldishesList> {
                                   iconAnimationType: AnimationType.onHover,
                                   style: ToggleStyle(
                                     borderColor: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(15.0),
+                                    borderRadius: BorderRadius.circular(
+                                        MediaQuery.of(context).size.width *
+                                            0.03),
                                     boxShadow: [
                                       const BoxShadow(
                                         color: Colors.black26,
@@ -1322,7 +1359,9 @@ class _smalldishesListState extends State<smalldishesList> {
                                     height: MediaQuery.of(context).size.height *
                                         0.035,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15.0),
+                                      borderRadius: BorderRadius.circular(
+                                          MediaQuery.of(context).size.width *
+                                              0.03),
                                       color: Colors.white,
                                       boxShadow: [
                                         BoxShadow(
@@ -1360,14 +1399,17 @@ class _smalldishesListState extends State<smalldishesList> {
                                       0.2, // Set the width of the button
                                   child: ElevatedButton(
                                       key: _floatingButtonKey,
-                                      onPressed: () async{
+                                      onPressed: () async {
                                         await loadSerial();
                                         createDish();
                                       },
                                       style: ElevatedButton.styleFrom(
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
-                                              15.0), // Adjust the corner radius if needed
+                                              MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.03), // Adjust the corner radius if needed
                                         ),
                                         backgroundColor: Colors.white,
                                         foregroundColor: Colors.black,
