@@ -443,6 +443,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
     final double cardWidth = screenWidth * 0.05;
     final double cardHeight = screenHeight * 0.08;
     final double iconSize = screenWidth * 0.07;
+    countDishes();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -579,7 +580,6 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                 suffixIcon: Stack(
                                   alignment: Alignment.centerRight,
                                   children: [
-                                    // Microphone Icon Button
                                     Positioned(
                                       right: 3.0,
                                       child: IconButton(
@@ -593,12 +593,11 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                         },
                                       ),
                                     ),
-                                    // Close Button
                                     Padding(
                                       padding: EdgeInsets.only(
                                           right: screenWidth * 0.08,
                                           top: screenHeight * 0.002),
-                                      child: IconButton(
+                                      child: _focusNode.hasFocus? IconButton(
                                         onPressed: !_isListening
                                             ? _startListening
                                             : _stopListening,
@@ -609,8 +608,8 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                           color: _isListening
                                               ? Colors.red
                                               : Colors.grey,
-                                        ),
-                                      ),
+                                        ), 
+                                      ): null,
                                     ),
                                   ],
                                 ),
@@ -1671,7 +1670,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                           ),
                                         ),
                                         Text(
-                                          widget.non_veg
+                                          widget.veg
                                               .toString(), // Placeholder text
                                           style: GoogleFonts.poppins(
                                             fontSize: screenWidth * 0.02,
@@ -1690,7 +1689,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                           ),
                                         ),
                                         Text(
-                                          widget.veg
+                                          widget.non_veg
                                               .toString(), // Placeholder text
                                           style: GoogleFonts.poppins(
                                             fontSize: screenWidth * 0.02,

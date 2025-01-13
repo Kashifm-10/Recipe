@@ -32,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await Supabase.instance.client
           .from('users')
-          .select('email, password, name')
+          .select('email, password, name, access')
           .eq('email', _emailController.text.toLowerCase())
           .eq('password', _passwordController.text);
 
@@ -41,10 +41,12 @@ class _LoginScreenState extends State<LoginScreen> {
       if (data.isNotEmpty) {
         String email = data.first['email'];
         String username = data.first['name'];
+        String access = data.first['access'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', email);
         await prefs.setString('name', username);
+        await prefs.setString('access', access);
         await prefs.setBool("isLoggedIn", true);
 
         Navigator.pushReplacement(

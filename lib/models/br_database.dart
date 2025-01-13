@@ -284,9 +284,19 @@ class database extends ChangeNotifier {
 
   Future<void> fetchDishes(String type) async {
     final prefs = await SharedPreferences.getInstance();
+    String? access = prefs.getString('access');
     String? mail = prefs.getString('email');
-    final response =
-        await Supabase.instance.client.from('dishes').select().eq('type', type);
+
+    final response = access == 'false'
+        ? await Supabase.instance.client
+            .from('dishes')
+            .select()
+            .eq('type', type)
+            .eq('mail', mail!)
+        : await Supabase.instance.client
+            .from('dishes')
+            .select()
+            .eq('type', type);
     //S .eq('mail', mail!);
     final data = List<Map<String, dynamic>>.from(response);
 

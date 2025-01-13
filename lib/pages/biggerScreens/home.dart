@@ -597,11 +597,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                         right: 35.0,
                                         top:
                                             1), // Adjust this padding as needed
-                                    child: IconButton(
+                                    child:  _focusNode.hasFocus? IconButton(
                                       onPressed: !_isListening
                                           ? _startListening
                                           : _stopListening, // Start or stop voice search
-                                      icon: Icon(
+                                      icon:Icon(
                                         _isListening
                                             ? Icons.mic
                                             : Icons
@@ -610,7 +610,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                             ? Colors.red
                                             : Colors.grey,
                                       ),
-                                    ),
+                                    ):null,
                                   ),
                                 ],
                               ),
@@ -1640,7 +1640,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                           ),
                                         ),
                                         Text(
-                                          widget.non_veg
+                                          widget.veg
                                               .toString(), // Placeholder text
                                           style: GoogleFonts.poppins(
                                             fontSize: 10,
@@ -1659,7 +1659,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                           ),
                                         ),
                                         Text(
-                                          widget.veg
+                                          widget.non_veg
                                               .toString(), // Placeholder text
                                           style: GoogleFonts.poppins(
                                             fontSize: 10,

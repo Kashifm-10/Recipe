@@ -67,16 +67,19 @@ class AuthService {
       // Check if the email is already registered in Supabase
       final response = await Supabase.instance.client
           .from('users')
-          .select('email') // Only check for the email field
+          .select('email, access') // Only check for the email field
           .eq('email', userEmail);
 
       // Convert the response to a list of maps
       final data = List<Map<String, dynamic>>.from(response);
+      String access = data.first['access'];
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('access', access);
       await prefs.setBool("isLoggedIn", true);
 
       if (data.isEmpty) {
-        String password = await generateRandomPassword();
+        String password = generateRandomPassword();
         // Email is not taken, proceed with registration
         try {
           final userResponse =
@@ -96,14 +99,14 @@ class AuthService {
           await prefs.setString('user_name', userName);
 
           // Optionally navigate to home screen
-         Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MediaQuery.of(context).size.width > 600
-                  ? const MyHomePage()
-                  : const MySmallHomePage()),
-          (Route<dynamic> route) => false,
-        );
+          Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(
+                builder: (context) => MediaQuery.of(context).size.width > 600
+                    ? const MyHomePage()
+                    : const MySmallHomePage()),
+            (Route<dynamic> route) => false,
+          );
         } catch (e) {
           print('Error: $e');
           ScaffoldMessenger.of(context).showSnackBar(
@@ -112,14 +115,14 @@ class AuthService {
         }
       }
       // Navigate to a new page after successful login
-     Navigator.pushAndRemoveUntil(
-          context,
-          MaterialPageRoute(
-              builder: (context) => MediaQuery.of(context).size.width > 600
-                  ? const MyHomePage()
-                  : const MySmallHomePage()),
-          (Route<dynamic> route) => false,
-        );
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+            builder: (context) => MediaQuery.of(context).size.width > 600
+                ? const MyHomePage()
+                : const MySmallHomePage()),
+        (Route<dynamic> route) => false,
+      );
     } catch (e) {
       print("Google sign-in error: $e");
       ScaffoldMessenger.of(context).showSnackBar(
