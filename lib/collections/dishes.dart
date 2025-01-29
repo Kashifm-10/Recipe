@@ -1,6 +1,6 @@
 import 'package:isar/isar.dart';
 
-part 'names.g.dart'; // Ensure this matches the generated file name
+part 'dishes.g.dart'; // Ensure this matches the generated file name
 
 @Collection()
 class Dish {
@@ -13,10 +13,11 @@ class Dish {
   String? category;
   String? time;
   String? date;
+  String? imageUrl;
 
   Dish({
     required this.name, this.serial,
-    this.type, this.duration, this.category, this.time,this.date
+    this.type, this.duration, this.category, this.time,this.date, this.imageUrl
   });
 
 }

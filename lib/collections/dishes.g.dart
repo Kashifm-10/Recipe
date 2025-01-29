@@ -1,6 +1,6 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'names.dart';
+part of 'dishes.dart';
 
 // **************************************************************************
 // IsarCollectionGenerator

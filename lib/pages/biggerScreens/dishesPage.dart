@@ -1,3 +1,5 @@
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:drop_down_list/model/selected_list_item.dart';
@@ -13,7 +15,7 @@ import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
@@ -30,6 +32,9 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'dart:async'; // For using Timer
 import 'package:drop_down_list/drop_down_list.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
+import 'package:crypto/crypto.dart';
 
 class dishesList extends StatefulWidget {
   dishesList({super.key, required this.type, required this.title});
@@ -48,6 +53,11 @@ class _dishesListState extends State<dishesList> {
   List<Title> currentTitles = [];
   late SharedPreferences prefs;
   bool positive = false;
+
+  File? _image;
+  final picker = ImagePicker();
+  String? _uploadedImageUrl;
+  String? _publicId; // To store the public_id for deletion
 
   String dropdownValue = 'A-Z'; // Class-level variable
   int? serial = 0;
@@ -178,6 +188,92 @@ class _dishesListState extends State<dishesList> {
             1); // Specify the unique identifier (replace '1' with the actual row id)
   }
 
+  void showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.05,
+            width: MediaQuery.of(context).size.width * 0.07,
+            decoration: BoxDecoration(
+              color: colorList[int.parse(widget.type!) -
+                  1], // Set the background color to orange
+              borderRadius: BorderRadius.circular(15), // Match dialog shape
+            ),
+            padding: const EdgeInsets.all(0.0),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Creating",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Set text color to white
+                  ),
+                ),
+                SizedBox(width: 16),
+                CircularProgressIndicator(
+                  strokeWidth: 5,
+                  color: Colors.white, // Set progress indicator color to white
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void showUpdatingingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+          child: Container(
+            height: MediaQuery.of(context).size.height * 0.05,
+            width: MediaQuery.of(context).size.width * 0.07,
+            decoration: BoxDecoration(
+              color: colorList[int.parse(widget.type!) -
+                  1], // Set the background color to orange
+              borderRadius: BorderRadius.circular(15), // Match dialog shape
+            ),
+            padding: const EdgeInsets.all(0.0),
+            child: const Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Updating",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white, // Set text color to white
+                  ),
+                ),
+                SizedBox(width: 16),
+                CircularProgressIndicator(
+                  strokeWidth: 5,
+                  color: Colors.white, // Set progress indicator color to white
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
   //function to create a note
   void createDish() {
     const red = Color(0xFFFD0821);
@@ -240,7 +336,7 @@ class _dishesListState extends State<dishesList> {
                               color: Colors.white, shape: BoxShape.circle),
                           child: Center(
                             child: category == '0'
-                                ? Icon(Icons.eco,
+                                ? const Icon(Icons.eco,
                                     size: 20.0, color: Colors.green)
                                 : SvgPicture.asset(
                                     'assets/icons/steak_icon.svg',
@@ -357,6 +453,49 @@ class _dishesListState extends State<dishesList> {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.03,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.gallery),
+                        icon: const Icon(Icons.photo, color: Colors.white),
+                        label: const Text('Pick from Gallery',
+                            style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              colorList[int.parse(widget.type!) - 1],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 12.0),
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.camera),
+                        icon: const Icon(
+                          Icons.camera,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'Take a Picture',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              colorList[int.parse(widget.type!) - 1],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 12.0),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -372,13 +511,16 @@ class _dishesListState extends State<dishesList> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  showLoadingDialog(context);
                   setState(() {
                     // Check if the text field is empty
                     isTextFieldEmpty = textController.text.isEmpty;
                   });
 
                   if (!isTextFieldEmpty) {
+                    await _uploadImage(serial.toString());
+
                     serial;
                     int incrementedSerial = (serial! + 1);
                     saveSerial(incrementedSerial);
@@ -390,19 +532,21 @@ class _dishesListState extends State<dishesList> {
                         '${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
                     context.read<database>().addDish(
-                          serial.toString(),
-                          textController.text,
-                          widget.type!,
-                          selectedDurationHours.toStringAsFixed(1),
-                          category,
-                          date,
-                          time,
-                        );
+                        serial.toString(),
+                        textController.text,
+                        widget.type!,
+                        selectedDurationHours.toStringAsFixed(1),
+                        category,
+                        date,
+                        time,
+                        _uploadedImageUrl ?? ' ');
 
                     duration = selectedDurationHours.toStringAsFixed(1);
                     Navigator.pop(context);
+                    _uploadedImageUrl=' ';
                     textController.clear();
                   }
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorList[int.parse(widget.type!) - 1],
@@ -443,6 +587,8 @@ class _dishesListState extends State<dishesList> {
     textController.text = name.name;
     int dishId = data.isNotEmpty ? data[0]['id'] : 0; // Ensure a default value
     String category = name.category!; // Default value
+    String serial = name.serial!;
+    String url = name.imageUrl?? ' ';
     String selectedDurationHours = name.duration!; // Default duration
     bool isTextFieldEmpty = false; // Flag for empty text field error message
 
@@ -482,6 +628,7 @@ class _dishesListState extends State<dishesList> {
                             actions: [
                               TextButton(
                                 onPressed: () {
+                                  _deleteImage(serial);
                                   deleteNote(name.id, widget.type!, name.name);
                                   Navigator.pop(
                                       context); // Close confirmation dialog
@@ -500,7 +647,8 @@ class _dishesListState extends State<dishesList> {
                           ),
                         );
                       },
-                      icon: Icon(Icons.delete, color: Colors.red, size: 25),
+                      icon:
+                          const Icon(Icons.delete, color: Colors.red, size: 25),
                     ),
                   ],
                 ),
@@ -538,7 +686,7 @@ class _dishesListState extends State<dishesList> {
                           ),
                           child: Center(
                             child: category == '0' // 'Veg'
-                                ? Icon(
+                                ? const Icon(
                                     Icons.eco,
                                     size: 20.0,
                                     color: Colors.green,
@@ -664,6 +812,49 @@ class _dishesListState extends State<dishesList> {
                       ),
                     ],
                   ),
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.03,
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.gallery),
+                        icon: const Icon(Icons.photo, color: Colors.white),
+                        label: const Text('Pick from Gallery',
+                            style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              colorList[int.parse(widget.type!) - 1],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 12.0),
+                        ),
+                      ),
+                      ElevatedButton.icon(
+                        onPressed: () => _pickImage(ImageSource.camera),
+                        icon: const Icon(
+                          Icons.camera,
+                          color: Colors.white,
+                        ),
+                        label: const Text(
+                          'Take a Picture',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:
+                              colorList[int.parse(widget.type!) - 1],
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12.0),
+                          ),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 20.0, vertical: 12.0),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
@@ -681,12 +872,15 @@ class _dishesListState extends State<dishesList> {
               ),
               // Update Button
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
+                  showUpdatingingDialog(context);
                   setState(() {
                     // Check if the text field is empty
                     isTextFieldEmpty = textController.text.isEmpty;
                   });
                   if (textController.text.isNotEmpty) {
+                    await isImageUrlValid(serial);
+
                     final now = DateTime.now();
                     final date =
                         '${now.year}-${now.month.toString().padLeft(2, '0')}-${now.day.toString().padLeft(2, '0')}';
@@ -695,18 +889,19 @@ class _dishesListState extends State<dishesList> {
 
                     // Update dish information
                     context.read<database>().updateDish(
-                          dishId, // Dish ID to update
-                          textController.text,
-                          widget.type!,
-                          selectedDurationHours,
-                          category,
-                          date,
-                          time,
-                        );
-
+                        dishId, // Dish ID to update
+                        textController.text,
+                        widget.type!,
+                        selectedDurationHours,
+                        category,
+                        date,
+                        time,
+                        _uploadedImageUrl == null ? url : _uploadedImageUrl!);
                     Navigator.pop(context);
                     textController.clear();
+                    _uploadedImageUrl=' ';
                   }
+                  Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorList[int.parse(widget.type!) - 1],
@@ -840,7 +1035,7 @@ class _dishesListState extends State<dishesList> {
             : Colors.grey, // Adjust color
       );
     } else {
-      return Icon(
+      return const Icon(
         Icons.lightbulb_outline_rounded,
         size: 25.0,
         color: Colors.grey, // Default to grey color
@@ -975,6 +1170,244 @@ class _dishesListState extends State<dishesList> {
       prefs.setBool('tutorialShowndishes', true);
     });
   }
+
+  // Pick an image from the gallery or camera
+  Future<void> _pickImage(ImageSource source) async {
+    final pickedFile = await picker.pickImage(source: source);
+
+    if (pickedFile != null) {
+      setState(() {
+        _image = File(pickedFile.path);
+      });
+    }
+  }
+
+  Future<void> _uploadImage(String serial) async {
+    if (_image == null) return;
+
+    try {
+      // Rename the file before uploading
+      final directory = _image!.parent;
+      final renamedFile = File('${directory.path}/$serial.jpg');
+
+      if (renamedFile.existsSync()) {
+        renamedFile
+            .deleteSync(); // Avoid conflicts by deleting any existing file with the same name
+      }
+
+      _image!.copySync(renamedFile.path);
+
+      print('Before rename: ${_image!.path}');
+      print('After rename: ${renamedFile.path}');
+
+      final cloudinaryUrl =
+          'https://api.cloudinary.com/v1_1/dcrm8qosr/image/upload';
+      final preset = 'Flutter';
+
+      final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl));
+      request.fields['upload_preset'] = preset;
+      request.files
+          .add(await http.MultipartFile.fromPath('file', renamedFile.path));
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final jsonResponse = json.decode(responseBody);
+
+        setState(() {
+          _uploadedImageUrl = jsonResponse['secure_url'];
+          _publicId = jsonResponse['public_id'];
+        });
+
+        print('Image uploaded successfully: $_uploadedImageUrl');
+        print('Public ID: $_publicId');
+        _image = null;
+      } else {
+        print('Image upload failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during file renaming or uploading: $e');
+    }
+  }
+
+  Future<void> _deleteImage(String serial) async {
+    _publicId = serial;
+    if (_publicId == null) {
+      print('No image to delete.');
+      return;
+    }
+
+    try {
+      final timestamp =
+          (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
+      const cloudinarySecret =
+          'E3arq8D_VZ2sJcgbFgSvtI0jGTc'; // Replace with your Cloudinary API secret
+      final String signatureString =
+          'public_id=$_publicId&timestamp=$timestamp$cloudinarySecret';
+      final String signature =
+          sha1.convert(utf8.encode(signatureString)).toString();
+
+      const cloudinaryDeleteUrl =
+          'https://api.cloudinary.com/v1_1/dcrm8qosr/image/destroy'; // Replace with your cloud name
+
+      final response = await http.post(
+        Uri.parse(cloudinaryDeleteUrl),
+        body: {
+          'public_id': _publicId!,
+          'api_key': '647275926686889', // Replace with your Cloudinary API key
+          'timestamp': timestamp,
+          'signature': signature,
+        },
+      );
+
+      if (response.statusCode == 200) {
+        final jsonResponse = json.decode(response.body);
+        if (jsonResponse['result'] == 'ok') {
+          print('Image deleted successfully.');
+          setState(() {
+            _uploadedImageUrl = null;
+            _publicId = null;
+          });
+        } else {
+          print('Image deletion failed: ${jsonResponse['result']}');
+        }
+      } else {
+        print(
+            'Failed to delete image: ${response.statusCode} ${response.body}');
+      }
+    } catch (e) {
+      print('Error during image deletion: $e');
+    }
+  }
+
+  Future<void> isImageUrlValid(String serial) async {
+    if (_image == null) return;
+    try {
+      // Construct the URL
+      final url = Uri.parse(
+          'https://res.cloudinary.com/dcrm8qosr/image/upload/v12345/$serial.jpg');
+
+      // Send a HEAD request to check if the image exists
+      final response = await http.head(url);
+
+      // If the status code is 200, it means the image exists
+      if (response.statusCode == 200) {
+        await _deleteImage(serial);
+        await _uploadImage(serial);
+      } else {
+        await _uploadImage(serial);
+      }
+    } catch (e) {
+      print('Error checking image URL: $e');
+    }
+  }
+
+/* Future<void> _updateImage(String serial) async {
+  await isImageUrlValid(serial);
+  if (_image == null) return;
+
+  try {
+    final directory = _image!.parent;
+    final renamedFile = File('${directory.path}/$serial.jpg');
+
+    // Check if a file with the same name exists in Cloudinary
+    final cloudinaryCheckUrl =
+        'https://api.cloudinary.com/v1_1/dcrm8qosr/resources/image/upload';
+    final responseCheck = await http.get(
+      Uri.parse('$cloudinaryCheckUrl?prefix=$serial.jpg&max_results=1'),
+      headers: {
+        'Authorization': '647275926686889',
+      },
+    );
+
+    if (responseCheck.statusCode == 200) {
+      final jsonResponse = json.decode(responseCheck.body);
+      if (jsonResponse['resources'] != null && jsonResponse['resources'].isNotEmpty) {
+        // Image already exists in Cloudinary, delete it
+        final publicId = jsonResponse['resources'][0]['public_id'];
+        await _deleteImage(publicId); // Delete the existing image by its public_id
+      }
+    } else {
+      print('Error checking Cloudinary: ${responseCheck.statusCode}');
+    }
+
+    // Check if a file with the same name exists locally and delete it
+    if (renamedFile.existsSync()) {
+      renamedFile.deleteSync();
+      print('Existing local file deleted: ${renamedFile.path}');
+    }
+
+    // Copy the new image to the renamed file path
+    _image!.copySync(renamedFile.path);
+
+    print('Before rename: ${_image!.path}');
+    print('After rename: ${renamedFile.path}');
+
+    // Upload the new image to Cloudinary
+    final cloudinaryUrl =
+        'https://api.cloudinary.com/v1_1/dcrm8qosr/image/upload';
+    final preset = 'Flutter';
+
+    final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl));
+    request.fields['upload_preset'] = preset;
+    request.files.add(await http.MultipartFile.fromPath('file', renamedFile.path));
+
+    final response = await request.send();
+
+    if (response.statusCode == 200) {
+      final responseBody = await response.stream.bytesToString();
+      final jsonResponse = json.decode(responseBody);
+
+      setState(() {
+        _uploadedImageUrl = jsonResponse['secure_url'];
+        _publicId = jsonResponse['public_id']; // Store the public_id for deletion
+      });
+
+      print('Image uploaded successfully: $_uploadedImageUrl');
+      print('Public ID: $_publicId');
+    } else {
+      print('Image upload failed: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error during image update process: $e');
+  }
+} */
+
+/* Future<void> _deleteImage(String publicId) async {
+  try {
+    final timestamp = (DateTime.now().millisecondsSinceEpoch ~/ 1000).toString();
+    const cloudinarySecret = 'E3arq8D_VZ2sJcgbFgSvtI0jGTc'; // Replace with your Cloudinary API secret
+    final String signatureString = 'public_id=$publicId&timestamp=$timestamp$cloudinarySecret';
+    final String signature = sha1.convert(utf8.encode(signatureString)).toString();
+
+    const cloudinaryDeleteUrl =
+        'https://api.cloudinary.com/v1_1/dcrm8qosr/image/destroy'; // Replace with your cloud name
+
+    final response = await http.post(
+      Uri.parse(cloudinaryDeleteUrl),
+      body: {
+        'public_id': publicId,
+        'api_key': '647275926686889', // Replace with your Cloudinary API key
+        'timestamp': timestamp,
+        'signature': signature,
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = json.decode(response.body);
+      if (jsonResponse['result'] == 'ok') {
+        print('Image deleted successfully.');
+      } else {
+        print('Image deletion failed: ${jsonResponse['result']}');
+      }
+    } else {
+      print('Failed to delete image: ${response.statusCode}');
+    }
+  } catch (e) {
+    print('Error during image deletion: $e');
+  }
+} */
 
   @override
   Widget build(BuildContext context) {
@@ -1268,7 +1701,7 @@ class _dishesListState extends State<dishesList> {
                               ],
                             ),
                             child: Padding(
-                              padding: EdgeInsets.only(left: 0.0),
+                              padding: const EdgeInsets.only(left: 0.0),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -1278,7 +1711,7 @@ class _dishesListState extends State<dishesList> {
                                     style: GoogleFonts.poppins(
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  Icon(Icons.arrow_drop_down, size: 30),
+                                  const Icon(Icons.arrow_drop_down, size: 30),
                                 ],
                               ),
                             ),
@@ -1325,8 +1758,8 @@ class _dishesListState extends State<dishesList> {
               child: _isLoading
                   ? Center(
                       child: ColorFiltered(
-                        colorFilter:
-                            ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn),
                         child: Lottie.asset(
                           'assets/lottie_json/loadingspoons.json',
                           width: screenWidth * 0.3,
@@ -1402,6 +1835,7 @@ class _dishesListState extends State<dishesList> {
                                           access: true,
                                           background: colorList[
                                               int.parse(widget.type!) - 1],
+                                          imageURL: note.imageUrl,
                                         )));
                                   });
                                 },
@@ -1412,6 +1846,8 @@ class _dishesListState extends State<dishesList> {
                                   type: widget.type,
                                   text: note.name,
                                   fromType: 'no',
+                                  serial: note.serial,
+                                  imageURL: note.imageUrl,
                                   onEditPressed: () => updateDish(
                                       note, widget.type!, note.name!),
                                   onDeletePressed: () => deleteNote(

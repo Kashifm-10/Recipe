@@ -3,7 +3,7 @@ import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:recipe/collections/homeTitle.dart';
 import 'package:recipe/collections/links.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/collections/ingredients.dart';
 import 'package:recipe/collections/recipe.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -252,8 +252,15 @@ class database extends ChangeNotifier {
   final List<Recipe> recipes = [];
   final List<Dish> dishes = [];
   final List<Dish> currentNames = [];
-  Future<void> addDish(String serial, String textFromUser, String type,
-      String duration, String category, String date, String time) async {
+  Future<void> addDish(
+      String serial,
+      String textFromUser,
+      String type,
+      String duration,
+      String category,
+      String date,
+      String time,
+      String imageURL) async {
     final prefs = await SharedPreferences.getInstance();
     String? mail = prefs.getString('email');
 
@@ -274,6 +281,7 @@ class database extends ChangeNotifier {
       'date': date,
       'time': time,
       'mail': mail,
+      'imageURL': imageURL
     };
 
     final response =
@@ -283,6 +291,7 @@ class database extends ChangeNotifier {
   }
 
   Future<void> fetchDishes(String type) async {
+    currentNames.clear();
     final prefs = await SharedPreferences.getInstance();
     String? access = prefs.getString('access');
     String? mail = prefs.getString('email');
@@ -302,14 +311,14 @@ class database extends ChangeNotifier {
 
     dishes.clear();
     dishes.addAll(data.map((item) => Dish(
-          name: item['name'],
-          serial: item['serial'],
-          type: item['type'],
-          duration: item['duration'],
-          category: item['category'],
-          date: item['date'],
-          time: item['time'],
-        )));
+        name: item['name'],
+        serial: item['serial'],
+        type: item['type'],
+        duration: item['duration'],
+        category: item['category'],
+        date: item['date'],
+        time: item['time'],
+        imageUrl: item['imageURL'])));
 
     print(response);
 
@@ -327,14 +336,14 @@ class database extends ChangeNotifier {
 
     dishes.clear();
     dishes.addAll(data.map((item) => Dish(
-          name: item['name'],
-          serial: item['serial'],
-          type: item['type'],
-          duration: item['duration'],
-          category: item['category'],
-          date: item['date'],
-          time: item['time'],
-        )));
+        name: item['name'],
+        serial: item['serial'],
+        type: item['type'],
+        duration: item['duration'],
+        category: item['category'],
+        date: item['date'],
+        time: item['time'],
+        imageUrl: item['imageURL'])));
 
     print(response);
 
@@ -345,7 +354,7 @@ class database extends ChangeNotifier {
 
   //UPDATE
   Future<void> updateDish(int id, String newText, String type, String duration,
-      String category, String date, String time) async {
+      String category, String date, String time, String imageURL) async {
     // Capitalize the first letter of each word in newText
     String formattedName = newText
         .split(' ')
@@ -361,6 +370,7 @@ class database extends ChangeNotifier {
       'category': category,
       'date': date,
       'time': time,
+      'imageURL': imageURL
     };
 
     final response = await Supabase.instance.client

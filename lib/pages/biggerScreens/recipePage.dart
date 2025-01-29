@@ -6,7 +6,7 @@ import 'package:isar/isar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/links.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/collections/recipe.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/notInUse/brin_db.dart';
@@ -32,13 +32,15 @@ class recipe extends StatefulWidget {
       required this.dish,
       required this.category,
       required this.access,
-      required this.background});
+      required this.background,
+      required this.imageURL});
   String? serial;
   String? type;
   String? dish;
   String? category;
   bool? access;
   Color? background;
+  String? imageURL;
 
   @override
   State<recipe> createState() => _recipeState();
@@ -168,8 +170,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   strokeWidth: 5,
                   color: (Theme.of(context).primaryColor),
                 ),
-                SizedBox(width: 20),
-                Text("Processing..."),
+                const SizedBox(width: 20),
+                const Text("Processing..."),
               ],
             ),
           ),
@@ -383,7 +385,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       'pc',
       'cup',
       'tsp',
-'tbsp'
+      'tbsp'
     ];
 
     void clearInputs() {
@@ -490,7 +492,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                       controller: quantityController,
                                       decoration: InputDecoration(
                                         labelStyle:
-                                            TextStyle(color: Colors.black),
+                                            const TextStyle(color: Colors.black),
                                         labelText: 'Quantity',
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -531,7 +533,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                     DropdownButtonFormField<String>(
                                       decoration: InputDecoration(
                                         labelStyle:
-                                            TextStyle(color: Colors.black),
+                                            const TextStyle(color: Colors.black),
                                         labelText: 'Unit',
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -575,7 +577,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               ),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Text(
                             'Note: For quantity 1/2 enter 0.5 and for 1/4 enter 0.25',
                             style: GoogleFonts.poppins(
@@ -746,14 +748,22 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
       'nos': 'nos',
       'pcs': 'pc',
       'cups': 'cup',
-       'tsp': 'tsp',
-                            'tbsp': 'tbsp',
+      'tsp': 'tsp',
+      'tbsp': 'tbsp',
     };
 
     String? selectedUnit = unitMap[ingredient.uom] ?? ingredient.uom;
 
-    List<String> unitOptions = ['nos', 'pc', 'gm', 'kg', 'ltr', 'cup', 'tsp',
-'tbsp'];
+    List<String> unitOptions = [
+      'nos',
+      'pc',
+      'gm',
+      'kg',
+      'ltr',
+      'cup',
+      'tsp',
+      'tbsp'
+    ];
 
     await showDialog(
       context: context,
@@ -900,7 +910,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               ),
                             ],
                           ),
-                          SizedBox(height: 10),
+                          const SizedBox(height: 10),
                           Text(
                             'Note: For quantity 1/2 enter 0.5 and for 1/4 enter 0.25',
                             style: GoogleFonts.poppins(
@@ -1011,7 +1021,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     if (quantity > 1) {
                       adjustedUnit = {
                             'cup': 'cups',
-                             'tsp': 'tsp',
+                            'tsp': 'tsp',
                             'tbsp': 'tbsp',
                             'pc': 'pcs',
                             'gm': 'gms',
@@ -1267,7 +1277,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(" "),
+                const Text(" "),
                 Text(
                   'Edit Recipe',
                   style: GoogleFonts.poppins(
@@ -1442,129 +1452,128 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   }
 
   void createLink() async {
-  TextEditingController titleController = TextEditingController();
-  TextEditingController textController = TextEditingController();
+    TextEditingController titleController = TextEditingController();
+    TextEditingController textController = TextEditingController();
 
-  // Regular expression for URL validation
-  RegExp urlRegExp = RegExp(
-    r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$', // Simple URL regex
-  );
+    // Regular expression for URL validation
+    RegExp urlRegExp = RegExp(
+      r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$', // Simple URL regex
+    );
 
-  await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      title: Text(
-        'Add Link',
-        style: GoogleFonts.poppins(
-          fontWeight: FontWeight.bold,
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
-      ),
-      content: Container(
-        width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title Input
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
-                hintText: 'Enter title',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Link Input with URL validation
-            TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                labelText: 'Link',
-                hintText: 'www.youtube.com',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                errorText: textController.text.isNotEmpty &&
-                        !urlRegExp.hasMatch(textController.text)
-                    ? 'Enter a valid URL'
-                    : null, // Show error message if URL is invalid
-              ),
-            ),
-          ],
-        ),
-      ),
-      actionsPadding:
-          const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      actions: [
-        // Cancel Button
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey.shade600,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            textStyle: GoogleFonts.poppins(fontSize: 16),
+        title: Text(
+          'Add Link',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
           ),
-          child: const Text('Cancel'),
         ),
-
-        // Create Button
-        ElevatedButton(
-          onPressed: () async {
-            // Validate the URL before proceeding
-            if (textController.text.isNotEmpty &&
-                titleController.text.isNotEmpty &&
-                urlRegExp.hasMatch(textController.text)) {
-              await context.read<database>().addLink(
-                  titleController.text,
-                  textController.text,
-                  widget.serial!,
-                  widget.type!,
-                  widget.dish!); // Pass additional data
-              Navigator.pop(context);
-              readRecipe(widget.dish!, widget.type!, widget.serial!);
-              readLink(widget.serial!);
-
-              textController.clear();
-              titleController.clear();
-            } else {
-              // Optionally, show an error message for invalid input
-              if (!urlRegExp.hasMatch(textController.text)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Please enter a valid URL'),
-                    duration: Duration(seconds: 2),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title Input
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'Enter title',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                );
-              }
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: widget.background,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            textStyle: GoogleFonts.poppins(fontSize: 16),
-          ),
-          child: const Text('Create'),
-        ),
-      ],
-    ),
-  );
-}
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+              ),
+              const SizedBox(height: 16),
 
+              // Link Input with URL validation
+              TextField(
+                controller: textController,
+                decoration: InputDecoration(
+                  labelText: 'Link',
+                  hintText: 'www.youtube.com',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  errorText: textController.text.isNotEmpty &&
+                          !urlRegExp.hasMatch(textController.text)
+                      ? 'Enter a valid URL'
+                      : null, // Show error message if URL is invalid
+                ),
+              ),
+            ],
+          ),
+        ),
+        actionsPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey.shade600,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
+            ),
+            child: const Text('Cancel'),
+          ),
+
+          // Create Button
+          ElevatedButton(
+            onPressed: () async {
+              // Validate the URL before proceeding
+              if (textController.text.isNotEmpty &&
+                  titleController.text.isNotEmpty &&
+                  urlRegExp.hasMatch(textController.text)) {
+                await context.read<database>().addLink(
+                    titleController.text,
+                    textController.text,
+                    widget.serial!,
+                    widget.type!,
+                    widget.dish!); // Pass additional data
+                Navigator.pop(context);
+                readRecipe(widget.dish!, widget.type!, widget.serial!);
+                readLink(widget.serial!);
+
+                textController.clear();
+                titleController.clear();
+              } else {
+                // Optionally, show an error message for invalid input
+                if (!urlRegExp.hasMatch(textController.text)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a valid URL'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: widget.background,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
+            ),
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
 
   //read notes
   void readLink(String serial) async {
@@ -1590,129 +1599,129 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   }
 
   void newLink() async {
-  TextEditingController titleController = TextEditingController();
-  TextEditingController textController = TextEditingController();
+    TextEditingController titleController = TextEditingController();
+    TextEditingController textController = TextEditingController();
 
-  // Regular expression for URL validation
-  RegExp urlRegExp = RegExp(
-    r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$', // Simple URL regex
-  );
+    // Regular expression for URL validation
+    RegExp urlRegExp = RegExp(
+      r'^(https?|ftp):\/\/[^\s/$.?#].[^\s]*$', // Simple URL regex
+    );
 
-  await showDialog(
-    context: context,
-    builder: (context) => AlertDialog(
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
-      title: Text(
-        'New Link',
-        style: GoogleFonts.poppins(
-          fontWeight: FontWeight.bold,
+    await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
         ),
-      ),
-      content: Container(
-        width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            // Title Input
-            TextField(
-              controller: titleController,
-              decoration: InputDecoration(
-                labelText: 'Title',
-                hintText: 'Enter title',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-              ),
-            ),
-            const SizedBox(height: 16),
-
-            // Link Input with URL validation
-            TextField(
-              controller: textController,
-              decoration: InputDecoration(
-                labelText: 'Link',
-                hintText: 'www.youtube.com',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                filled: true,
-                fillColor: Colors.grey[100],
-                errorText: textController.text.isNotEmpty &&
-                        !urlRegExp.hasMatch(textController.text)
-                    ? 'Enter a valid URL'
-                    : null, // Show error message if URL is invalid
-              ),
-            ),
-          ],
-        ),
-      ),
-      actionsPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-      actions: [
-        // Cancel Button
-        TextButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          style: TextButton.styleFrom(
-            foregroundColor: Colors.grey.shade600,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            textStyle: GoogleFonts.poppins(fontSize: 16),
+        title: Text(
+          'New Link',
+          style: GoogleFonts.poppins(
+            fontWeight: FontWeight.bold,
           ),
-          child: const Text('Cancel'),
         ),
-
-        // Update Button
-        ElevatedButton(
-          onPressed: () async {
-            // Validate the URL before proceeding
-            if (textController.text.isNotEmpty &&
-                titleController.text.isNotEmpty &&
-                urlRegExp.hasMatch(textController.text)) {
-              await context.read<database>().addLink(
-                    titleController.text,
-                    textController.text,
-                    widget.serial!,
-                    widget.type!,
-                    widget.dish!,
-                  ); // Pass title and description
-              Navigator.pop(context);
-              readRecipe(widget.dish!, widget.type!, widget.serial!);
-              readLink(widget.serial!);
-
-              textController.clear();
-              titleController.clear();
-            } else {
-              // Optionally, show an error message for invalid input
-              if (!urlRegExp.hasMatch(textController.text)) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Please enter a valid URL'),
-                    duration: Duration(seconds: 2),
+        content: Container(
+          width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Title Input
+              TextField(
+                controller: titleController,
+                decoration: InputDecoration(
+                  labelText: 'Title',
+                  hintText: 'Enter title',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
                   ),
-                );
-              }
-            }
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: widget.background,
-            foregroundColor: Colors.white,
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            textStyle: GoogleFonts.poppins(fontSize: 16),
-          ),
-          child: const Text('Create'),
-        ),
-      ],
-    ),
-  );
-}
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                ),
+              ),
+              const SizedBox(height: 16),
 
+              // Link Input with URL validation
+              TextField(
+                controller: textController,
+                decoration: InputDecoration(
+                  labelText: 'Link',
+                  hintText: 'www.youtube.com',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  filled: true,
+                  fillColor: Colors.grey[100],
+                  errorText: textController.text.isNotEmpty &&
+                          !urlRegExp.hasMatch(textController.text)
+                      ? 'Enter a valid URL'
+                      : null, // Show error message if URL is invalid
+                ),
+              ),
+            ],
+          ),
+        ),
+        actionsPadding:
+            const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        actions: [
+          // Cancel Button
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+            },
+            style: TextButton.styleFrom(
+              foregroundColor: Colors.grey.shade600,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
+            ),
+            child: const Text('Cancel'),
+          ),
+
+          // Update Button
+          ElevatedButton(
+            onPressed: () async {
+              // Validate the URL before proceeding
+              if (textController.text.isNotEmpty &&
+                  titleController.text.isNotEmpty &&
+                  urlRegExp.hasMatch(textController.text)) {
+                await context.read<database>().addLink(
+                      titleController.text,
+                      textController.text,
+                      widget.serial!,
+                      widget.type!,
+                      widget.dish!,
+                    ); // Pass title and description
+                Navigator.pop(context);
+                readRecipe(widget.dish!, widget.type!, widget.serial!);
+                readLink(widget.serial!);
+
+                textController.clear();
+                titleController.clear();
+              } else {
+                // Optionally, show an error message for invalid input
+                if (!urlRegExp.hasMatch(textController.text)) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Please enter a valid URL'),
+                      duration: Duration(seconds: 2),
+                    ),
+                  );
+                }
+              }
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: widget.background,
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              textStyle: GoogleFonts.poppins(fontSize: 16),
+            ),
+            child: const Text('Create'),
+          ),
+        ],
+      ),
+    );
+  }
 
   //update note
   /* void updateLink(Recipe name) async {
@@ -1863,6 +1872,23 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     const Color.fromARGB(255, 104, 159, 56), // #689F38
     const Color.fromARGB(255, 179, 157, 219), // #B39DDB
   ];
+
+  List<String> images = [
+    'https://img.freepik.com/free-photo/breakfast-consists-bread-fried-egg-salad-dressing-black-grapes-tomatoes-sliced-a-a-onions_1150-24459.jpg?t=st=1737460645~exp=1737464245~hmac=211ae8a793b1d99d23e0892b0f71f4b0efecbc65ea11ee8131a0fc260f287918&w=1380',
+    'https://images.pexels.com/photos/25225626/pexels-photo-25225626/free-photo-of-sandwich-baked-potatoes-and-salad-on-plate.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1618913/pexels-photo-1618913.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/19834448/pexels-photo-19834448/free-photo-of-soup-and-spices.jpeg',
+    'https://images.pexels.com/photos/5602707/pexels-photo-5602707.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/3504874/pexels-photo-3504874.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/3356409/pexels-photo-3356409.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/1320998/pexels-photo-1320998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/14774693/pexels-photo-14774693.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
+    'https://images.pexels.com/photos/6660071/pexels-photo-6660071.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+  ];
+
+  
+
+ 
 
   @override
   Widget build(BuildContext context) {
@@ -2033,15 +2059,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               ),
               labelColor: Colors.white,
               unselectedLabelColor: Colors.black87,
-              indicator: UnderlineTabIndicator(
+              indicator: const UnderlineTabIndicator(
                 borderSide: BorderSide(width: 3.0, color: Colors.white),
                 insets: EdgeInsets.symmetric(horizontal: 20.0),
               ),
-              indicatorSize: TabBarIndicatorSize.tab,
+              indicatorSize: TabBarIndicatorSize.label,
               indicatorColor: Colors.white,
               overlayColor:
                   MaterialStateProperty.all(Colors.white.withOpacity(0.1)),
               splashBorderRadius: BorderRadius.circular(8),
+              dividerColor: Colors.transparent,
             ),
           ),
         ),
@@ -2051,302 +2078,378 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
           controller: _tabController,
           children: [
             // Ingredients Tab
-            SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding:
-                        const EdgeInsets.only(top: 10, right: 30.0, bottom: 10),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
-                      children: [
-                        Text(
-                          "Calculator : ",
-                          style: GoogleFonts.poppins(
-                            fontSize: MediaQuery.of(context).size.width > 600
-                                ? 20
-                                : 15,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
-                        DropdownButtonHideUnderline(
-                          child: DropdownButton2<String>(
-                            isExpanded: true,
-                            hint: Row(
+            Stack(
+              children: [
+                // Image container
+                Positioned(
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    width: screenWidth,
+                    height: screenHeight * 0.4,
+                    child: ClipRRect(
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(
+                            30.0), // Adjust the radius as needed
+                        topRight: Radius.circular(30.0),
+                      ),
+                      child: Image.network(
+                        widget.imageURL!,
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Image.network(
+                            images[int.parse(widget.type!) - 1],
+                            fit: BoxFit.cover,
+                          );
+                        },
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Expanded container with slight overlap
+                Positioned(
+                  top: screenHeight *
+                      0.25, // Adjust this value to control the overlap
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: widget.background,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.only(
+                                top: 10, right: 30.0, bottom: 10),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
                               children: [
-                                Icon(
-                                  Icons.list,
-                                  size: MediaQuery.of(context).size.width > 600
-                                      ? 16
-                                      : 8,
-                                  color: Colors.white,
+                                Text(
+                                  "Calculator : ",
+                                  style: GoogleFonts.poppins(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width > 600
+                                            ? 20
+                                            : 15,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
                                 ),
-                                SizedBox(
-                                  width: 4,
-                                ),
-                                Expanded(
-                                  child: Text(
-                                    '1',
-                                    style: GoogleFonts.poppins(
-                                      fontSize:
-                                          MediaQuery.of(context).size.width >
+                                DropdownButtonHideUnderline(
+                                  child: DropdownButton2<String>(
+                                    isExpanded: true,
+                                    hint: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.list,
+                                          size: MediaQuery.of(context)
+                                                      .size
+                                                      .width >
                                                   600
-                                              ? 14
-                                              : 10,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.black,
+                                              ? 16
+                                              : 8,
+                                          color: Colors.white,
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Expanded(
+                                          child: Text(
+                                            '1',
+                                            style: GoogleFonts.poppins(
+                                              fontSize: MediaQuery.of(context)
+                                                          .size
+                                                          .width >
+                                                      600
+                                                  ? 14
+                                                  : 10,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.black,
+                                            ),
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
                                     ),
-                                    overflow: TextOverflow.ellipsis,
+                                    items: items
+                                        .map((String item) =>
+                                            DropdownMenuItem<String>(
+                                              value: item,
+                                              child: Text(
+                                                item,
+                                                style: GoogleFonts.poppins(
+                                                  fontSize:
+                                                      MediaQuery.of(context)
+                                                                  .size
+                                                                  .width >
+                                                              600
+                                                          ? 14
+                                                          : 10,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black,
+                                                ),
+                                                overflow: TextOverflow.ellipsis,
+                                              ),
+                                            ))
+                                        .toList(),
+                                    value: selectedValue,
+                                    onChanged: (String? value) {
+                                      setState(() {
+                                        selectedValue = value;
+                                      });
+                                    },
+                                    buttonStyleData: ButtonStyleData(
+                                      height: 30,
+                                      width: 60,
+                                      padding: const EdgeInsets.only(
+                                          left: 14, right: 14),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(14),
+                                        color: Colors.white,
+                                      ),
+                                      elevation: 0,
+                                    ),
+                                    iconStyleData: const IconStyleData(
+                                      icon: Icon(Icons.keyboard_arrow_down),
+                                      iconSize: 14,
+                                      iconEnabledColor: Colors.black,
+                                      iconDisabledColor: Colors.grey,
+                                    ),
+                                    dropdownStyleData: DropdownStyleData(
+                                      maxHeight: 200,
+                                      width: 60,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(14),
+                                        color: Colors.white,
+                                      ),
+                                      offset: const Offset(0, 0),
+                                      scrollbarTheme: ScrollbarThemeData(
+                                        radius: const Radius.circular(40),
+                                        thickness:
+                                            MaterialStateProperty.all<double>(
+                                                6),
+                                        thumbVisibility:
+                                            MaterialStateProperty.all<bool>(
+                                                true),
+                                      ),
+                                    ),
+                                    menuItemStyleData: const MenuItemStyleData(
+                                      height: 40,
+                                      padding:
+                                          EdgeInsets.only(left: 14, right: 14),
+                                    ),
                                   ),
                                 ),
                               ],
                             ),
-                            items: items
-                                .map((String item) => DropdownMenuItem<String>(
-                                      value: item,
-                                      child: Text(
-                                        item,
-                                        style: GoogleFonts.poppins(
-                                          fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width >
-                                                  600
-                                              ? 14
-                                              : 10,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
-                                      ),
-                                    ))
-                                .toList(),
-                            value: selectedValue,
-                            onChanged: (String? value) {
-                              setState(() {
-                                selectedValue = value;
-                              });
-                            },
-                            buttonStyleData: ButtonStyleData(
-                              height: 30,
-                              width: 60,
-                              padding:
-                                  const EdgeInsets.only(left: 14, right: 14),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                /* border: Border.all(
-                                  color: Colors.black26,
-                                ), */
-                                color: Colors.white,
-                              ),
-                              elevation: 0,
-                            ),
-                            iconStyleData: const IconStyleData(
-                              icon: Icon(
-                                Icons.keyboard_arrow_down,
-                              ),
-                              iconSize: 14,
-                              iconEnabledColor: Colors.black,
-                              iconDisabledColor: Colors.grey,
-                            ),
-                            dropdownStyleData: DropdownStyleData(
-                              maxHeight: 200,
-                              width: 60,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(14),
-                                color: Colors.white,
-                              ),
-                              offset: const Offset(0, 0),
-                              scrollbarTheme: ScrollbarThemeData(
-                                radius: const Radius.circular(40),
-                                thickness: MaterialStateProperty.all<double>(6),
-                                thumbVisibility:
-                                    MaterialStateProperty.all<bool>(true),
-                              ),
-                            ),
-                            menuItemStyleData: const MenuItemStyleData(
-                              height: 40,
-                              padding: EdgeInsets.only(left: 14, right: 14),
-                            ),
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: const EdgeInsets.only(left: 20.0),
+                            child: _isLoading
+                                ? Center(
+                                    child: ColorFiltered(
+                                    colorFilter: const ColorFilter.mode(
+                                        Colors.white, BlendMode.srcIn),
+                                    child: Lottie.asset(
+                                      'assets/lottie_json/loadingspoons.json',
+                                      width: screenWidth * 0.3,
+                                    ),
+                                  ))
+                                : currentNotes.isEmpty
+                                    ? Center(
+                                        child: Padding(
+                                          padding: EdgeInsets.symmetric(
+                                              vertical: screenWidth * 0.3),
+                                          child: GestureDetector(
+                                            onTap: createIngredient,
+                                            child: Column(
+                                              children: [
+                                                Lottie.asset(
+                                                  'assets/lottie_json/noingredients.json',
+                                                  width: screenWidth * 0.4,
+                                                ),
+                                                const SizedBox(height: 10),
+                                                Text(
+                                                  'No Ingredients Added',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        screenWidth * 0.04,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                                Text(
+                                                  'Tap to Add',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        screenWidth * 0.03,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      )
+                                    : Column(
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.only(
+                                                left: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 10
+                                                    : 0,
+                                                right: 15),
+                                            child: Table(
+                                              columnWidths: {
+                                                0: FlexColumnWidth(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.085),
+                                                1: FlexColumnWidth(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.015),
+                                                2: FlexColumnWidth(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.025),
+                                                3: FlexColumnWidth(
+                                                    MediaQuery.of(context)
+                                                            .size
+                                                            .width *
+                                                        0.025),
+                                              },
+                                              children: [
+                                                TableRow(
+                                                  children: [
+                                                    TableCell(
+                                                      child: Padding(
+                                                        padding: EdgeInsets.only(
+                                                            top: cellPadding),
+                                                        child: Text(
+                                                          "INGREDIENTS",
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: fontSize,
+                                                            color: Colors
+                                                                .grey[850],
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TableCell(
+                                                      child: Padding(
+                                                        padding: EdgeInsets.only(
+                                                            left: 0,
+                                                            top: cellPadding),
+                                                        child: Text(
+                                                          'Qty',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: fontSize,
+                                                            color: Colors
+                                                                .grey[850],
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TableCell(
+                                                      child: Padding(
+                                                        padding: EdgeInsets.only(
+                                                            left: 0,
+                                                            top: cellPadding),
+                                                        child: Text(
+                                                          'Calc',
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: fontSize,
+                                                            color: Colors
+                                                                .grey[850],
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.center,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                    TableCell(
+                                                      child: Padding(
+                                                        padding: EdgeInsets.only(
+                                                            top: cellPadding,
+                                                            left: cellPadding),
+                                                        child: Text(
+                                                          "Unit",
+                                                          style: GoogleFonts
+                                                              .poppins(
+                                                            fontSize: fontSize,
+                                                            color: Colors
+                                                                .grey[850],
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                          ),
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          ListView.builder(
+                                            shrinkWrap: true,
+                                            itemCount: currentNotes.length,
+                                            itemBuilder: (context, index) {
+                                              final note = currentNotes[index];
+                                              return ingredientList(
+                                                count: selectedValue!,
+                                                dish: widget.dish,
+                                                text: note.name!,
+                                                quantity: double.parse(
+                                                    note.quantity!),
+                                                uom: note.uom,
+                                                access: widget.access!,
+                                                onEditPressed: () =>
+                                                    updateIng(note, note.name!),
+                                                onDeletePressed: () =>
+                                                    deleteIng(note.name!),
+                                              );
+                                            },
+                                          ),
+                                        ],
+                                      ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 20.0),
-                    child: _isLoading
-                        ? Center(
-                            child: ColorFiltered(
-                            colorFilter:
-                                ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                            child: Lottie.asset(
-                              'assets/lottie_json/loadingspoons.json',
-                              width: screenWidth * 0.3,
-                            ),
-                          )) // Show loading indicator
-                        : currentNotes.isEmpty
-                            ? Center(
-                                child: Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: screenWidth * 0.3),
-                                  child: GestureDetector(
-                                    onTap: createIngredient,
-                                    child: Column(
-                                      children: [
-                                        Lottie.asset(
-                                          'assets/lottie_json/noingredients.json',
-                                          width: screenWidth * 0.4,
-                                        ),
-                                        const SizedBox(
-                                          height: 10,
-                                        ),
-                                        Text(
-                                          'No Ingredients Added',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: screenWidth * 0.04,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                        Text(
-                                          'Tap to Add',
-                                          style: GoogleFonts.poppins(
-                                            fontSize: screenWidth * 0.03,
-                                            fontWeight: FontWeight.bold,
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ), // Show this if list is empty
-                              )
-                            : Column(
-                                children: [
-                                  Padding(
-                                    padding: EdgeInsets.only(
-                                        left:
-                                            MediaQuery.of(context).size.width >
-                                                    600
-                                                ? 10
-                                                : 0,
-                                        right: 15),
-                                    child: Table(
-                                      columnWidths: {
-                                        0: FlexColumnWidth(
-                                            MediaQuery.of(context).size.width *
-                                                0.085),
-                                        1: FlexColumnWidth(
-                                            MediaQuery.of(context).size.width *
-                                                0.015),
-                                        2: FlexColumnWidth(
-                                            MediaQuery.of(context).size.width *
-                                                0.025),
-                                        3: FlexColumnWidth(
-                                            MediaQuery.of(context).size.width *
-                                                0.025),
-                                        // 4: FlexColumnWidth(.1),
-                                      },
-                                      children: [
-                                        TableRow(
-                                          children: [
-                                            TableCell(
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: cellPadding),
-                                                child: Text(
-                                                  "INGREDIENTS",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: fontSize,
-                                                    color: Colors.grey[850],
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                              ),
-                                            ),
-                                            TableCell(
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    left: 0, top: cellPadding),
-                                                child: Text(
-                                                  'Qty',
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: fontSize,
-                                                    color: Colors.grey[850],
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ),
-                                            TableCell(
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    left: 0, top: cellPadding),
-                                                child: Text(
-                                                  'Calc',
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: fontSize,
-                                                    color: Colors.grey[850],
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  textAlign: TextAlign.center,
-                                                ),
-                                              ),
-                                            ),
-                                            TableCell(
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    top: cellPadding,
-                                                    left: cellPadding),
-                                                child: Text(
-                                                  "Unit",
-                                                  style: GoogleFonts.poppins(
-                                                    fontSize: fontSize,
-                                                    color: Colors.grey[850],
-                                                    fontWeight: FontWeight.w600,
-                                                  ),
-                                                  textAlign: TextAlign.left,
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  ListView.builder(
-                                    physics:
-                                        const NeverScrollableScrollPhysics(), // Disable individual scrolling
-                                    shrinkWrap:
-                                        true, // Ensures the ListView takes minimal height
-                                    itemCount: currentNotes.length,
-                                    itemBuilder: (context, index) {
-                                      final note = currentNotes[index];
-                                      return ingredientList(
-                                        count: selectedValue!,
-                                        dish: widget.dish,
-                                        //type: widget.type!,
-                                        text: note.name!,
-                                        quantity: double.parse(note.quantity!),
-                                        uom: note.uom,
-                                        access: widget.access!,
-                                        onEditPressed: () =>
-                                            updateIng(note, note.name!),
-                                        onDeletePressed: () =>
-                                            deleteIng(note.name!),
-                                      );
-                                    },
-                                  ),
-                                ],
-                              ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
+
             // Instructions Tab
 
             SingleChildScrollView(
@@ -2354,7 +2457,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   ? Center(
                       child: ColorFiltered(
                       colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                          const ColorFilter.mode(Colors.white, BlendMode.srcIn),
                       child: Lottie.asset(
                         'assets/lottie_json/loadingspoons.json',
                         width: screenWidth * 0.3,
@@ -2400,7 +2503,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       : Column(
                           children: [
                             Padding(
-                              padding: EdgeInsets.all(20.0),
+                              padding: const EdgeInsets.all(20.0),
                               child: Text(
                                 "How to Cook",
                                 style: GoogleFonts.poppins(

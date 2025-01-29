@@ -8,7 +8,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/pages/biggerScreens/allDishes.dart';
 import 'package:recipe/pages/biggerScreens/dishesPage.dart';
@@ -333,8 +333,16 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> countDishes() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? access = prefs.getString('access');
+    String? mail = prefs.getString('email');
     try {
-      final response = await Supabase.instance.client.from('dishes').select();
+      final response = access == 'false'
+          ? await Supabase.instance.client
+              .from('dishes')
+              .select()
+              .eq('mail', mail!)
+          : await Supabase.instance.client.from('dishes').select();
       final data = List<Map<String, dynamic>>.from(response);
 
       // Parse dishes
@@ -437,6 +445,7 @@ class _MyHomePageState extends State<MyHomePage> {
       body: GestureDetector(
         // When tapping anywhere outside the search bar, it unfocuses the search field and hides the keyboard.
         onTap: () {
+          countDishes();
           FocusScope.of(context).unfocus();
           textController.clear();
           _focusNode.unfocus();
@@ -597,20 +606,22 @@ class _MyHomePageState extends State<MyHomePage> {
                                         right: 35.0,
                                         top:
                                             1), // Adjust this padding as needed
-                                    child:  _focusNode.hasFocus? IconButton(
-                                      onPressed: !_isListening
-                                          ? _startListening
-                                          : _stopListening, // Start or stop voice search
-                                      icon:Icon(
-                                        _isListening
-                                            ? Icons.mic
-                                            : Icons
-                                                .mic_none, // Change icon based on listening state
-                                        color: _isListening
-                                            ? Colors.red
-                                            : Colors.grey,
-                                      ),
-                                    ):null,
+                                    child: _focusNode.hasFocus
+                                        ? IconButton(
+                                            onPressed: !_isListening
+                                                ? _startListening
+                                                : _stopListening, // Start or stop voice search
+                                            icon: Icon(
+                                              _isListening
+                                                  ? Icons.mic
+                                                  : Icons
+                                                      .mic_none, // Change icon based on listening state
+                                              color: _isListening
+                                                  ? Colors.red
+                                                  : Colors.grey,
+                                            ),
+                                          )
+                                        : null,
                                   ),
                                 ],
                               ),
@@ -623,6 +634,7 @@ class _MyHomePageState extends State<MyHomePage> {
                             ),
                           ),
                           suggestionsCallback: (pattern) async {
+                            await fetchDishes();
                             final lowercasePattern = pattern.toLowerCase();
                             return searchdishes
                                 .where((dish) => dish.name
@@ -643,7 +655,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       padding:
                                           EdgeInsets.all(screenWidth * 0.0),
                                       child: Image.asset(homeIcons[
-                                          int.parse(suggestion.type!)-1]),
+                                          int.parse(suggestion.type!) - 1]),
                                     ),
                                     title: Text(
                                       suggestion.name,
@@ -692,8 +704,8 @@ class _MyHomePageState extends State<MyHomePage> {
                                     tileColor: Colors.transparent,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10),
-                                      side:
-                                          const BorderSide(color: Colors.transparent),
+                                      side: const BorderSide(
+                                          color: Colors.transparent),
                                     ),
                                     trailing: CircleAvatar(
                                       radius: 10,
@@ -728,6 +740,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         access: true,
                                         background: colorList[
                                             int.parse(suggestion.type!) - 1],
+                                        imageURL: suggestion.imageUrl,
                                       )));
                             });
                             print("suggestion: ${suggestion.name}");

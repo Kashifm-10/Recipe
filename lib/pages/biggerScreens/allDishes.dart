@@ -11,7 +11,7 @@ import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/ingredients.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
@@ -1298,6 +1298,7 @@ class _alldishesListState extends State<alldishesList> {
                                           category: note.category,
                                           access: false,
                                           background: widget.scafColor,
+                                          imageURL: note.imageUrl,
                                         )));
                                   });
                                 },
@@ -1307,6 +1308,7 @@ class _alldishesListState extends State<alldishesList> {
                                     dish: note.name,
                                     type: note.type,
                                     text: note.name,
+                                    serial: note.serial,
                                     fromType:
                                         typeList[int.parse(note.type!) - 1]),
                               );

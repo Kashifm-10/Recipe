@@ -7,7 +7,7 @@ import 'package:path_provider/path_provider.dart';
 import 'package:recipe/collections/homeTitle.dart';
 import 'package:recipe/collections/ingredients.dart';
 import 'package:recipe/collections/links.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/collections/recipe.dart';
 
 class IsarInstance {

@@ -8,7 +8,7 @@ import 'package:ionicons/ionicons.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
-import 'package:recipe/collections/names.dart';
+import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/pages/biggerScreens/allDishes.dart';
 import 'package:recipe/pages/biggerScreens/dishesPage.dart';
@@ -347,8 +347,16 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
   }
 
   Future<void> countDishes() async {
+    final prefs = await SharedPreferences.getInstance();
+    String? access = prefs.getString('access');
+    String? mail = prefs.getString('email');
     try {
-      final response = await Supabase.instance.client.from('dishes').select();
+      final response = access == 'false'
+          ? await Supabase.instance.client
+              .from('dishes')
+              .select()
+              .eq('mail', mail!)
+          : await Supabase.instance.client.from('dishes').select();
       final data = List<Map<String, dynamic>>.from(response);
 
       // Parse dishes
@@ -443,13 +451,14 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
     final double cardWidth = screenWidth * 0.05;
     final double cardHeight = screenHeight * 0.08;
     final double iconSize = screenWidth * 0.07;
-    countDishes();
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         // When tapping anywhere outside the search bar, it unfocuses the search field and hides the keyboard.
         onTap: () {
+          countDishes();
+          fetchDishes();
           FocusScope.of(context).unfocus();
           textController.clear();
           _focusNode.unfocus();
@@ -597,19 +606,21 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                       padding: EdgeInsets.only(
                                           right: screenWidth * 0.08,
                                           top: screenHeight * 0.002),
-                                      child: _focusNode.hasFocus? IconButton(
-                                        onPressed: !_isListening
-                                            ? _startListening
-                                            : _stopListening,
-                                        icon: Icon(
-                                          _isListening
-                                              ? Icons.mic
-                                              : Icons.mic_none,
-                                          color: _isListening
-                                              ? Colors.red
-                                              : Colors.grey,
-                                        ), 
-                                      ): null,
+                                      child: _focusNode.hasFocus
+                                          ? IconButton(
+                                              onPressed: !_isListening
+                                                  ? _startListening
+                                                  : _stopListening,
+                                              icon: Icon(
+                                                _isListening
+                                                    ? Icons.mic
+                                                    : Icons.mic_none,
+                                                color: _isListening
+                                                    ? Colors.red
+                                                    : Colors.grey,
+                                              ),
+                                            )
+                                          : null,
                                     ),
                                   ],
                                 ),
@@ -622,6 +633,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                               ),
                             ),
                             suggestionsCallback: (pattern) async {
+                              await fetchDishes();
                               final lowercasePattern = pattern.toLowerCase();
                               return searchdishes
                                   .where((dish) => dish.name
@@ -727,6 +739,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                           dish: suggestion.name,
                                           category: suggestion.category,
                                           access: true,
+                                          imageURL: suggestion.imageUrl ?? ' ',
                                           background: colorList[
                                               int.parse(suggestion.type!) - 1],
                                         )));
