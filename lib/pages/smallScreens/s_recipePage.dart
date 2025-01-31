@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -2063,16 +2064,17 @@ class _smallrecipeState extends State<smallrecipe>
                             screenWidth>600?30.0 :10), // Adjust the radius as needed
                         topRight: Radius.circular(screenWidth>600?30.0 :10),
                       ),
-                      child: Image.network(
-                        widget.imageURL! ?? '',
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            images[int.parse(widget.type!) - 1],
-                            fit: BoxFit.cover,
-                          );
-                        },
-                      ),
+child: CachedNetworkImage(
+  imageUrl: widget.imageURL ?? '',
+  fit: BoxFit.cover,
+  placeholder: (context, url) => Center(child: CircularProgressIndicator(color: widget.background)),
+  errorWidget: (context, url, error) => CachedNetworkImage(
+    imageUrl: images[int.parse(widget.type!) - 1],
+    fit: BoxFit.cover,
+    placeholder: (context, url) => Center(child: CircularProgressIndicator(color: widget.background)),
+    errorWidget: (context, url, error) => Icon(Icons.error),
+  ),
+),
                     ),
                   ),
                 ),

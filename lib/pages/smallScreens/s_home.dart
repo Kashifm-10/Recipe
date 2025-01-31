@@ -325,7 +325,10 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
   } */
   Future<void> fetchDishes() async {
     try {
-      final response = await Supabase.instance.client.from('dishes').select();
+      final response = await Supabase.instance.client
+          .from('dishes')
+          .select()
+          .order('name', ascending: true);
       final data = List<Map<String, dynamic>>.from(response);
 
       setState(() {
@@ -799,6 +802,9 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                   clipBehavior: Clip.antiAlias,
                                   child: GestureDetector(
                                     onTap: () {
+                                      FocusScope.of(context).unfocus();
+                                      textController.clear();
+                                      _focusNode.unfocus();
                                       Navigator.of(context).push(
                                         PageTransition(
                                           curve: Curves.linear,

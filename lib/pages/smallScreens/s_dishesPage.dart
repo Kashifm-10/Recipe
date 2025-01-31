@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
@@ -11,6 +12,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
+import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
 import 'package:lite_rolling_switch/lite_rolling_switch.dart';
@@ -55,10 +57,13 @@ class _smalldishesListState extends State<smalldishesList> {
   late SharedPreferences prefs;
   bool positive = false;
 
+  bool ai = false;
   File? _image;
   final picker = ImagePicker();
   String? _uploadedImageUrl = ' ';
   String? _publicId;
+  Uint8List? _imageBytes;
+  TextEditingController _promptController = TextEditingController();
 
   String dropdownValue = 'A-Z'; // Class-level variable
   int? serial = 0;
@@ -370,49 +375,133 @@ class _smalldishesListState extends State<smalldishesList> {
                     ],
                   ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.03,
+                    height: MediaQuery.of(context).size.height * 0.02,
                   ),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: () => _pickImage(ImageSource.gallery),
-                        icon: const Icon(Icons.photo, color: Colors.white),
-                        label: const Text('Pick from Gallery',
-                            style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              colorList[int.parse(widget.type!) - 1],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 12.0),
+                      Text(
+                        "Enable AI Image",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
                         ),
                       ),
-                      SizedBox(height: 10,),
-                      ElevatedButton.icon(
-                        onPressed: () => _pickImage(ImageSource.camera),
-                        icon: const Icon(
-                          Icons.camera,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          'Take a Picture',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              colorList[int.parse(widget.type!) - 1],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 12.0),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.1,
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.03,
+                        width: MediaQuery.of(context).size.width * 0.13,
+                        child: CustomAnimatedToggleSwitch<bool>(
+                          current: ai,
+                          spacing: 36.0,
+                          values: const [false, true],
+                          animationDuration: const Duration(milliseconds: 350),
+                          animationCurve: Curves.ease,
+                          iconBuilder: (context, local, global) =>
+                              const SizedBox(),
+                          onTap: (_) => setState(() => ai = !ai),
+                          iconsTappable: false,
+                          onChanged: (b) => setState(() => ai = b),
+                          height: 40,
+                          padding: const EdgeInsets.all(5.0),
+                          indicatorSize: Size.square(
+                              MediaQuery.of(context).size.width * 0.03),
+                          foregroundIndicatorBuilder: (context, global) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width * 0.01,
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
+                              child: Center(
+                                child: ai
+                                    ? Icon(Icons.smart_toy,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                        color: const Color.fromARGB(
+                                            255, 255, 255, 255))
+                                    : Icon(Icons.image,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.005,
+                                        color: const Color.fromARGB(
+                                            255, 255, 255, 255)),
+                              ),
+                            );
+                          },
+                          wrapperBuilder: (context, global, child) {
+                            final color = Color.lerp(
+                                Colors.grey, Colors.blue, global.position)!;
+                            return DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(50.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: color.withOpacity(0.7),
+                                    blurRadius: 15.0,
+                                    offset: const Offset(0.0, 5.0),
+                                  ),
+                                ],
+                              ),
+                              child: child,
+                            );
+                          },
                         ),
                       ),
                     ],
                   ),
+
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                  if (!ai)
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () => _pickImage(ImageSource.gallery),
+                          icon: const Icon(Icons.photo, color: Colors.white),
+                          label: const Text('Pick from Gallery',
+                              style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                colorList[int.parse(widget.type!) - 1],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 12.0),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => _pickImage(ImageSource.camera),
+                          icon: const Icon(
+                            Icons.camera,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Take a Picture',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                colorList[int.parse(widget.type!) - 1],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 12.0),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -436,7 +525,13 @@ class _smalldishesListState extends State<smalldishesList> {
                   });
 
                   if (!isTextFieldEmpty) {
-                    await _uploadImage(serial.toString());
+                    if (!ai) {
+                      await _uploadImage(serial.toString());
+                    } else {
+                      await generateAIImage(serial.toString());
+                      await _uploadToCloudinaryFromAI(
+                          _imageBytes!, serial.toString());
+                    }
 
                     serial;
                     int incrementedSerial = (serial! + 1);
@@ -459,7 +554,8 @@ class _smalldishesListState extends State<smalldishesList> {
                         _uploadedImageUrl ?? ' ');
                     readDishes(widget.type!);
                     duration = selectedDurationHours.toStringAsFixed(1);
-                    _uploadedImageUrl=' ';
+                    _uploadedImageUrl = ' ';
+                    ai = false;
                     Navigator.pop(context);
                     Navigator.pop(context);
                     textController.clear();
@@ -491,7 +587,6 @@ class _smalldishesListState extends State<smalldishesList> {
 
   //read notes
   void readDishes(String type) async {
-   
     await context.read<database>().fetchDishes(type);
   }
 
@@ -506,7 +601,7 @@ class _smalldishesListState extends State<smalldishesList> {
     int dishId = data.isNotEmpty ? data[0]['id'] : 0; // Ensure a default value
     String category = name.category!; // Default value
     String serial = name.serial!;
-    String url = name.imageUrl?? ' ';
+    String url = name.imageUrl ?? ' ';
     String selectedDurationHours = name.duration!; // Default duration
     bool isTextFieldEmpty = false; // Flag for empty text field error message
 
@@ -545,7 +640,8 @@ class _smalldishesListState extends State<smalldishesList> {
                                 "Are you sure you want to delete this dish?"),
                             actions: [
                               TextButton(
-                                onPressed: () {
+                                onPressed: () async {
+                                  await _deleteImage(name.serial!);
                                   deleteNote(name.id, widget.type!, name.name);
                                   Navigator.pop(
                                       context); // Close confirmation dialog
@@ -730,49 +826,133 @@ class _smalldishesListState extends State<smalldishesList> {
                     ],
                   ),
                   SizedBox(
-                    height: MediaQuery.of(context).size.height * 0.03,
+                    height: MediaQuery.of(context).size.height * 0.02,
                   ),
-                   Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      ElevatedButton.icon(
-                        onPressed: () => _pickImage(ImageSource.gallery),
-                        icon: const Icon(Icons.photo, color: Colors.white),
-                        label: const Text('Pick from Gallery',
-                            style: TextStyle(color: Colors.white)),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              colorList[int.parse(widget.type!) - 1],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 12.0),
+                      Text(
+                        "Update AI Image",
+                        style: GoogleFonts.poppins(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.black87,
                         ),
                       ),
-                      SizedBox(height: 10,),
-                      ElevatedButton.icon(
-                        onPressed: () => _pickImage(ImageSource.camera),
-                        icon: const Icon(
-                          Icons.camera,
-                          color: Colors.white,
-                        ),
-                        label: const Text(
-                          'Take a Picture',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              colorList[int.parse(widget.type!) - 1],
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12.0),
-                          ),
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 20.0, vertical: 12.0),
+                      SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.1,
+                      ),
+                      SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.03,
+                        width: MediaQuery.of(context).size.width * 0.13,
+                        child: CustomAnimatedToggleSwitch<bool>(
+                          current: ai,
+                          spacing: 36.0,
+                          values: const [false, true],
+                          animationDuration: const Duration(milliseconds: 350),
+                          animationCurve: Curves.ease,
+                          iconBuilder: (context, local, global) =>
+                              const SizedBox(),
+                          onTap: (_) => setState(() => ai = !ai),
+                          iconsTappable: false,
+                          onChanged: (b) => setState(() => ai = b),
+                          height: 40,
+                          padding: const EdgeInsets.all(5.0),
+                          indicatorSize: Size.square(
+                              MediaQuery.of(context).size.width * 0.03),
+                          foregroundIndicatorBuilder: (context, global) {
+                            return Container(
+                              width: MediaQuery.of(context).size.width * 0.01,
+                              alignment: Alignment.center,
+                              decoration: const BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
+                              child: Center(
+                                child: ai
+                                    ? Icon(Icons.smart_toy,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.01,
+                                        color: const Color.fromARGB(
+                                            255, 255, 255, 255))
+                                    : Icon(Icons.image,
+                                        size:
+                                            MediaQuery.of(context).size.width *
+                                                0.005,
+                                        color: const Color.fromARGB(
+                                            255, 255, 255, 255)),
+                              ),
+                            );
+                          },
+                          wrapperBuilder: (context, global, child) {
+                            final color = Color.lerp(
+                                Colors.grey, Colors.blue, global.position)!;
+                            return DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: color,
+                                borderRadius: BorderRadius.circular(50.0),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: color.withOpacity(0.7),
+                                    blurRadius: 15.0,
+                                    offset: const Offset(0.0, 5.0),
+                                  ),
+                                ],
+                              ),
+                              child: child,
+                            );
+                          },
                         ),
                       ),
                     ],
                   ),
+
+                  SizedBox(
+                    height: MediaQuery.of(context).size.height * 0.02,
+                  ),
+                  if (!ai)
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: () => _pickImage(ImageSource.gallery),
+                          icon: const Icon(Icons.photo, color: Colors.white),
+                          label: const Text('Pick from Gallery',
+                              style: TextStyle(color: Colors.white)),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                colorList[int.parse(widget.type!) - 1],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 12.0),
+                          ),
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: () => _pickImage(ImageSource.camera),
+                          icon: const Icon(
+                            Icons.camera,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Take a Picture',
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                colorList[int.parse(widget.type!) - 1],
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12.0),
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 20.0, vertical: 12.0),
+                          ),
+                        ),
+                      ],
+                    ),
                 ],
               ),
             ),
@@ -1101,6 +1281,93 @@ class _smalldishesListState extends State<smalldishesList> {
     }
   }
 
+  Future<void> generateAIImage(String serial) async {
+    // Get the prompt from the TextField
+    String prompt = textController.text.isNotEmpty
+        ? textController.text
+        : 'food'; // Default prompt if empty
+
+    var headers = {
+      'Authorization':
+          'Bearer vk-y5TVB2IIbx3NR14FFMejRTP522iUQFw2X4N0qwF9sUDD8CWm'
+    };
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://api.vyro.ai/v2/image/generations'));
+
+    request.fields.addAll({
+      'prompt': prompt,
+      'style': 'realistic',
+      'aspect_ratio': '4:3',
+      'seed': '5'
+    });
+
+    request.headers.addAll(headers);
+
+    try {
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        // Check if the response is an image
+        var contentType = response.headers['content-type'] ?? '';
+
+        if (contentType.contains('image')) {
+          var bytes = await response.stream.toBytes();
+          setState(() async {
+            _imageBytes = bytes;
+            // await _uploadToCloudinaryFromAI(_imageBytes!, serial);
+          });
+        } else {
+          var responseBody = await response.stream.bytesToString();
+          print("Received text response: $responseBody");
+        }
+      } else {
+        print('Error: ${response.reasonPhrase}');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
+  }
+
+  Future<void> _uploadToCloudinaryFromAI(
+      Uint8List imageBytes, String serial) async {
+    try {
+      const cloudinaryUrl =
+          'https://api.cloudinary.com/v1_1/dcrm8qosr/image/upload';
+      const preset = 'Flutter';
+
+      final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl));
+      request.fields['upload_preset'] = preset;
+
+      // Convert Uint8List to MultipartFile
+      request.files.add(http.MultipartFile.fromBytes(
+        'file',
+        imageBytes,
+        filename: '$serial.jpg', // Give it a name
+        contentType: MediaType('image', 'jpeg'),
+      ));
+
+      final response = await request.send();
+
+      if (response.statusCode == 200) {
+        final responseBody = await response.stream.bytesToString();
+        final jsonResponse = json.decode(responseBody);
+
+        setState(() {
+          _uploadedImageUrl = jsonResponse['secure_url'];
+          _publicId = jsonResponse['public_id'];
+        });
+
+        print('Image uploaded successfully: $_uploadedImageUrl');
+        print('Public ID: $_publicId');
+      } else {
+        print('Image upload failed: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error during image upload: $e');
+    }
+  }
+
   Future<void> _uploadImage(String serial) async {
     if (_image == null) return;
 
@@ -1119,9 +1386,9 @@ class _smalldishesListState extends State<smalldishesList> {
       print('Before rename: ${_image!.path}');
       print('After rename: ${renamedFile.path}');
 
-      final cloudinaryUrl =
+      const cloudinaryUrl =
           'https://api.cloudinary.com/v1_1/dcrm8qosr/image/upload';
-      final preset = 'Flutter';
+      const preset = 'Flutter';
 
       final request = http.MultipartRequest('POST', Uri.parse(cloudinaryUrl));
       request.fields['upload_preset'] = preset;
@@ -1201,7 +1468,7 @@ class _smalldishesListState extends State<smalldishesList> {
   }
 
   Future<void> isImageUrlValid(String serial) async {
-    if (_image == null) return;
+    if (_image == null && ai == false) return;
     try {
       // Construct the URL
       final url = Uri.parse(
@@ -1213,9 +1480,19 @@ class _smalldishesListState extends State<smalldishesList> {
       // If the status code is 200, it means the image exists
       if (response.statusCode == 200) {
         await _deleteImage(serial);
-        await _uploadImage(serial);
+        if (!ai) {
+          await _uploadImage(serial.toString());
+        } else {
+          await generateAIImage(serial.toString());
+          await _uploadToCloudinaryFromAI(_imageBytes!, serial.toString());
+        }
       } else {
-        await _uploadImage(serial);
+        if (!ai) {
+          await _uploadImage(serial.toString());
+        } else {
+          await generateAIImage(serial.toString());
+          await _uploadToCloudinaryFromAI(_imageBytes!, serial.toString());
+        }
       }
     } catch (e) {
       print('Error checking image URL: $e');

@@ -82,7 +82,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
   void _onSortChanged(List<dynamic> selectedList) {
     if (selectedList.isNotEmpty) {
       final String selectedValue =
-          selectedList[0].name; // Get the name of the selected item
+          selectedList[0].value; // Get the name of the selected item
       setState(() {
         dropdownValue = selectedValue;
       });
@@ -131,6 +131,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
         _isLoading = false;
       });
     });
+        _loadData();
+_filterAndSortNotes();
     readDishes();
     loadSerial();
     _filterbying();
@@ -626,11 +628,11 @@ final response = await supabase
     final titleFontSize = screenWidth * 0.08;
 
     // Update notes based on selected filter, sort, and search
-    _filterAndSortNotes();
+   // _filterAndSortNotes();
     // _filterbying();
 
-    readDishes();
-    _loadData();
+   // readDishes();
+   // _loadData();
 
     return Scaffold(
       backgroundColor: widget.scafColor,
@@ -1009,6 +1011,7 @@ final response = await supabase
                                   onTap: () {
                                     DropDownState(
                                       DropDown(
+                                        onSelected: _onFilterChanged,
                                         data: _filterOptions,
                                         isDismissible: true,
                                         isSearchVisible: true,
@@ -1248,6 +1251,7 @@ final response = await supabase
                                     type: note.type,
                                     text: note.name,
                                     serial: note.serial,
+                                    imageURL: note.imageUrl,
                                     fromType:
                                         typeList[int.parse(note.type!) - 1]),
                               );

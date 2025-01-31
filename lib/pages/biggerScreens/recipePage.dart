@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
@@ -491,8 +492,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                     TextField(
                                       controller: quantityController,
                                       decoration: InputDecoration(
-                                        labelStyle:
-                                            const TextStyle(color: Colors.black),
+                                        labelStyle: const TextStyle(
+                                            color: Colors.black),
                                         labelText: 'Quantity',
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -532,8 +533,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   children: [
                                     DropdownButtonFormField<String>(
                                       decoration: InputDecoration(
-                                        labelStyle:
-                                            const TextStyle(color: Colors.black),
+                                        labelStyle: const TextStyle(
+                                            color: Colors.black),
                                         labelText: 'Unit',
                                         border: OutlineInputBorder(
                                           borderRadius:
@@ -1886,10 +1887,6 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     'https://images.pexels.com/photos/6660071/pexels-photo-6660071.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
   ];
 
-  
-
- 
-
   @override
   Widget build(BuildContext context) {
     // note database
@@ -2094,15 +2091,20 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             30.0), // Adjust the radius as needed
                         topRight: Radius.circular(30.0),
                       ),
-                      child: Image.network(
-                        widget.imageURL!,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.imageURL!,
                         fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Image.network(
-                            images[int.parse(widget.type!) - 1],
-                            fit: BoxFit.cover,
-                          );
-                        },
+                        placeholder: (context, url) =>
+                            Center(child: CircularProgressIndicator( color: widget.background,)),
+                        errorWidget: (context, url, error) =>
+                            CachedNetworkImage(
+                          imageUrl: images[int.parse(widget.type!) - 1],
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) =>
+                              Center(child: CircularProgressIndicator(color: widget.background)),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
                       ),
                     ),
                   ),

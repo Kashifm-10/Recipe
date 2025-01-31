@@ -311,7 +311,7 @@ class _MyHomePageState extends State<MyHomePage> {
   } */
   Future<void> fetchDishes() async {
     try {
-      final response = await Supabase.instance.client.from('dishes').select();
+      final response = await Supabase.instance.client.from('dishes').select().order('name', ascending: true);;
       final data = List<Map<String, dynamic>>.from(response);
 
       setState(() {

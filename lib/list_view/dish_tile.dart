@@ -4,6 +4,7 @@ import 'package:popover/popover.dart';
 import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/notInUse/dish.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 class DishTile extends StatelessWidget {
   DishTile(
@@ -39,6 +40,19 @@ class DishTile extends StatelessWidget {
     'https://images.pexels.com/photos/1320998/pexels-photo-1320998.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     'https://images.pexels.com/photos/14774693/pexels-photo-14774693.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
     'https://images.pexels.com/photos/6660071/pexels-photo-6660071.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1'
+  ];
+
+  List<Color> colorList = [
+    Colors.orange.shade400,
+    Colors.green.shade400,
+    Colors.red.shade400,
+    Colors.brown.shade500,
+    Colors.red.shade200,
+    Colors.deepOrange.shade500,
+    Colors.yellow.shade900,
+    Colors.blue.shade300,
+    Colors.green.shade700,
+    Colors.deepPurple.shade300,
   ];
 
   @override
@@ -82,37 +96,45 @@ class DishTile extends StatelessWidget {
             Padding(
               padding: screenWidth > 600
                   ? EdgeInsets.all(20.0)
-                  : EdgeInsets.only(left: screenWidth > 600
-                  ? 15.0: screenWidth*0.015, top: 0, bottom: 5),
+                  : EdgeInsets.only(
+                      left: screenWidth > 600 ? 15.0 : screenWidth * 0.015,
+                      top: 0,
+                      bottom: 5),
               child: Row(
                 children: [
                   Padding(
-                    padding:  EdgeInsets.only(right: 10.0, top: screenWidth > 600
-                  ?0:screenHeight*0.006),
+                    padding: EdgeInsets.only(
+                        right: 10.0,
+                        top: screenWidth > 600 ? 0 : screenHeight * 0.006),
                     child: Container(
-                      width: screenWidth > 600
-                  ?screenWidth * 0.1 : screenWidth *0.2,
-                      height: screenHeight*0.1,
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(
-                            8.0), // Adjust the radius as needed
-                        child: Image.network(
-                          "$imageURL",
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            // If image fails to load, show default image
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(
-                                  8.0), // Same border radius
-                              child: Image.network(
-                                images[int.parse(type!) - 1],
-                                fit: BoxFit.cover,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
+                        width: screenWidth > 600
+                            ? screenWidth * 0.1
+                            : screenWidth * 0.2,
+                        height: screenHeight * 0.1,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(
+                              8.0), // Adjust the radius as needed
+                          child: CachedNetworkImage(
+                            imageUrl: imageURL!?? ' ',
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(
+                                    color: colorList[int.parse(type!) - 1])),
+                            errorWidget: (context, url, error) => ClipRRect(
+                                borderRadius: BorderRadius.circular(
+                                    8.0), // Same border radius
+                                child: CachedNetworkImage(
+                                  imageUrl: images[int.parse(type!) - 1],
+                                  fit: BoxFit.cover,
+                                  placeholder: (context, url) => Center(
+                                      child: CircularProgressIndicator(
+                                          color:
+                                              colorList[int.parse(type!) - 1])),
+                                  errorWidget: (context, url, error) =>
+                                      Icon(Icons.error),
+                                )),
+                          ),
+                        )),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -121,7 +143,11 @@ class DishTile extends StatelessWidget {
                         : MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
-                        screenWidth > 600?text:text.length>24?"${text.substring(0, 22)}...":text,
+                        screenWidth > 600
+                            ? text
+                            : text.length > 24
+                                ? "${text.substring(0, 22)}..."
+                                : text,
                         style: GoogleFonts.poppins(
                           color: Colors.black,
                           fontSize:
@@ -129,14 +155,31 @@ class DishTile extends StatelessWidget {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           /*  Padding(
                             padding: const EdgeInsets.only(bottom: 4.0),
                             child: Icon(Icons.timer, color: Colors.grey.shade400),
                           ),
                           SizedBox(width: 5), */
+                           if (fromType! != 'no')
+                            Padding(
+                              padding: EdgeInsets.only(
+                                  right: MediaQuery.of(context).size.width > 600
+                                      ? 0
+                                      : MediaQuery.of(context).size.width *
+                                          0.02),
+                              child: Text(
+                                fromType!,
+                                style: GoogleFonts.poppins(
+                                  color: Colors.grey.shade500,
+                                  fontSize: screenWidth > 600
+                                      ? 12
+                                      : screenWidth * 0.025,
+                                ),
+                              ),
+                            ),
                           Text(
                             duration != null
                                 ? (() {
@@ -163,23 +206,7 @@ class DishTile extends StatelessWidget {
                                   screenWidth > 600 ? 12 : screenWidth * 0.025,
                             ),
                           ),
-                          if (fromType! != 'no')
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  right: MediaQuery.of(context).size.width > 600
-                                      ? 0
-                                      : MediaQuery.of(context).size.width *
-                                          0.02),
-                              child: Text(
-                                fromType!,
-                                style: GoogleFonts.poppins(
-                                  color: Colors.grey.shade500,
-                                  fontSize: screenWidth > 600
-                                      ? 12
-                                      : screenWidth * 0.025,
-                                ),
-                              ),
-                            ),
+                         
                         ],
                       ),
                     ],
