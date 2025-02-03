@@ -7,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/ingredients.dart';
@@ -1309,6 +1308,7 @@ class _alldishesListState extends State<alldishesList> {
                                     type: note.type,
                                     text: note.name,
                                     serial: note.serial,
+                                    imageURL: note.imageUrl,
                                     fromType:
                                         typeList[int.parse(note.type!) - 1]),
                               );

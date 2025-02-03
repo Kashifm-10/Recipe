@@ -514,7 +514,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  const Text('Please Connect to Internet'),
+                                   Text('Please Connect to Internet',  style: GoogleFonts.poppins()),
                                   TextButton(
                                     onPressed: () {
                                       _isErrorDialogShown =
@@ -529,7 +529,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                         (Route<dynamic> route) => false,
                                       );
                                     },
-                                    child: const Text('Retry'),
+                                    child:   Text('Retry',  style: GoogleFonts.poppins()),
                                   ),
                                 ],
                               ))),
@@ -570,10 +570,10 @@ class _MyHomePageState extends State<MyHomePage> {
                           textFieldConfiguration: TextFieldConfiguration(
                             focusNode: _focusNode, // Attach the focus node
                             controller: textController,
-                            autofocus: false,
-                            style: DefaultTextStyle.of(context).style.copyWith(
+                            autofocus: false
+                           ,  style: GoogleFonts.poppins() /* DefaultTextStyle.of(context).style.copyWith(
                                   fontStyle: FontStyle.normal,
-                                ),
+                                ) */,
                             decoration: InputDecoration(
                               hintText: "Search Dishes",
                               hintStyle: GoogleFonts.poppins(

@@ -528,7 +528,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                  const Text('Please Connect to Internet'),
+                                    Text('Please Connect to Internet',  style: GoogleFonts.poppins()),
                                   TextButton(
                                     onPressed: () {
                                       _isErrorDialogShown =
@@ -543,7 +543,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                         (Route<dynamic> route) => false,
                                       );
                                     },
-                                    child: const Text('Retry'),
+                                    child:   Text('Retry',  style: GoogleFonts.poppins()),
                                   ),
                                 ],
                               ))),
@@ -578,10 +578,10 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                               controller: textController,
                               focusNode: _focusNode, // Attach the focus node
                               autofocus: false,
-                              style:
-                                  DefaultTextStyle.of(context).style.copyWith(
+                                style: GoogleFonts.poppins()
+                                  /* DefaultTextStyle.of(context).style.copyWith(
                                         fontStyle: FontStyle.normal,
-                                      ),
+                                      ) */,
                               decoration: InputDecoration(
                                 hintText: "Search Dishes",
                                 hintStyle: GoogleFonts.poppins(

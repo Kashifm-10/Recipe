@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -197,10 +198,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return passwordChars.join();
   }
 
-  void _showSnackBar(String message) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(SnackBar(content: Text(message)));
-  }
+  
 
   Future<void> _signInWithEmailPassword() async {
     try {
@@ -214,15 +212,46 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (data.isNotEmpty) {
         _sendForgotMail();
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-              content: Text('Invalid email or not registered before')),
+         const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'OOPS!',
+            message: 'Invalid Email or Not Registered',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.warning,
+            inMaterialBanner: true,
+          ),
         );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       }
     } catch (e) {
       print("Email sign-in error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: No Internet Connection')));
+             const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'Login failed!',
+            message: 'No Internet Connection',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
     }
   }
 
@@ -233,7 +262,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     final recipient = _emailController.text.trim();
     if (recipient.isEmpty) {
-      _showSnackBar('Please enter a valid email address.');
+       const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'Invalid!',
+            message: 'Please enter a valid email address',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       return;
     }
 
@@ -274,10 +320,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         fit: BoxFit.contain,
       ),
       dialogWidth: kIsWeb ? 0.3 : null,
+      
       context: context,
       actions: [
         IconsButton(
           onPressed: () {
+            Navigator.of(context).pop();
             Navigator.of(context).pop();
           },
           text: 'OK',

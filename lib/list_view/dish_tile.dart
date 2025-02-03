@@ -5,6 +5,7 @@ import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/notInUse/dish.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shimmer/shimmer.dart';
 
 class DishTile extends StatelessWidget {
   DishTile(
@@ -64,7 +65,7 @@ class DishTile extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
       child: Container(
         width: screenWidth * 0.1,
-        height: screenWidth > 600 ? screenHeight * 0.08 : screenHeight * 0.07,
+        height: screenWidth > 600 ? screenHeight * 0.081 : screenHeight * 0.07,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(15),
@@ -95,7 +96,7 @@ class DishTile extends StatelessWidget {
             ),
             Padding(
               padding: screenWidth > 600
-                  ? EdgeInsets.all(20.0)
+                  ? EdgeInsets.only(left: 10.0, top: 5, bottom: 5)
                   : EdgeInsets.only(
                       left: screenWidth > 600 ? 15.0 : screenWidth * 0.015,
                       top: 0,
@@ -108,38 +109,59 @@ class DishTile extends StatelessWidget {
                         top: screenWidth > 600 ? 0 : screenHeight * 0.006),
                     child: Container(
                         width: screenWidth > 600
-                            ? screenWidth * 0.1
+                            ? screenWidth * 0.15
                             : screenWidth * 0.2,
-                        height: screenHeight * 0.1,
+                        height: screenWidth > 600
+                            ? screenHeight * 0.065
+                            : screenHeight * 0.1,
                         child: ClipRRect(
-                          borderRadius: BorderRadius.circular(
-                              8.0), // Adjust the radius as needed
-                          child: CachedNetworkImage(
-                            imageUrl: imageURL!?? ' ',
-                            fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
-                                child: CircularProgressIndicator(
-                                    color: colorList[int.parse(type!) - 1])),
-                            errorWidget: (context, url, error) => ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                                screenWidth > 600
+                                    ? 10
+                                    : 8.0), // Adjust the radius as needed
+                            child: CachedNetworkImage(
+                              imageUrl: imageURL!,
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey[300]!,
+                                highlightColor: Colors.grey[100]!,
+                                child: Center(
+                                  child: Container(
+                                    color: Colors.white,
+                                    height: double
+                                        .infinity, // Adjust based on the aspect ratio of the image
+                                    width: double.infinity,
+                                  ),
+                                ),
+                              ),
+                              errorWidget: (context, url, error) => ClipRRect(
                                 borderRadius: BorderRadius.circular(
                                     8.0), // Same border radius
                                 child: CachedNetworkImage(
                                   imageUrl: images[int.parse(type!) - 1],
                                   fit: BoxFit.cover,
-                                  placeholder: (context, url) => Center(
-                                      child: CircularProgressIndicator(
-                                          color:
-                                              colorList[int.parse(type!) - 1])),
+                                  placeholder: (context, url) =>
+                                      Shimmer.fromColors(
+                                    baseColor: Colors.grey[200]!,
+                                    highlightColor: Colors.grey[100]!,
+                                    child: Center(
+                                      child: Container(
+                                        color: Colors.white,
+                                        height: double.infinity,
+                                        width: double.infinity,
+                                      ),
+                                    ),
+                                  ),
                                   errorWidget: (context, url, error) =>
                                       Icon(Icons.error),
-                                )),
-                          ),
-                        )),
+                                ),
+                              ),
+                            ))),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisAlignment: screenWidth > 600
-                        ? MainAxisAlignment.spaceBetween
+                        ? MainAxisAlignment.start
                         : MainAxisAlignment.spaceEvenly,
                     children: [
                       Text(
@@ -163,7 +185,7 @@ class DishTile extends StatelessWidget {
                             child: Icon(Icons.timer, color: Colors.grey.shade400),
                           ),
                           SizedBox(width: 5), */
-                           if (fromType! != 'no')
+                          if (fromType! != 'no')
                             Padding(
                               padding: EdgeInsets.only(
                                   right: MediaQuery.of(context).size.width > 600
@@ -206,7 +228,6 @@ class DishTile extends StatelessWidget {
                                   screenWidth > 600 ? 12 : screenWidth * 0.025,
                             ),
                           ),
-                         
                         ],
                       ),
                     ],

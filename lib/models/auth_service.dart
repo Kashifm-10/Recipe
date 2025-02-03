@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -8,6 +9,7 @@ import 'package:recipe/pages/loginPage.dart';
 import 'package:recipe/pages/smallScreens/s_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:intl/intl.dart';
 
 class AuthService {
   String generateRandomPassword() {
@@ -67,15 +69,17 @@ class AuthService {
       // Check if the email is already registered in Supabase
       final response = await Supabase.instance.client
           .from('users')
-          .select('email, access') // Only check for the email field
+          .select('email, access, date') // Only check for the email field
           .eq('email', userEmail);
 
       // Convert the response to a list of maps
       final data = List<Map<String, dynamic>>.from(response);
       String access = data.first['access'];
+      String date = data.first['date'];
 
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('access', access);
+      await prefs.setString('date', date);
       await prefs.setBool("isLoggedIn", true);
 
       if (data.isEmpty) {
@@ -86,7 +90,9 @@ class AuthService {
               await Supabase.instance.client.from('users').insert([
             {
               'name': userName,
-              'email': userEmail,
+              'email': userEmail.toLowerCase(),
+              'date':(DateFormat('dd-MM-yyyy').format(DateTime.now())).toString(),
+              'access': false,
               'password':
                   password, // No password needed for Google sign-in, or set a placeholder
             }
@@ -125,8 +131,25 @@ class AuthService {
       );
     } catch (e) {
       print("Google sign-in error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: No Internet Connection')));
+       const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'Login failed!',
+            message: 'No Internet Connection',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
     }
   }
 

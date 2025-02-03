@@ -15,7 +15,6 @@ import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:http_parser/http_parser.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -67,6 +66,7 @@ class _smalldishesListState extends State<smalldishesList> {
 
   String dropdownValue = 'A-Z'; // Class-level variable
   int? serial = 0;
+  String? key = '';
   List<bool> _isSelected = [true, false, false]; // Default to filter by all
   int _currentIndex = 0;
   String? dishName;
@@ -117,12 +117,14 @@ class _smalldishesListState extends State<smalldishesList> {
     'assets/lottie_json/fall.json',
     'assets/lottie_json/cups.json'
   ];
+
   late final String selectedLottie;
 
   @override
   void initState() {
     super.initState();
     selectedLottie = _lottieFiles[_random.nextInt(_lottieFiles.length)];
+    fetchAIKey();
     _createTutorial();
     Timer(const Duration(seconds: 2), () {
       setState(() {
@@ -131,6 +133,20 @@ class _smalldishesListState extends State<smalldishesList> {
     });
     readDishes(widget.type!);
     _speech = stt.SpeechToText();
+  }
+
+   Future<void> fetchAIKey() async {
+    final response = await supabase
+        .from('keys') // Replace with your table name
+        .select(
+            'key') // Replace with the column name where the serial is stored
+        .eq('name', 'imagine')
+        .single();
+
+    setState(() {
+      key = response['key'] ?? 0;
+    });
+    print(key); // Replace with your column name
   }
 
   void _startListening() async {
@@ -197,6 +213,7 @@ class _smalldishesListState extends State<smalldishesList> {
 
   //function to create a note
   void createDish() {
+    ai = false;
     const red = Color(0xFFFD0821);
     const green = Color(0xFF46E82E);
     const borderWidth = 10.0;
@@ -465,8 +482,8 @@ class _smalldishesListState extends State<smalldishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label: const Text('Pick from Gallery',
-                              style: TextStyle(color: Colors.white)),
+                          label:   Text('Pick from Gallery',
+                                style: GoogleFonts.poppins(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -477,7 +494,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                 horizontal: 20.0, vertical: 12.0),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         ElevatedButton.icon(
@@ -486,9 +503,9 @@ class _smalldishesListState extends State<smalldishesList> {
                             Icons.camera,
                             color: Colors.white,
                           ),
-                          label: const Text(
-                            'Take a Picture',
-                            style: TextStyle(color: Colors.white),
+                          label:   Text(
+                            'Take a Picture'
+                            ,  style: GoogleFonts.poppins(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -514,21 +531,21 @@ class _smalldishesListState extends State<smalldishesList> {
                   foregroundColor: Colors.grey.shade600,
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
               ElevatedButton(
                 onPressed: () async {
-                  showLoadingDialog(context);
                   setState(() {
                     // Check if the text field is empty
                     isTextFieldEmpty = textController.text.isEmpty;
                   });
 
                   if (!isTextFieldEmpty) {
+                    showLoadingDialog(context);
                     if (!ai) {
                       await _uploadImage(serial.toString());
                     } else {
-                      await generateAIImage(serial.toString());
+                      await generateAIImage(serial.toString(), true);
                       await _uploadToCloudinaryFromAI(
                           _imageBytes!, serial.toString());
                     }
@@ -591,6 +608,7 @@ class _smalldishesListState extends State<smalldishesList> {
   }
 
   void updateDish(Dish name, String type, String dish) async {
+     ai = false;
     final response = await Supabase.instance.client
         .from('dishes')
         .select('id') // Specify the field to fetch
@@ -635,9 +653,9 @@ class _smalldishesListState extends State<smalldishesList> {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text("Confirm Deletion"),
-                            content: const Text(
-                                "Are you sure you want to delete this dish?"),
+                            title:    Text("Confirm Deletion",  style: GoogleFonts.poppins()),
+                            content:   Text(
+                                "Are you sure you want to delete this dish?",  style: GoogleFonts.poppins()),
                             actions: [
                               TextButton(
                                 onPressed: () async {
@@ -647,14 +665,14 @@ class _smalldishesListState extends State<smalldishesList> {
                                       context); // Close confirmation dialog
                                   Navigator.pop(context); // Close update dialog
                                 },
-                                child: const Text("Yes, Delete"),
+                                child:   Text("Yes, Delete",  style: GoogleFonts.poppins()),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(
                                       context); // Close confirmation dialog
                                 },
-                                child: const Text("Cancel"),
+                                child:   Text("Cancel",  style: GoogleFonts.poppins()),
                               ),
                             ],
                           ),
@@ -916,8 +934,8 @@ class _smalldishesListState extends State<smalldishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label: const Text('Pick from Gallery',
-                              style: TextStyle(color: Colors.white)),
+                          label:   Text('Pick from Gallery'
+                            ,  style: GoogleFonts.poppins(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -928,7 +946,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                 horizontal: 20.0, vertical: 12.0),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 10,
                         ),
                         ElevatedButton.icon(
@@ -937,9 +955,9 @@ class _smalldishesListState extends State<smalldishesList> {
                             Icons.camera,
                             color: Colors.white,
                           ),
-                          label: const Text(
-                            'Take a Picture',
-                            style: TextStyle(color: Colors.white),
+                          label:   Text(
+                            'Take a Picture'
+                           ,  style: GoogleFonts.poppins(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -966,12 +984,12 @@ class _smalldishesListState extends State<smalldishesList> {
                   foregroundColor: Colors.grey.shade600,
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
               // Update Button
               ElevatedButton(
                 onPressed: () async {
-                  showUpdatingingDialog(context);
+                  showLoadingDialog(context);
 
                   setState(() {
                     // Check if the text field is empty
@@ -997,6 +1015,7 @@ class _smalldishesListState extends State<smalldishesList> {
                         _uploadedImageUrl == ' ' ? url : _uploadedImageUrl!);
                     Navigator.pop(context);
                     _uploadedImageUrl = ' ';
+                     ai = false;
                     textController.clear();
                     Navigator.pop(context);
                   }
@@ -1281,7 +1300,7 @@ class _smalldishesListState extends State<smalldishesList> {
     }
   }
 
-  Future<void> generateAIImage(String serial) async {
+/*   Future<void> generateAIImage(String serial) async {
     // Get the prompt from the TextField
     String prompt = textController.text.isNotEmpty
         ? textController.text
@@ -1289,7 +1308,7 @@ class _smalldishesListState extends State<smalldishesList> {
 
     var headers = {
       'Authorization':
-          'Bearer vk-y5TVB2IIbx3NR14FFMejRTP522iUQFw2X4N0qwF9sUDD8CWm'
+          'Bearer $key'
     };
 
     var request = http.MultipartRequest(
@@ -1300,7 +1319,38 @@ class _smalldishesListState extends State<smalldishesList> {
       'style': 'realistic',
       'aspect_ratio': '4:3',
       'seed': '5'
-    });
+    }); */ //old fetch without new
+
+     Future<void> generateAIImage(String serial, bool useSeed) async {
+    // Get the prompt from the TextField
+    String prompt = textController.text.isNotEmpty
+        ? textController.text
+        : 'food'; // Default prompt if empty
+
+    /* var headers = {
+      'Authorization':
+          'Bearer vk-y5TVB2IIbx3NR14FFMejRTP522iUQFw2X4N0qwF9sUDD8CWm'
+    }; */
+    var headers = {
+      'Authorization':
+          'Bearer $key'
+    };
+
+    var request = http.MultipartRequest(
+        'POST', Uri.parse('https://api.vyro.ai/v2/image/generations'));
+
+    var fields = {
+      'prompt': prompt,
+      'style': 'realistic',
+      'aspect_ratio': '4:3',
+    };
+
+    if (useSeed) {
+      // Only add 'seed' if useSeed is true
+      fields['seed'] = '5';
+    }
+
+    request.fields.addAll(fields);
 
     request.headers.addAll(headers);
 
@@ -1483,14 +1533,14 @@ class _smalldishesListState extends State<smalldishesList> {
         if (!ai) {
           await _uploadImage(serial.toString());
         } else {
-          await generateAIImage(serial.toString());
+          await generateAIImage(serial.toString(), false);
           await _uploadToCloudinaryFromAI(_imageBytes!, serial.toString());
         }
       } else {
         if (!ai) {
           await _uploadImage(serial.toString());
         } else {
-          await generateAIImage(serial.toString());
+          await generateAIImage(serial.toString(), false);
           await _uploadToCloudinaryFromAI(_imageBytes!, serial.toString());
         }
       }
@@ -1499,48 +1549,61 @@ class _smalldishesListState extends State<smalldishesList> {
     }
   }
 
-  void showLoadingDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return Dialog(
+void showLoadingDialog(BuildContext context) {
+  showDialog(
+    context: context,
+    barrierDismissible: false,
+    builder: (BuildContext context) {
+      return WillPopScope(
+        onWillPop: () async => false, // Prevent back button dismiss
+        child: Dialog(
+          backgroundColor: Colors.transparent,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(15),
           ),
           child: Container(
-            height: MediaQuery.of(context).size.height * 0.05,
+            height: MediaQuery.of(context).size.height * 0.1,
             width: MediaQuery.of(context).size.width * 0.07,
             decoration: BoxDecoration(
-              color: colorList[int.parse(widget.type!) -
-                  1], // Set the background color to orange
-              borderRadius: BorderRadius.circular(15), // Match dialog shape
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(15),
             ),
-            padding: const EdgeInsets.all(0.0),
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Creating",
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white, // Set text color to white
+            padding: EdgeInsets.symmetric(
+              horizontal: MediaQuery.of(context).size.width * 0.2,
+            ),
+            child: ai
+                ? Container(
+                    decoration: BoxDecoration(
+                      color: colorList[int.parse(widget.type!) - 1],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    width: 10,
+                    child: ColorFiltered(
+                      colorFilter: const ColorFilter.mode(
+                          Colors.white, BlendMode.srcATop),
+                      child: Lottie.asset(
+                        'assets/lottie_json/pulsing_ai2.json',
+                        repeat: true,
+                      ),
+                    ),
+                  )
+                : Container(
+                    decoration: BoxDecoration(
+                      color: colorList[int.parse(widget.type!) - 1],
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    width: 10,
+                    child: Lottie.asset(
+                      'assets/lottie_json/creating.json',
+                      repeat: true,
+                    ),
                   ),
-                ),
-                SizedBox(width: 16),
-                CircularProgressIndicator(
-                  strokeWidth: 5,
-                  color: Colors.white, // Set progress indicator color to white
-                ),
-              ],
-            ),
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
 
   void showUpdatingingDialog(BuildContext context) {
     showDialog(
@@ -1560,13 +1623,13 @@ class _smalldishesListState extends State<smalldishesList> {
               borderRadius: BorderRadius.circular(15), // Match dialog shape
             ),
             padding: const EdgeInsets.all(0.0),
-            child: const Row(
+            child:  Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Updating",
-                  style: TextStyle(
+                  "Updating"
+                 ,  style: GoogleFonts.poppins(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white, // Set text color to white
@@ -1671,9 +1734,12 @@ class _smalldishesListState extends State<smalldishesList> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(
-                              15.0), // All corners rounded
+                          color: _isSearchVisible
+                              ? Colors.grey.shade400
+                              : Colors.white,
+                          borderRadius: BorderRadius.circular(!_isSearchVisible
+                              ? 30
+                              : 12.0), // All corners rounded
                           // Rounded except top-right and bottom-right
                           boxShadow: const [
                             BoxShadow(
@@ -1686,7 +1752,7 @@ class _smalldishesListState extends State<smalldishesList> {
                         child: Row(
                           children: [
                             Container(
-                              margin: const EdgeInsets.all(0),
+                              margin: const EdgeInsets.all(01),
                               width: MediaQuery.of(context).size.width * 0.11,
                               height:
                                   MediaQuery.of(context).size.height * 0.035,
@@ -1765,7 +1831,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                                 0.035,
                                         decoration: BoxDecoration(
                                           color: Colors.white,
-                                          borderRadius: BorderRadius.only(
+                                          borderRadius: /* BorderRadius.only(
                                             topRight: Radius.circular(
                                                 MediaQuery.of(context)
                                                         .size
@@ -1786,8 +1852,9 @@ class _smalldishesListState extends State<smalldishesList> {
                                                         .size
                                                         .width *
                                                     0.03),
-                                          ),
-                                          boxShadow: [
+                                          ), */
+                                              BorderRadius.circular(12),
+                                          boxShadow: const [
                                             BoxShadow(
                                               color: Colors.black26,
                                               spreadRadius: 0,
@@ -1899,9 +1966,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                   iconAnimationType: AnimationType.onHover,
                                   style: ToggleStyle(
                                     borderColor: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(
-                                        MediaQuery.of(context).size.width *
-                                            0.03),
+                                    borderRadius: BorderRadius.circular(12),
                                     boxShadow: [
                                       const BoxShadow(
                                         color: Colors.black26,
@@ -1962,9 +2027,7 @@ class _smalldishesListState extends State<smalldishesList> {
                                     height: MediaQuery.of(context).size.height *
                                         0.035,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(
-                                          MediaQuery.of(context).size.width *
-                                              0.03),
+                                      borderRadius: BorderRadius.circular(12),
                                       color: Colors.white,
                                       boxShadow: [
                                         BoxShadow(
@@ -2005,14 +2068,12 @@ class _smalldishesListState extends State<smalldishesList> {
                                       onPressed: () async {
                                         await loadSerial();
                                         createDish();
+                                        //showLoadingDialog(context);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         shape: RoundedRectangleBorder(
                                           borderRadius: BorderRadius.circular(
-                                              MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  0.03), // Adjust the corner radius if needed
+                                              12), // Adjust the corner radius if needed
                                         ),
                                         backgroundColor: Colors.white,
                                         foregroundColor: Colors.black,
@@ -2043,8 +2104,8 @@ class _smalldishesListState extends State<smalldishesList> {
               child: _isLoading
                   ? Center(
                       child: ColorFiltered(
-                        colorFilter:
-                            ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcIn),
                         child: Lottie.asset(
                           'assets/lottie_json/loadingspoons.json',
                           width: screenWidth * 0.4,

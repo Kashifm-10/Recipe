@@ -7,7 +7,6 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:ionicons/ionicons.dart';
-import 'package:lite_rolling_switch/lite_rolling_switch.dart';
 import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
@@ -91,10 +90,10 @@ class _smallalldishesListState extends State<smallalldishesList> {
   }
 
   Future<void> _onFilterChanged(List<dynamic> selectedList) async {
+    selectedIngredients.clear();
+    selectedSerials.clear();
+    finalSerials.clear();
     if (selectedList.isNotEmpty) {
-      selectedIngredients.clear();
-      selectedSerials.clear();
-      finalSerials.clear();
       for (int i = 0; i < selectedList.length; i++) {
         final String selectedValue =
             selectedList[0].name; // Get the name of the selected item
@@ -111,7 +110,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
           // Always update finalSerials after any operation
         });
       }
-      _updateFinalSerialsForCycle();
+      await _updateFinalSerialsForCycle();
 
       // Apply filter and sort
     } else {
@@ -125,25 +124,27 @@ class _smallalldishesListState extends State<smallalldishesList> {
     super.initState();
     _createTutorial();
     fetchSortingOptions();
+    _filterAndSortNotes();
 
     Timer(const Duration(seconds: 1), () {
       setState(() {
         _isLoading = false;
       });
     });
-        _loadData();
-_filterAndSortNotes();
+    _loadData();
     readDishes();
     loadSerial();
     _filterbying();
+    _filterAndSortNotes();
+
     _speech = stt.SpeechToText();
   }
 
   Future<void> fetchSortingOptions() async {
-final response = await supabase
-    .from('ingredients')
-    .select()
-    .order('name', ascending: true); // Sort in ascending order by 'name'
+    final response = await supabase
+        .from('ingredients')
+        .select()
+        .order('name', ascending: true); // Sort in ascending order by 'name'
 
     setState(() {
       _filterOptions = response
@@ -553,7 +554,7 @@ final response = await supabase
     print('Remaining selected ingredients: ${selectedIngredients.join(', ')}');
   }
 
-  void _updateFinalSerialsForCycle() {
+  Future<void> _updateFinalSerialsForCycle() async {
     setState(() {
       /*  if (selectedIngredients.isEmpty) {
         // Clear finalSerials if no ingredients are selected
@@ -578,7 +579,7 @@ final response = await supabase
       } */
       finalSerials = selectedSerials;
     });
-
+    _filterAndSortNotes();
     print('Final serials after update: ${finalSerials.join(', ')}');
   }
 
@@ -628,11 +629,11 @@ final response = await supabase
     final titleFontSize = screenWidth * 0.08;
 
     // Update notes based on selected filter, sort, and search
-   // _filterAndSortNotes();
+    // _filterAndSortNotes();
     // _filterbying();
 
-   // readDishes();
-   // _loadData();
+    // readDishes();
+    // _loadData();
 
     return Scaffold(
       backgroundColor: widget.scafColor,

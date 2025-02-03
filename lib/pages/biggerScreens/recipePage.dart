@@ -172,7 +172,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   color: (Theme.of(context).primaryColor),
                 ),
                 const SizedBox(width: 20),
-                const Text("Processing..."),
+                 Text("Processing...",  style: GoogleFonts.poppins()),
               ],
             ),
           ),
@@ -270,19 +270,19 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title: const Text('Confirm Deletion'),
+                                      title:   Text('Confirm Deletion',  style: GoogleFonts.poppins()),
                                       content: Text(
-                                          'Are you sure you want to delete "$name"?'),
+                                          'Are you sure you want to delete "$name"?',  style: GoogleFonts.poppins()),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, false),
-                                          child: const Text('Cancel'),
+                                          child:   Text('Cancel',  style: GoogleFonts.poppins()),
                                         ),
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, true),
-                                          child: const Text('Delete'),
+                                          child:   Text('Delete',  style: GoogleFonts.poppins()),
                                         ),
                                       ],
                                     );
@@ -492,7 +492,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                     TextField(
                                       controller: quantityController,
                                       decoration: InputDecoration(
-                                        labelStyle: const TextStyle(
+                                        labelStyle: GoogleFonts.poppins(
                                             color: Colors.black),
                                         labelText: 'Quantity',
                                         border: OutlineInputBorder(
@@ -533,7 +533,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   children: [
                                     DropdownButtonFormField<String>(
                                       decoration: InputDecoration(
-                                        labelStyle: const TextStyle(
+                                        labelStyle: GoogleFonts.poppins(
                                             color: Colors.black),
                                         labelText: 'Unit',
                                         border: OutlineInputBorder(
@@ -564,14 +564,14 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                       items: unitOptions.map((String unit) {
                                         return DropdownMenuItem<String>(
                                           value: unit,
-                                          child: Text(unit),
+                                          child: Text(unit,  style: GoogleFonts.poppins()),
                                         );
                                       }).toList(),
                                       onChanged: (String? value) {
                                         setState(() => selectedUnit = value);
                                       },
                                       value: selectedUnit,
-                                      hint: const Text('Select'),
+                                      hint:   Text('Select',  style: GoogleFonts.poppins()),
                                     ),
                                   ],
                                 ),
@@ -579,12 +579,17 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          Text(
-                            'Note: For quantity 1/2 enter 0.5 and for 1/4 enter 0.25',
-                            style: GoogleFonts.poppins(
+                          Align(
+                            alignment:
+                                Alignment.centerLeft, // Align text to the left
+                            child: Text(
+                              'Note: Enter 0.5 for 1/2 and 0.25 for 1/4.',
+                              style: GoogleFonts.poppins(
                                 color: Colors.grey.shade600,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                           if (isQuantity)
                             Text(
@@ -624,7 +629,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
 
               // Create Button
@@ -639,8 +644,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isName = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Ingredient name is required.')),
+                        SnackBar(
+                          content: Text('Ingredient name is required.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -655,9 +660,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                        SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).')),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -672,7 +677,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a unit.')),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -710,7 +715,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   ),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Create'),
+                child:   Text('Create',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -788,9 +793,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text("Confirm Action"),
-                        content: const Text(
-                            "Are you sure you want to delete this ingredient?"),
+                        title:  Text("Confirm Action",  style: GoogleFonts.poppins()),
+                        content:   Text(
+                            "Are you sure you want to delete this ingredient?",  style: GoogleFonts.poppins()),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -798,13 +803,13 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
-                            child: const Text("Yes, Delete"),
+                            child:   Text("Yes, Delete",  style: GoogleFonts.poppins()),
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text("Cancel"),
+                            child:   Text("Cancel",  style: GoogleFonts.poppins()),
                           ),
                         ],
                       ),
@@ -897,14 +902,14 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                       items: unitOptions.map((String unit) {
                                         return DropdownMenuItem<String>(
                                           value: unit,
-                                          child: Text(unit),
+                                          child: Text(unit,  style: GoogleFonts.poppins()),
                                         );
                                       }).toList(),
                                       onChanged: (String? value) {
                                         setState(() => selectedUnit = value);
                                       },
                                       value: selectedUnit,
-                                      hint: const Text('Select'),
+                                      hint:   Text('Select',  style: GoogleFonts.poppins()),
                                     ),
                                   ],
                                 ),
@@ -912,12 +917,17 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             ],
                           ),
                           const SizedBox(height: 10),
-                          Text(
-                            'Note: For quantity 1/2 enter 0.5 and for 1/4 enter 0.25',
-                            style: GoogleFonts.poppins(
+                          Align(
+                            alignment:
+                                Alignment.centerLeft, // Align text to the left
+                            child: Text(
+                              'Note: Enter 0.5 for 1/2 and 0.25 for 1/4.',
+                              style: GoogleFonts.poppins(
                                 color: Colors.grey.shade600,
                                 fontSize: 14,
-                                fontWeight: FontWeight.w500),
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
                           ),
                           if (isQuantity)
                             Text(
@@ -956,7 +966,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
 
               // Update Button
@@ -971,8 +981,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isName = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Ingredient name is required.')),
+                        SnackBar(
+                          content: Text('Ingredient name is required.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -987,9 +997,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                        SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).')),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -1004,7 +1014,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a unit.')),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -1058,7 +1068,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   ),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Update'),
+                child:   Text('Update',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -1206,7 +1216,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
                 },
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1237,7 +1247,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     });
                   }
                 },
-                child: const Text('Add Recipe'),
+                child:   Text('Add Recipe' ,  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -1300,8 +1310,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                           style:
                               GoogleFonts.poppins(fontWeight: FontWeight.bold),
                         ),
-                        content: const Text(
-                          "Are you sure you want to delete this recipe?",
+                        content:   Text(
+                          "Are you sure you want to delete this recipe?",  style: GoogleFonts.poppins()
                         ),
                         actions: [
                           TextButton(
@@ -1321,7 +1331,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               Navigator.pop(
                                   context); // Close confirmation dialog
                             },
-                            child: const Text("Cancel"),
+                            child:   Text("Cancel",  style: GoogleFonts.poppins()),
                           ),
                         ],
                       ),
@@ -1387,7 +1397,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
                 },
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1420,7 +1430,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     });
                   }
                 },
-                child: const Text('Update Recipe'),
+                child:   Text('Update Recipe',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -1526,7 +1536,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Cancel'),
+            child:   Text('Cancel',  style: GoogleFonts.poppins()),
           ),
 
           // Create Button
@@ -1552,8 +1562,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 // Optionally, show an error message for invalid input
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid URL'),
+                      SnackBar(
+                      content: Text('Please enter a valid URL',  style: GoogleFonts.poppins()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1569,7 +1579,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               ),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Create'),
+            child:   Text('Create',  style: GoogleFonts.poppins()),
           ),
         ],
       ),
@@ -1673,7 +1683,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Cancel'),
+            child:   Text('Cancel',  style: GoogleFonts.poppins()),
           ),
 
           // Update Button
@@ -1700,8 +1710,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 // Optionally, show an error message for invalid input
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Please enter a valid URL'),
+                      SnackBar(
+                      content: Text('Please enter a valid URL',  style: GoogleFonts.poppins()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1717,7 +1727,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               ),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Create'),
+            child:   Text('Create',  style: GoogleFonts.poppins()),
           ),
         ],
       ),
@@ -1956,8 +1966,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 10.0),
                           child: Text(
-                            widget.dish != null && widget.dish!.length > 20
-                                ? '${widget.dish!.substring(0, 10)}...'
+                            widget.dish != null && widget.dish!.length > 22
+                                ? '${widget.dish!.substring(0, 19)}...'
                                 : widget.dish ?? '',
                             style: GoogleFonts.poppins(
                               fontSize: MediaQuery.of(context).size.width > 600
@@ -2004,8 +2014,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                 createLink();
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('No links available')),
+                                    SnackBar(
+                                      content: Text('No links available',  style: GoogleFonts.poppins())),
                                 );
                                 return;
                               }
@@ -2047,11 +2057,11 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 Tab(text: 'Ingredients'),
                 Tab(text: 'Instructions'),
               ],
-              labelStyle: GoogleFonts.montserrat(
+              labelStyle: GoogleFonts.poppins(
                 fontSize: MediaQuery.of(context).size.width > 600 ? 30 : 14.0,
                 fontWeight: FontWeight.bold,
               ),
-              unselectedLabelStyle: GoogleFonts.montserrat(
+              unselectedLabelStyle: GoogleFonts.poppins(
                 fontSize: MediaQuery.of(context).size.width > 600 ? 25.0 : 12.0,
               ),
               labelColor: Colors.white,
@@ -2093,15 +2103,18 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       ),
                       child: CachedNetworkImage(
                         imageUrl: widget.imageURL!,
-                        fit: BoxFit.cover,
-                        placeholder: (context, url) =>
-                            Center(child: CircularProgressIndicator( color: widget.background,)),
+                        fit: BoxFit.fitWidth,
+                        placeholder: (context, url) => Center(
+                            child: CircularProgressIndicator(
+                          color: widget.background,
+                        )),
                         errorWidget: (context, url, error) =>
                             CachedNetworkImage(
                           imageUrl: images[int.parse(widget.type!) - 1],
-                          fit: BoxFit.cover,
-                          placeholder: (context, url) =>
-                              Center(child: CircularProgressIndicator(color: widget.background)),
+                          fit: BoxFit.fitWidth,
+                          placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(
+                                  color: widget.background)),
                           errorWidget: (context, url, error) =>
                               Icon(Icons.error),
                         ),
@@ -2131,125 +2144,140 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                           Padding(
                             padding: const EdgeInsets.only(
                                 top: 10, right: 30.0, bottom: 10),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Text(
-                                  "Calculator : ",
-                                  style: GoogleFonts.poppins(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width > 600
-                                            ? 20
-                                            : 15,
-                                    fontWeight: FontWeight.w600,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                                DropdownButtonHideUnderline(
-                                  child: DropdownButton2<String>(
-                                    isExpanded: true,
-                                    hint: Row(
-                                      children: [
-                                        Icon(
-                                          Icons.list,
-                                          size: MediaQuery.of(context)
+                            child: currentNotes.isEmpty
+                                ? null
+                                : Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      Text(
+                                        "Calculator : ",
+                                        style: GoogleFonts.poppins(
+                                          fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width >
                                                   600
-                                              ? 16
-                                              : 8,
+                                              ? 20
+                                              : 15,
+                                          fontWeight: FontWeight.w600,
                                           color: Colors.white,
                                         ),
-                                        const SizedBox(width: 4),
-                                        Expanded(
-                                          child: Text(
-                                            '1',
-                                            style: GoogleFonts.poppins(
-                                              fontSize: MediaQuery.of(context)
-                                                          .size
-                                                          .width >
-                                                      600
-                                                  ? 14
-                                                  : 10,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.black,
+                                      ),
+                                      DropdownButtonHideUnderline(
+                                        child: DropdownButton2<String>(
+                                          isExpanded: true,
+                                          hint: Row(
+                                            children: [
+                                              Icon(
+                                                Icons.list,
+                                                size: MediaQuery.of(context)
+                                                            .size
+                                                            .width >
+                                                        600
+                                                    ? 16
+                                                    : 8,
+                                                color: Colors.white,
+                                              ),
+                                              const SizedBox(width: 4),
+                                              Expanded(
+                                                child: Text(
+                                                  '1',
+                                                  style: GoogleFonts.poppins(
+                                                    fontSize:
+                                                        MediaQuery.of(context)
+                                                                    .size
+                                                                    .width >
+                                                                600
+                                                            ? 14
+                                                            : 10,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                          items: items
+                                              .map((String item) =>
+                                                  DropdownMenuItem<String>(
+                                                    value: item,
+                                                    child: Text(
+                                                      item,
+                                                      style:
+                                                          GoogleFonts.poppins(
+                                                        fontSize: MediaQuery.of(
+                                                                        context)
+                                                                    .size
+                                                                    .width >
+                                                                600
+                                                            ? 14
+                                                            : 10,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        color: Colors.black,
+                                                      ),
+                                                      overflow:
+                                                          TextOverflow.ellipsis,
+                                                    ),
+                                                  ))
+                                              .toList(),
+                                          value: selectedValue,
+                                          onChanged: (String? value) {
+                                            setState(() {
+                                              selectedValue = value;
+                                            });
+                                          },
+                                          buttonStyleData: ButtonStyleData(
+                                            height: 30,
+                                            width: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.08,
+                                            padding: const EdgeInsets.only(
+                                                left: 14, right: 14),
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              color: Colors.white,
                                             ),
-                                            overflow: TextOverflow.ellipsis,
+                                            elevation: 0,
+                                          ),
+                                          iconStyleData: const IconStyleData(
+                                            icon:
+                                                Icon(Icons.keyboard_arrow_down),
+                                            iconSize: 14,
+                                            iconEnabledColor: Colors.black,
+                                            iconDisabledColor: Colors.grey,
+                                          ),
+                                          dropdownStyleData: DropdownStyleData(
+                                            maxHeight: 200,
+                                            width: 60,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(14),
+                                              color: Colors.white,
+                                            ),
+                                            offset: const Offset(0, 0),
+                                            scrollbarTheme: ScrollbarThemeData(
+                                              radius: const Radius.circular(40),
+                                              thickness: MaterialStateProperty
+                                                  .all<double>(6),
+                                              thumbVisibility:
+                                                  MaterialStateProperty.all<
+                                                      bool>(true),
+                                            ),
+                                          ),
+                                          menuItemStyleData:
+                                              const MenuItemStyleData(
+                                            height: 40,
+                                            padding: EdgeInsets.only(
+                                                left: 14, right: 14),
                                           ),
                                         ),
-                                      ],
-                                    ),
-                                    items: items
-                                        .map((String item) =>
-                                            DropdownMenuItem<String>(
-                                              value: item,
-                                              child: Text(
-                                                item,
-                                                style: GoogleFonts.poppins(
-                                                  fontSize:
-                                                      MediaQuery.of(context)
-                                                                  .size
-                                                                  .width >
-                                                              600
-                                                          ? 14
-                                                          : 10,
-                                                  fontWeight: FontWeight.bold,
-                                                  color: Colors.black,
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ))
-                                        .toList(),
-                                    value: selectedValue,
-                                    onChanged: (String? value) {
-                                      setState(() {
-                                        selectedValue = value;
-                                      });
-                                    },
-                                    buttonStyleData: ButtonStyleData(
-                                      height: 30,
-                                      width: 60,
-                                      padding: const EdgeInsets.only(
-                                          left: 14, right: 14),
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        color: Colors.white,
                                       ),
-                                      elevation: 0,
-                                    ),
-                                    iconStyleData: const IconStyleData(
-                                      icon: Icon(Icons.keyboard_arrow_down),
-                                      iconSize: 14,
-                                      iconEnabledColor: Colors.black,
-                                      iconDisabledColor: Colors.grey,
-                                    ),
-                                    dropdownStyleData: DropdownStyleData(
-                                      maxHeight: 200,
-                                      width: 60,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(14),
-                                        color: Colors.white,
-                                      ),
-                                      offset: const Offset(0, 0),
-                                      scrollbarTheme: ScrollbarThemeData(
-                                        radius: const Radius.circular(40),
-                                        thickness:
-                                            MaterialStateProperty.all<double>(
-                                                6),
-                                        thumbVisibility:
-                                            MaterialStateProperty.all<bool>(
-                                                true),
-                                      ),
-                                    ),
-                                    menuItemStyleData: const MenuItemStyleData(
-                                      height: 40,
-                                      padding:
-                                          EdgeInsets.only(left: 14, right: 14),
-                                    ),
+                                    ],
                                   ),
-                                ),
-                              ],
-                            ),
                           ),
                           Padding(
                             padding: const EdgeInsets.only(left: 20.0),
@@ -2267,7 +2295,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                     ? Center(
                                         child: Padding(
                                           padding: EdgeInsets.symmetric(
-                                              vertical: screenWidth * 0.3),
+                                              vertical: screenWidth * 0.2),
                                           child: GestureDetector(
                                             onTap: createIngredient,
                                             child: Column(
@@ -2421,25 +2449,33 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                               ],
                                             ),
                                           ),
-                                          ListView.builder(
-                                            shrinkWrap: true,
-                                            itemCount: currentNotes.length,
-                                            itemBuilder: (context, index) {
-                                              final note = currentNotes[index];
-                                              return ingredientList(
-                                                count: selectedValue!,
-                                                dish: widget.dish,
-                                                text: note.name!,
-                                                quantity: double.parse(
-                                                    note.quantity!),
-                                                uom: note.uom,
-                                                access: widget.access!,
-                                                onEditPressed: () =>
-                                                    updateIng(note, note.name!),
-                                                onDeletePressed: () =>
-                                                    deleteIng(note.name!),
-                                              );
-                                            },
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.5,
+                                            child: ListView.builder(
+                                              shrinkWrap: true,
+                                              itemCount: currentNotes.length,
+                                              itemBuilder: (context, index) {
+                                                final note =
+                                                    currentNotes[index];
+                                                return ingredientList(
+                                                  count: selectedValue!,
+                                                  dish: widget.dish,
+                                                  text: note.name!,
+                                                  quantity: double.parse(
+                                                      note.quantity!),
+                                                  uom: note.uom,
+                                                  access: widget.access!,
+                                                  onEditPressed: () =>
+                                                      updateIng(
+                                                          note, note.name!),
+                                                  onDeletePressed: () =>
+                                                      deleteIng(note.name!),
+                                                );
+                                              },
+                                            ),
                                           ),
                                         ],
                                       ),

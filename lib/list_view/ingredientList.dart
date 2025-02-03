@@ -220,8 +220,9 @@ class ingredientList extends StatelessWidget {
                   horizontal: MediaQuery.of(context).size.width * 0.001),
               child: Container(
                 width: MediaQuery.of(context).size.width * 0.9,
-                height: 70.0, // Limit the height of the whole list
+                height: 30.0, // Limit the height of the whole list
                 child: ListView.builder(
+                  physics: NeverScrollableScrollPhysics(),
                   itemCount: items.length,
                   itemBuilder: (context, index) {
                     final item = items[index];

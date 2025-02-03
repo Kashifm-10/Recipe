@@ -12,6 +12,7 @@ import 'package:recipe/pages/registerPage.dart';
 import 'package:recipe/pages/smallScreens/s_home.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -32,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       final response = await Supabase.instance.client
           .from('users')
-          .select('email, password, name, access')
+          .select('email, password, name, access, date')
           .eq('email', _emailController.text.toLowerCase())
           .eq('password', _passwordController.text);
 
@@ -42,11 +43,13 @@ class _LoginScreenState extends State<LoginScreen> {
         String email = data.first['email'];
         String username = data.first['name'];
         String access = data.first['access'];
+        String date = data.first['date'];
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('email', email);
         await prefs.setString('name', username);
         await prefs.setString('access', access);
+        await prefs.setString('date', date);
         await prefs.setBool("isLoggedIn", true);
 
         Navigator.pushReplacement(
@@ -57,14 +60,45 @@ class _LoginScreenState extends State<LoginScreen> {
                   : const MySmallHomePage()),
         );
       } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid email or password')),
+       const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'OOPS!',
+            message: 'Invalid Email or Password',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
         );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       }
     } catch (e) {
       print("Email sign-in error: $e");
-      ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Login failed: No Internet Connection')));
+            const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'Login failed!',
+            message: 'No Internet Connection',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
     }
     setState(() {
       _isEmailSignInInProgress = false;
@@ -79,8 +113,25 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await AuthService().signInWithGoogle(context);
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+             const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'OOPS!',
+            message: 'Something went wrong',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
     } finally {
       setState(() {
         _isGoogleSignInInProgress = false;

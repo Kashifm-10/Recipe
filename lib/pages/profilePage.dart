@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -20,11 +21,13 @@ class _ProfilePageState extends State<ProfilePage> {
       firebase_auth.FirebaseAuth.instance.currentUser;
   String? email = '';
   String? username = '';
+  String? date = '';
   Future<void> _getUserDataFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       email = prefs.getString('email');
       username = prefs.getString('name');
+      date = prefs.getString('date');
     });
   }
 
@@ -32,6 +35,13 @@ class _ProfilePageState extends State<ProfilePage> {
   void initState() {
     super.initState();
     _getUserDataFromPrefs();
+  }
+
+  String toTitleCase(String text) {
+    return text.split(' ').map((word) {
+      if (word.isEmpty) return word; // Handle empty strings safely
+      return word[0].toUpperCase() + word.substring(1).toLowerCase();
+    }).join(' ');
   }
 
   @override
@@ -124,16 +134,27 @@ class _ProfilePageState extends State<ProfilePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
-                          Text(
-                            user?.displayName ?? username!,
-                            style: GoogleFonts.poppins(
+                          FittedBox(
+                            fit: BoxFit.scaleDown,
+                            child: Text(
+                              toTitleCase(user?.displayName ?? username!),
+                              style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.09,
-                                color: Color.fromARGB(255, 10, 10, 9)),
+                                color: Color.fromARGB(255, 10, 10, 9),
+                              ),
+                            ),
                           ),
                           Text(
                             user?.email ?? email!,
+                            style: GoogleFonts.poppins(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.03,
+                                color: Colors.grey[500]),
+                          ),
+                          Text(
+                            "Creating from: ${date!}",
                             style: GoogleFonts.poppins(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
@@ -170,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                               return Container(
                                 child: AlertDialog(
-                                  title: Text('Enter New Password'),
+                                  title: Text('Enter New Password',  style: GoogleFonts.poppins()),
                                   content: Form(
                                     key: _formKey,
                                     child: Column(
@@ -291,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Navigator.of(context)
                                             .pop(); // Close the dialog
                                       },
-                                      child: Text('Cancel'),
+                                      child: Text('Cancel',  style: GoogleFonts.poppins()),
                                     ),
                                     ElevatedButton(
                                       onPressed: () async {
@@ -311,12 +332,26 @@ class _ProfilePageState extends State<ProfilePage> {
                                                           .text);
 
                                           if (validateResponse.isEmpty) {
-                                            ScaffoldMessenger.of(context)
-                                                .showSnackBar(
-                                              SnackBar(
-                                                  content: Text(
-                                                      'Invalid current password')),
+                                            const snackBar = SnackBar(
+                                              /// need to set following properties for best effect of awesome_snackbar_content
+                                              elevation: 0,
+                                              behavior:
+                                                  SnackBarBehavior.floating,
+                                              backgroundColor:
+                                                  Colors.transparent,
+                                              content: AwesomeSnackbarContent(
+                                                color: Colors.red,
+                                                title: 'Oh Snap!',
+                                                message:
+                                                    'Invalid current password',
+
+                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                                contentType:
+                                                    ContentType.failure,
+                                                inMaterialBanner: true,
+                                              ),
                                             );
+
                                             return;
                                           }
 
@@ -331,15 +366,28 @@ class _ProfilePageState extends State<ProfilePage> {
 
                                           Navigator.of(context)
                                               .pop(); // Close the dialog
-                                          ScaffoldMessenger.of(context)
-                                              .showSnackBar(
-                                            SnackBar(
-                                                content: Text(
-                                                    'Password changed successfully!')),
+                                          const snackBar = SnackBar(
+                                            /// need to set following properties for best effect of awesome_snackbar_content
+                                            elevation: 0,
+                                            behavior: SnackBarBehavior.floating,
+                                            backgroundColor: Colors.transparent,
+                                            content: AwesomeSnackbarContent(
+                                              color: Colors.red,
+                                              title: 'Yay!',
+                                              message:
+                                                  'Password changed successfully!',
+
+                                              /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                              contentType: ContentType.failure,
+                                              inMaterialBanner: true,
+                                            ),
                                           );
+                                          ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
                                         }
                                       },
-                                      child: Text('Confirm'),
+                                      child: Text('Confirm',  style: GoogleFonts.poppins()),
                                     ),
                                   ],
                                 ),
@@ -359,10 +407,10 @@ class _ProfilePageState extends State<ProfilePage> {
                         child: Text(
                           'Change Password',
                           style: GoogleFonts.poppins(
-                            fontSize: MediaQuery.of(context).size.width * 0.035,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold
-                          ),
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
 /*                       SizedBox(
@@ -375,22 +423,22 @@ class _ProfilePageState extends State<ProfilePage> {
                                 builder: (BuildContext context) {
                                   return AlertDialog(
                                     title: const Text("Confirm Logout"),
-                                    content: const Text(
-                                        "Are you sure you want to logout?"),
+                                    content:  Text(
+                                        "Are you sure you want to logout?",  style: GoogleFonts.poppins()),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
                                               .pop(false); // Cancel
                                         },
-                                        child: const Text("No"),
+                                        child:  Text("No",  style: GoogleFonts.poppins()),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
                                               .pop(true); // Confirm
                                         },
-                                        child: const Text("Yes"),
+                                        child:  Text("Yes",  style: GoogleFonts.poppins()),
                                       ),
                                     ],
                                   );
@@ -429,8 +477,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               color: Colors.white,
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
-                              fontWeight: FontWeight.bold
-                              ),
+                              fontWeight: FontWeight.bold),
                         ),
                       ),
                       SizedBox(

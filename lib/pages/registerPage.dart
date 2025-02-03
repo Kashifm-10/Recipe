@@ -1,13 +1,22 @@
+import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
+import 'package:intl/intl.dart';
+import 'package:lottie/lottie.dart';
+import 'package:material_dialogs/dialogs.dart';
+import 'package:material_dialogs/widgets/buttons/icon_button.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:recipe/models/auth_service.dart';
 import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 
 // Make sure AuthService is available
 
@@ -22,6 +31,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
   final _usernameController = TextEditingController();
   final _formKey = GlobalKey<FormState>(); // FormKey to manage form validation
   bool _isGoogleSignInInProgress = false;
+  bool _isEmailSignUpInProgress = false;
   bool _obscureText = true;
 
   String? _usernameError;
@@ -67,6 +77,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     if (!_validateFields()) {
       return; // If validation fails, do nothing
     }
+    setState(() {
+      _isEmailSignUpInProgress = true;
+    });
 
     final response = await Supabase.instance.client
         .from('users')
@@ -79,34 +92,96 @@ class _RegisterScreenState extends State<RegisterScreen> {
       try {
         await Supabase.instance.client.from('users').insert([
           {
-            'name': _usernameController.text,
-            'email': _emailController.text,
+            'name': _usernameController.text.toLowerCase(),
+            'email': _emailController.text.toLowerCase(),
+            'date':
+                (DateFormat('dd-MM-yyyy').format(DateTime.now())).toString(),
+            'access': false,
             'password': _passwordController.text,
           }
         ]);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Email is registered successfully')),
-        );
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('user_email', _emailController.text);
         await prefs.setString('user_name', _usernameController.text);
 
+        setState(() {
+          _passwordController.clear();
+          _usernameController.clear();
+          _emailController.clear();
+        });
+        const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.green,
+            title: 'Registered!',
+            message: 'You have successfully registered',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.success,
+            inMaterialBanner: true,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
+
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => LoginScreen()),
+          PageTransition(
+            curve: Curves.linear,
+            type: PageTransitionType.leftToRightWithFade,
+            duration: const Duration(milliseconds: 800), // Adjust duration
+            child: LoginScreen(),
+          ),
         );
       } catch (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('An error occurred: $e')),
+       const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'OOPS!',
+            message: 'Something went wrong',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
         );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
       }
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Email is already registered')),
-      );
+      const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            title: 'OOPS!',
+            message: 'Email is already registered',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.warning,
+            inMaterialBanner: true,
+          ),
+        );
+
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
     }
+    setState(() {
+      _isEmailSignUpInProgress = false;
+    });
   }
 
   Future<void> _signInWithGoogle() async {
@@ -117,8 +192,24 @@ class _RegisterScreenState extends State<RegisterScreen> {
     try {
       await AuthService().signInWithGoogle(context);
     } catch (e) {
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text(e.toString())));
+     const snackBar = SnackBar(
+          /// need to set following properties for best effect of awesome_snackbar_content
+          elevation: 0,
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Colors.transparent,
+          content: AwesomeSnackbarContent(
+            color: Colors.red,
+            title: 'OOPS!',
+            message: 'Something went wrong',
+
+            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+            contentType: ContentType.failure,
+            inMaterialBanner: true,
+          ),
+        );
+        ScaffoldMessenger.of(context)
+          ..hideCurrentSnackBar()
+          ..showSnackBar(snackBar);
     } finally {
       setState(() {
         _isGoogleSignInInProgress = false;
@@ -160,13 +251,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(child: 
-                     Image.asset(
+                    Container(
+                        child: Image.asset(
                       'assets/images/banner.png',
-width: screenWidth > 600
-                        ?screenWidth * 0.3 : screenWidth * 0.4,                    )
-                    ),
-                   /*  SizedBox(height: screenHeight * 0.02),
+                      width: screenWidth > 600
+                          ? screenWidth * 0.3
+                          : screenWidth * 0.4,
+                    )),
+                    /*  SizedBox(height: screenHeight * 0.02),
                     Text(
                       'Create an Account',
                       style: GoogleFonts.poppins(
@@ -196,7 +288,7 @@ width: screenWidth > 600
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 8,
-                          offset: Offset(0, 4),
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
@@ -204,14 +296,13 @@ width: screenWidth > 600
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
-                        'Create an Account',
-                        style: GoogleFonts.poppins(
-                          fontSize: screenWidth * 0.04,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF5C2C2C),
+                          'Create an Account',
+                          style: GoogleFonts.poppins(
+                            fontSize: screenWidth * 0.04,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF5C2C2C),
+                          ),
                         ),
-                      ),
-                      
                         SizedBox(height: screenHeight * 0.02),
                         _buildTextField(
                           controller: _usernameController,
@@ -249,16 +340,22 @@ width: screenWidth > 600
                                 borderRadius: BorderRadius.circular(12),
                               ),
                             ),
-                            child: Text(
-                              'Register',
-                              style: GoogleFonts.poppins(
-                                fontSize: screenWidth > 600
-                                    ? screenWidth * 0.02
-                                    : screenWidth * 0.025,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
-                              ),
-                            ),
+                            child:
+                                _isEmailSignUpInProgress // Add the condition for loading state
+                                    ? LoadingAnimationWidget.inkDrop(
+                                        size: screenWidth * 0.04,
+                                        color: Colors.white,
+                                      )
+                                    : Text(
+                                        'Register',
+                                        style: GoogleFonts.poppins(
+                                          fontSize: screenWidth > 600
+                                              ? screenWidth * 0.02
+                                              : screenWidth * 0.025,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
                           ),
                         ),
                         Text(
@@ -355,7 +452,7 @@ width: screenWidth > 600
               labelText: label,
               // hintText: hintText,
               filled: true,
-              fillColor: Color(0xFFFEE1D5),
+              fillColor: const Color(0xFFFEE1D5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -363,10 +460,9 @@ width: screenWidth > 600
               // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
               labelStyle: GoogleFonts.poppins(
                 fontSize: screenWidth * 0.03,
-                color: Color(0xFF5C2C2C),
+                color: const Color(0xFF5C2C2C),
               ),
-              floatingLabelBehavior: FloatingLabelBehavior
-                                .never, 
+              floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -403,7 +499,7 @@ width: screenWidth > 600
               labelText: label,
               //  hintText: hintText,
               filled: true,
-              fillColor: Color(0xFFFEE1D5),
+              fillColor: const Color(0xFFFEE1D5),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
@@ -411,10 +507,9 @@ width: screenWidth > 600
               // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
               labelStyle: GoogleFonts.poppins(
                 fontSize: screenWidth * 0.03,
-                color: Color(0xFF5C2C2C),
+                color: const Color(0xFF5C2C2C),
               ),
-              floatingLabelBehavior: FloatingLabelBehavior
-                                .never, 
+              floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {
@@ -466,10 +561,9 @@ width: screenWidth > 600
               ),
               labelStyle: GoogleFonts.poppins(
                 fontSize: screenWidth * 0.03,
-                color: Color(0xFF5C2C2C),
+                color: const Color(0xFF5C2C2C),
               ),
-              floatingLabelBehavior: FloatingLabelBehavior
-                                .never, 
+              floatingLabelBehavior: FloatingLabelBehavior.never,
             ),
             validator: (value) {
               if (value == null || value.isEmpty) {

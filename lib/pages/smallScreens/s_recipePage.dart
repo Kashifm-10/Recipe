@@ -1,3 +1,4 @@
+import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
@@ -186,7 +187,7 @@ class _smallrecipeState extends State<smallrecipe>
                   color: (Theme.of(context).primaryColor),
                 ),
                 SizedBox(width: 20),
-                Text("Processing..."),
+                Text("Processing...",  style: GoogleFonts.poppins()),
               ],
             ),
           ),
@@ -284,19 +285,19 @@ class _smallrecipeState extends State<smallrecipe>
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title: const Text('Confirm Deletion'),
+                                      title:   Text('Confirm Deletion',  style: GoogleFonts.poppins()),
                                       content: Text(
-                                          'Are you sure you want to delete "$name"?'),
+                                          'Are you sure you want to delete "$name"?',  style: GoogleFonts.poppins()),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, false),
-                                          child: const Text('Cancel'),
+                                          child:   Text('Cancel',  style: GoogleFonts.poppins()),
                                         ),
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, true),
-                                          child: const Text('Delete'),
+                                          child:   Text('Delete',  style: GoogleFonts.poppins()),
                                         ),
                                       ],
                                     );
@@ -530,14 +531,6 @@ class _smallrecipeState extends State<smallrecipe>
                                 ),
                                 keyboardType: TextInputType.number,
                               ),
-                              if (isQuantity)
-                                Text(
-                                  'Please enter quantity.',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
                             ],
                           ),
                         ),
@@ -578,28 +571,42 @@ class _smallrecipeState extends State<smallrecipe>
                                 items: unitOptions.map((String unit) {
                                   return DropdownMenuItem<String>(
                                     value: unit,
-                                    child: Text(unit),
+                                    child: Text(unit,  style: GoogleFonts.poppins()),
                                   );
                                 }).toList(),
                                 onChanged: (String? value) {
                                   setState(() => selectedUnit = value);
                                 },
                                 value: selectedUnit,
-                                hint: const Text('Select'),
+                                hint:   Text('Select',  style: GoogleFonts.poppins()),
                               ),
-                              if (isUOM)
-                                Text(
-                                  'Please select UOM.',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
                             ],
                           ),
                         ),
                       ],
                     ),
+
+                    Text(
+                      "Note: Enter 0.5 for 1/2 and 0.25 for 1/4."
+                      ,  style: GoogleFonts.poppins(fontSize: 12),
+                    ),
+                    if (isUOM || isQuantity) const SizedBox(height: 10),
+                    if (isUOM)
+                      Text(
+                        'Please select UOM.',
+                        style: GoogleFonts.poppins(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    if (isQuantity)
+                      Text(
+                        'Please enter quantity.',
+                        style: GoogleFonts.poppins(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
                   ],
                 ),
               ),
@@ -619,7 +626,7 @@ class _smallrecipeState extends State<smallrecipe>
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
 
               // Create Button
@@ -635,8 +642,8 @@ class _smallrecipeState extends State<smallrecipe>
                       isName = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Ingredient name is required.')),
+                        SnackBar(
+                          content: Text('Ingredient name is required.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -653,9 +660,9 @@ class _smallrecipeState extends State<smallrecipe>
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                        SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).')),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -670,7 +677,7 @@ class _smallrecipeState extends State<smallrecipe>
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a unit.')),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -708,7 +715,7 @@ class _smallrecipeState extends State<smallrecipe>
                   ),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Create'),
+                child:   Text('Create',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -786,9 +793,9 @@ class _smallrecipeState extends State<smallrecipe>
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title: const Text("Confirm Action"),
-                        content: const Text(
-                            "Are you sure you want to delete this ingredient?"),
+                        title:   Text("Confirm Action",  style: GoogleFonts.poppins()),
+                        content:   Text(
+                            "Are you sure you want to delete this ingredient?",  style: GoogleFonts.poppins()),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -796,13 +803,13 @@ class _smallrecipeState extends State<smallrecipe>
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
-                            child: const Text("Yes, Delete"),
+                            child:   Text("Yes, Delete",  style: GoogleFonts.poppins()),
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text("Cancel"),
+                            child:   Text("Cancel",  style: GoogleFonts.poppins()),
                           ),
                         ],
                       ),
@@ -841,7 +848,6 @@ class _smallrecipeState extends State<smallrecipe>
                       ),
 
                     const SizedBox(height: 20),
-
                     // Quantity and Unit in One Row
                     Row(
                       children: [
@@ -862,14 +868,7 @@ class _smallrecipeState extends State<smallrecipe>
                                 ),
                                 keyboardType: TextInputType.number,
                               ),
-                              if (isQuantity)
-                                Text(
-                                  'Please enter quantity.',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
+                             
                             ],
                           ),
                         ),
@@ -893,28 +892,42 @@ class _smallrecipeState extends State<smallrecipe>
                                 items: unitOptions.map((String unit) {
                                   return DropdownMenuItem<String>(
                                     value: unit,
-                                    child: Text(unit),
+                                    child: Text(unit,  style: GoogleFonts.poppins()),
                                   );
                                 }).toList(),
                                 onChanged: (String? value) {
                                   setState(() => selectedUnit = value);
                                 },
                                 value: selectedUnit,
-                                hint: const Text('Select'),
+                                hint:   Text('Select',  style: GoogleFonts.poppins()),
                               ),
-                              if (isUOM)
-                                Text(
-                                  'Please select UOM.',
-                                  style: GoogleFonts.poppins(
-                                      color: Colors.red.shade700,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500),
-                                ),
+                              
                             ],
                           ),
                         ),
                       ],
                     ),
+                     Text(
+                      "Note: Enter 0.5 for 1/2 and 0.25 for 1/4."
+                     ,  style: GoogleFonts.poppins(fontSize: 12),
+                    ),
+                    if (isUOM || isQuantity) const SizedBox(height: 10),
+                    if (isUOM)
+                      Text(
+                        'Please select UOM.',
+                        style: GoogleFonts.poppins(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
+                    if (isQuantity)
+                      Text(
+                        'Please enter quantity.',
+                        style: GoogleFonts.poppins(
+                            color: Colors.red.shade700,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500),
+                      ),
                   ],
                 ),
               ),
@@ -933,7 +946,7 @@ class _smallrecipeState extends State<smallrecipe>
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
 
               // Update Button
@@ -948,8 +961,8 @@ class _smallrecipeState extends State<smallrecipe>
                       isName = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text('Ingredient name is required.')),
+                        SnackBar(
+                          content: Text('Ingredient name is required.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -964,9 +977,9 @@ class _smallrecipeState extends State<smallrecipe>
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
+                        SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).')),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -981,7 +994,7 @@ class _smallrecipeState extends State<smallrecipe>
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a unit.')),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -998,7 +1011,7 @@ class _smallrecipeState extends State<smallrecipe>
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Please select a unit.')),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
                     );
                     return;
                   } else {
@@ -1059,7 +1072,7 @@ class _smallrecipeState extends State<smallrecipe>
                   ),
                   textStyle: GoogleFonts.poppins(fontSize: 16),
                 ),
-                child: const Text('Update'),
+                child:   Text('Update',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -1207,7 +1220,7 @@ class _smallrecipeState extends State<smallrecipe>
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
                 },
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1238,7 +1251,7 @@ class _smallrecipeState extends State<smallrecipe>
                     });
                   }
                 },
-                child: const Text('Add Recipe'),
+                child:   Text('Add Recipe',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -1301,8 +1314,8 @@ class _smallrecipeState extends State<smallrecipe>
                           style:
                               GoogleFonts.poppins(fontWeight: FontWeight.bold),
                         ),
-                        content: const Text(
-                          "Are you sure you want to delete this recipe?",
+                        content:   Text(
+                          "Are you sure you want to delete this recipe?",  style: GoogleFonts.poppins()
                         ),
                         actions: [
                           TextButton(
@@ -1322,7 +1335,7 @@ class _smallrecipeState extends State<smallrecipe>
                               Navigator.pop(
                                   context); // Close confirmation dialog
                             },
-                            child: const Text("Cancel"),
+                            child:   Text("Cancel",  style: GoogleFonts.poppins()),
                           ),
                         ],
                       ),
@@ -1388,7 +1401,7 @@ class _smallrecipeState extends State<smallrecipe>
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
                 },
-                child: const Text('Cancel'),
+                child:   Text('Cancel',  style: GoogleFonts.poppins()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1421,7 +1434,7 @@ class _smallrecipeState extends State<smallrecipe>
                     });
                   }
                 },
-                child: const Text('Update Recipe'),
+                child:   Text('Update Recipe',  style: GoogleFonts.poppins()),
               ),
             ],
           );
@@ -1527,7 +1540,7 @@ class _smallrecipeState extends State<smallrecipe>
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Cancel'),
+            child:   Text('Cancel',  style: GoogleFonts.poppins()),
           ),
 
           // Create Button
@@ -1554,7 +1567,7 @@ class _smallrecipeState extends State<smallrecipe>
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Please enter a valid URL'),
+                      content: Text('Please enter a valid URL',  style: GoogleFonts.poppins()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1570,7 +1583,7 @@ class _smallrecipeState extends State<smallrecipe>
               ),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Create'),
+            child:   Text('Create',  style: GoogleFonts.poppins()),
           ),
         ],
       ),
@@ -1674,7 +1687,7 @@ class _smallrecipeState extends State<smallrecipe>
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Cancel'),
+            child:   Text('Cancel',  style: GoogleFonts.poppins()),
           ),
 
           // Update Button
@@ -1701,7 +1714,7 @@ class _smallrecipeState extends State<smallrecipe>
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Please enter a valid URL'),
+                      content: Text('Please enter a valid URL',  style: GoogleFonts.poppins()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1717,7 +1730,7 @@ class _smallrecipeState extends State<smallrecipe>
               ),
               textStyle: GoogleFonts.poppins(fontSize: 16),
             ),
-            child: const Text('Create'),
+            child:   Text('Create',  style: GoogleFonts.poppins()),
           ),
         ],
       ),
@@ -1891,7 +1904,7 @@ class _smallrecipeState extends State<smallrecipe>
     // Adjust sizes dynamically
     final iconSize =
         screenWidth * 0.07; // Adjust icon size based on screen width
-    final titleFontSize = screenWidth * 0.08;
+    final titleFontSize = screenWidth * 0.075;
     // current notes
     List<Ingredients> currentNotes = noteDatabase.currentIng;
     List<Recipe> currentRecipe = noteDatabase.currentRecipe;
@@ -1936,7 +1949,7 @@ class _smallrecipeState extends State<smallrecipe>
                           padding: const EdgeInsets.only(bottom: 10.0),
                           child: Text(
                             widget.dish != null && widget.dish!.length > 15
-                                ? '${widget.dish!.substring(0, 11)}...'
+                                ? '${widget.dish!.substring(0, 12)}...'
                                 : widget.dish ?? '',
                             style: GoogleFonts.poppins(
                               fontSize: titleFontSize,
@@ -1979,10 +1992,23 @@ class _smallrecipeState extends State<smallrecipe>
                               if (widget.access!) {
                                 createLink();
                               } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(
-                                      content: Text('No links available')),
+                                const snackBar = SnackBar(
+                                  /// need to set following properties for best effect of awesome_snackbar_content
+                                  elevation: 0,
+                                  behavior: SnackBarBehavior.floating,
+                                  backgroundColor: Colors.transparent,
+                                  content: AwesomeSnackbarContent(
+                                    title: 'OOPS!',
+                                    message: 'No links available',
+
+                                    /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                    contentType: ContentType.warning,
+                                    inMaterialBanner: true,
+                                  ),
                                 );
+                                ScaffoldMessenger.of(context)
+                                  ..hideCurrentSnackBar()
+                                  ..showSnackBar(snackBar);
                                 return;
                               }
                             } else {
@@ -2021,11 +2047,11 @@ class _smallrecipeState extends State<smallrecipe>
                 Tab(text: 'Ingredients'),
                 Tab(text: 'Instructions'),
               ],
-              labelStyle: GoogleFonts.montserrat(
+              labelStyle: GoogleFonts.poppins(
                 fontSize: MediaQuery.of(context).size.width * 0.05,
                 fontWeight: FontWeight.bold,
               ),
-              unselectedLabelStyle: GoogleFonts.montserrat(
+              unselectedLabelStyle: GoogleFonts.poppins(
                 fontSize: MediaQuery.of(context).size.width * 0.035,
               ),
               labelColor: Colors.white,
@@ -2059,22 +2085,30 @@ class _smallrecipeState extends State<smallrecipe>
                     width: screenWidth,
                     height: screenHeight * 0.4,
                     child: ClipRRect(
-                      borderRadius:  BorderRadius.only(
-                        topLeft: Radius.circular(
-                            screenWidth>600?30.0 :10), // Adjust the radius as needed
-                        topRight: Radius.circular(screenWidth>600?30.0 :10),
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(screenWidth > 600
+                            ? 30.0
+                            : 10), // Adjust the radius as needed
+                        topRight:
+                            Radius.circular(screenWidth > 600 ? 30.0 : 10),
                       ),
-child: CachedNetworkImage(
-  imageUrl: widget.imageURL ?? '',
-  fit: BoxFit.cover,
-  placeholder: (context, url) => Center(child: CircularProgressIndicator(color: widget.background)),
-  errorWidget: (context, url, error) => CachedNetworkImage(
-    imageUrl: images[int.parse(widget.type!) - 1],
-    fit: BoxFit.cover,
-    placeholder: (context, url) => Center(child: CircularProgressIndicator(color: widget.background)),
-    errorWidget: (context, url, error) => Icon(Icons.error),
-  ),
-),
+                      child: CachedNetworkImage(
+                        imageUrl: widget.imageURL ?? '',
+                        fit: BoxFit.fitWidth,
+                        placeholder: (context, url) => Center(
+                            child: CircularProgressIndicator(
+                                color: widget.background)),
+                        errorWidget: (context, url, error) =>
+                            CachedNetworkImage(
+                          imageUrl: images[int.parse(widget.type!) - 1],
+                          fit: BoxFit.fitWidth,
+                          placeholder: (context, url) => Center(
+                              child: CircularProgressIndicator(
+                                  color: widget.background)),
+                          errorWidget: (context, url, error) =>
+                              Icon(Icons.error),
+                        ),
+                      ),
                     ),
                   ),
                 ),
@@ -2433,29 +2467,34 @@ child: CachedNetworkImage(
                                               ),
                                             ),
                                           ),
-                                          ListView.builder(
-                                            /* physics:
-                                        const NeverScrollableScrollPhysics(),  */ // Disable individual scrolling
-                                            shrinkWrap:
-                                                true, // Ensures the ListView takes minimal height
-                                            itemCount: currentNotes.length,
-                                            itemBuilder: (context, index) {
-                                              final note = currentNotes[index];
-                                              return ingredientList(
-                                                count: selectedValue!,
-                                                dish: widget.dish,
-                                                //type: widget.type!,
-                                                text: note.name!,
-                                                quantity: double.parse(
-                                                    note.quantity!),
-                                                uom: note.uom,
-                                                access: widget.access!,
-                                                onEditPressed: () =>
-                                                    updateIng(note, note.name!),
-                                                onDeletePressed: () =>
-                                                    deleteIng(note.name!),
-                                              );
-                                            },
+                                          SizedBox(
+                                            height: MediaQuery.of(context)
+                                                    .size
+                                                    .height *
+                                                0.5, // You can set the height you need
+                                            child: ListView.builder(
+                                              shrinkWrap:
+                                                  true, // Ensures ListView only takes as much space as needed
+                                              itemCount: currentNotes.length,
+                                              itemBuilder: (context, index) {
+                                                final note =
+                                                    currentNotes[index];
+                                                return ingredientList(
+                                                  count: selectedValue!,
+                                                  dish: widget.dish,
+                                                  text: note.name!,
+                                                  quantity: double.parse(
+                                                      note.quantity!),
+                                                  uom: note.uom,
+                                                  access: widget.access!,
+                                                  onEditPressed: () =>
+                                                      updateIng(
+                                                          note, note.name!),
+                                                  onDeletePressed: () =>
+                                                      deleteIng(note.name!),
+                                                );
+                                              },
+                                            ),
                                           ),
                                         ],
                                       ),
