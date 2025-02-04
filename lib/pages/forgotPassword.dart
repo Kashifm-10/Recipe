@@ -331,7 +331,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           text: 'OK',
           iconData: Icons.done,
           color: Colors.blue,
-          textStyle: GoogleFonts.poppins(color: Colors.white),
+          textStyle: GoogleFonts.hammersmithOne(color: Colors.white),
           iconColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius:
@@ -364,7 +364,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           title: Text(
             "",
             style:
-                GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 40),
+                GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold, fontSize: 40),
           ),
           leading: Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -428,7 +428,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     /*  SizedBox(height: screenHeight * 0.09),
                     Text(
                       'Forgot Password',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.hammersmithOne(
                         fontSize: screenWidth > 600
                             ? screenWidth * 0.05
                             : screenWidth * 0.07,
@@ -464,7 +464,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       children: [
                         Text(
                           'Forgot Password',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                             fontSize: screenWidth * 0.04,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF5C2C2C),
@@ -510,7 +510,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                 ),
                           label: Text(
                             'Send Email',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.hammersmithOne(
                                 fontWeight: FontWeight.bold,
                                 color: Colors.white,
                                 fontSize: screenWidth > 600
@@ -545,7 +545,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   },
                   child: Text(
                     "Back to Login",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.hammersmithOne(
                       color: Colors.white,
                       fontSize: screenWidth > 600
                           ? screenWidth * 0.02
@@ -589,7 +589,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderSide: BorderSide.none,
             ),
             prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-            labelStyle: GoogleFonts.poppins(
+            labelStyle: GoogleFonts.hammersmithOne(
               color: Color(0xFF5C2C2C),
             ),
           ),
@@ -631,7 +631,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderSide: BorderSide.none,
             ),
             prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-            labelStyle: GoogleFonts.poppins(
+            labelStyle: GoogleFonts.hammersmithOne(
               color: Color(0xFF5C2C2C),
             ),
           ),
@@ -670,7 +670,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               borderSide: BorderSide.none,
             ),
             prefixIcon: Icon(Icons.lock, color: Color(0xFF5C2C2C)),
-            labelStyle: GoogleFonts.poppins(
+            labelStyle: GoogleFonts.hammersmithOne(
               color: Color(0xFF5C2C2C),
             ),
           ),

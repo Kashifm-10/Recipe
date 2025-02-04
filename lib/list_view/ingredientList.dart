@@ -97,7 +97,7 @@ class ingredientList extends StatelessWidget {
                                     item['text']!.length > 25
                                         ? "${item['text']!.substring(0, 24)}..."
                                         : item['text']!,
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: fontSize,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -133,7 +133,7 @@ class ingredientList extends StatelessWidget {
                                             .toString(); // Display full decimal if needed
                                       }
                                     })(),
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: fontSize,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -169,7 +169,7 @@ class ingredientList extends StatelessWidget {
                                             .toString(); // Display full decimal if needed
                                       }
                                     })(),
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: fontSize,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -184,7 +184,7 @@ class ingredientList extends StatelessWidget {
                                       left: cellPadding, top: cellPadding),
                                   child: Text(
                                     " ${item['uom']!}",
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: fontSize,
                                       color: Colors.white,
                                       fontWeight: FontWeight.w500,
@@ -197,7 +197,7 @@ class ingredientList extends StatelessWidget {
                                     padding: EdgeInsets.all(cellPadding),
                                     child: Text(
                                       " ${item['uom']!}",
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: fontSize,
                                         color: Colors.black,
                                         fontWeight: FontWeight.w600,
@@ -254,7 +254,7 @@ class ingredientList extends StatelessWidget {
                                       item['text']!.length > 20
                                           ? "${item['text']!.substring(0, 20)}..."
                                           : item['text']!,
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -290,7 +290,7 @@ class ingredientList extends StatelessWidget {
                                               .toString(); // Display full decimal if needed
                                         }
                                       })(),
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -326,7 +326,7 @@ class ingredientList extends StatelessWidget {
                                               .toString(); // Display full decimal if needed
                                         }
                                       })(),
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -341,7 +341,7 @@ class ingredientList extends StatelessWidget {
                                         left: cellPadding, top: cellPadding),
                                     child: Text(
                                       " ${item['uom']!}",
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: fontSize,
                                         color: Colors.white,
                                         fontWeight: FontWeight.w500,
@@ -354,7 +354,7 @@ class ingredientList extends StatelessWidget {
                                     padding: EdgeInsets.all(cellPadding),
                                     child: Text(
                                       " ${item['uom']!}",
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: fontSize,
                                         color: Colors.black,
                                         fontWeight: FontWeight.w600,

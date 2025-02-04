@@ -93,9 +93,14 @@ class _alldishesListState extends State<alldishesList> {
         _isLoading = false;
       });
     });
+   /*  readDishes();
+    loadSerial();
+    _filterbying(); */
+     _loadData();
     readDishes();
     loadSerial();
     _filterbying();
+    _filterAndSortNotes();
     _speech = stt.SpeechToText();
   }
 
@@ -164,12 +169,13 @@ class _alldishesListState extends State<alldishesList> {
   //read notes
   void readDishes() async {
     await context.read<database>().fetchAllDishes();
+    _filterbying();
   }
 
   Future<void> _filterbying() async {
     final noteDatabase = context.read<database>();
 
-    _filteredByIng = noteDatabase.currentAllIng.where((note) {
+    /* _filteredByIng = noteDatabase.currentAllIng.where((note) {
       // Check if the note name matches the search query
       final matchesSearch =
           note.name!.toLowerCase().contains(searchQueryIng.toLowerCase());
@@ -192,7 +198,9 @@ class _alldishesListState extends State<alldishesList> {
       }
 
       return false; // Default case: no match
-    }).toList();
+    }).toList(); */
+
+    _filteredByIng = noteDatabase.currentAllIng.toList();
 
     // Sort the filtered list alphabetically by note name
     _filteredByIng
@@ -208,8 +216,10 @@ class _alldishesListState extends State<alldishesList> {
           note.name.toLowerCase().contains(searchQuery.toLowerCase());
 
       // Check if note.serial contains any of the selected serials
-      final matchesSerial = finalSerials.isEmpty ||
+     /*  final matchesSerial = finalSerials.isEmpty ||
           finalSerials.any((serial) => note.serial!.contains(serial));
+ */
+final matchesSerial = finalSerials.isEmpty || finalSerials.contains(note.serial);
 
       if (_currentIndex == 0) {
         return matchesSearch &&
@@ -492,7 +502,7 @@ class _alldishesListState extends State<alldishesList> {
     print('Remaining selected ingredients: ${selectedIngredients.join(', ')}');
   }
 
-  void _updateFinalSerialsForCycle() {
+/*   void _updateFinalSerialsForCycle() {
     setState(() {
       if (selectedIngredients.isEmpty) {
         // Clear finalSerials if no ingredients are selected
@@ -518,7 +528,37 @@ class _alldishesListState extends State<alldishesList> {
     });
 
     print('Final serials after update: ${finalSerials.join(', ')}');
+  } */ //exact match filter
+
+   Future<void> _updateFinalSerialsForCycle() async {
+    setState(() {
+      /*  if (selectedIngredients.isEmpty) {
+        // Clear finalSerials if no ingredients are selected
+        finalSerials.clear();
+      } else {
+        // Compute matching serials
+        final matchingSerials = selectedSerials
+            .where((serial) {
+              int serialCount =
+                  selectedSerials.where((item) => item == serial).length;
+              return serialCount == selectedIngredients.length;
+            })
+            .toSet()
+            .toList();
+
+        // Update finalSerials
+        if (matchingSerials.isNotEmpty) {
+          finalSerials = matchingSerials;
+        } else {
+          finalSerials = ['00']; // Add '00' if no matches exist
+        }
+      } */
+      finalSerials = selectedSerials;
+    });
+    _filterAndSortNotes();
+    print('Final serials after update: ${finalSerials.join(', ')}');
   }
+
 
 // Function to display selected ingredients or 'All' if none selected
   String _getSelectedIngredientsText() {
@@ -567,7 +607,7 @@ class _alldishesListState extends State<alldishesList> {
 
     // Update notes based on selected filter, sort, and search
     _filterAndSortNotes();
-    _filterbying();
+    //_filterbying();
     readDishes();
     _loadData();
 
@@ -609,7 +649,7 @@ class _alldishesListState extends State<alldishesList> {
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
                 widget.title!,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.hammersmithOne(
                   fontSize: MediaQuery.of(context).size.width > 600
                       ? 50
                       : titleFontSize,
@@ -862,19 +902,19 @@ class _alldishesListState extends State<alldishesList> {
                                   isSearchVisible: false,
                                   bottomSheetTitle: Text(
                                     'Sort Options',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                         fontWeight: FontWeight.bold,
                                         fontSize: 20.0),
                                   ),
                                   submitButtonChild: Text(
                                     'Done',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
                                   ),
                                   clearButtonChild: Text(
                                     'Clear',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold),
                                   ),
@@ -907,7 +947,7 @@ class _alldishesListState extends State<alldishesList> {
                                     //Text(dropdownValue),
                                     Text(
                                       "Sort By",
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Icon(Icons.arrow_drop_down, size: 30),
@@ -1209,7 +1249,7 @@ class _alldishesListState extends State<alldishesList> {
                                     ),
                                     child: Text(
                                       'Reset All',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                           fontSize: 12), // Smaller font size
                                     ),
                                   ),
@@ -1236,7 +1276,7 @@ class _alldishesListState extends State<alldishesList> {
                                             ingredient.length < 25
                                                 ? ingredient
                                                 : "${ingredient.substring(0, 16)}...",
-                                            style: GoogleFonts.poppins(
+                                            style: GoogleFonts.hammersmithOne(
                                                 fontSize: 16,
                                                 fontWeight: FontWeight.w500),
                                           ),

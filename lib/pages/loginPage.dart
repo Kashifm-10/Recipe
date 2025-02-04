@@ -180,7 +180,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     SizedBox(height: screenHeight * 0.02),
                     /* Text(
                       'Ready to Cook',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.hammersmithOne(
                         fontSize: screenWidth > 600
                             ? screenWidth * 0.05
                             : screenWidth * 0.07,
@@ -215,7 +215,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       SizedBox(height: screenHeight * 0.01),
                       Text(
                         'Login',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: screenWidth * 0.06,
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF5C2C2C),
@@ -266,7 +266,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     )
                                   : Text(
                                       'Login',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                         fontSize: screenWidth > 600
                                             ? screenWidth * 0.02
                                             : screenWidth * 0.025,
@@ -278,7 +278,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       Text(
                         'or',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: const Color(0xFFF59E9E),
                             fontSize: screenWidth > 600
                                 ? screenWidth * 0.02
@@ -299,7 +299,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                         label: Text(
                           'Continue with Google',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               fontWeight: FontWeight.bold,
                               color: Colors.white,
                               fontSize: screenWidth > 600
@@ -326,7 +326,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         },
                         child: Text(
                           'Forgot Password?',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                             color: const Color(0xFFF59E9E),
                             fontSize: screenWidth * 0.025,
                             //fontWeight: FontWeight.bold,
@@ -351,7 +351,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                   child: Text(
                     "Don't have an account? Sign up",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.hammersmithOne(
                       color: Colors.white,
                       fontSize: screenWidth > 600
                           ? screenWidth * 0.02
@@ -408,7 +408,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     },
                   )
                 : null,
-            labelStyle: GoogleFonts.poppins(
+            labelStyle: GoogleFonts.hammersmithOne(
               fontSize: screenWidth * 0.03,
               color: const Color(0xFF5C2C2C),
             ),

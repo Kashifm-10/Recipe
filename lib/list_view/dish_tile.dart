@@ -170,7 +170,7 @@ class DishTile extends StatelessWidget {
                             : text.length > 24
                                 ? "${text.substring(0, 22)}..."
                                 : text,
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                           color: Colors.black,
                           fontSize:
                               screenWidth > 600 ? 24 : screenWidth * 0.045,
@@ -194,7 +194,7 @@ class DishTile extends StatelessWidget {
                                           0.02),
                               child: Text(
                                 fromType!,
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.hammersmithOne(
                                   color: Colors.grey.shade500,
                                   fontSize: screenWidth > 600
                                       ? 12
@@ -222,7 +222,7 @@ class DishTile extends StatelessWidget {
                                     }
                                   }())
                                 : 'Invalid duration',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.hammersmithOne(
                               color: Colors.grey.shade500,
                               fontSize:
                                   screenWidth > 600 ? 12 : screenWidth * 0.025,

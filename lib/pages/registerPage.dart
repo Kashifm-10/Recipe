@@ -261,7 +261,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     /*  SizedBox(height: screenHeight * 0.02),
                     Text(
                       'Create an Account',
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.hammersmithOne(
                         fontSize: screenWidth > 600
                             ? screenWidth * 0.05
                             : screenWidth * 0.07,
@@ -297,7 +297,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       children: [
                         Text(
                           'Create an Account',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                             fontSize: screenWidth * 0.04,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF5C2C2C),
@@ -348,7 +348,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       )
                                     : Text(
                                         'Register',
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.hammersmithOne(
                                           fontSize: screenWidth > 600
                                               ? screenWidth * 0.02
                                               : screenWidth * 0.025,
@@ -360,7 +360,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         Text(
                           'or',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               color: const Color(0xFFF59E9E),
                               fontSize: screenWidth > 600
                                   ? screenWidth * 0.02
@@ -381,7 +381,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                 ),
                           label: Text(
                             'Sign up with Google',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.hammersmithOne(
                                 color: Colors.white,
                                 fontSize: screenWidth > 600
                                     ? screenWidth * 0.02
@@ -412,7 +412,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   },
                   child: Text(
                     "Already have an account? Login",
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.hammersmithOne(
                       color: Colors.white,
                       fontSize: screenWidth > 600
                           ? screenWidth * 0.02
@@ -458,7 +458,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderSide: BorderSide.none,
               ),
               // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-              labelStyle: GoogleFonts.poppins(
+              labelStyle: GoogleFonts.hammersmithOne(
                 fontSize: screenWidth * 0.03,
                 color: const Color(0xFF5C2C2C),
               ),
@@ -505,7 +505,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderSide: BorderSide.none,
               ),
               // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-              labelStyle: GoogleFonts.poppins(
+              labelStyle: GoogleFonts.hammersmithOne(
                 fontSize: screenWidth * 0.03,
                 color: const Color(0xFF5C2C2C),
               ),
@@ -559,7 +559,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 borderRadius: BorderRadius.circular(12),
                 borderSide: BorderSide.none,
               ),
-              labelStyle: GoogleFonts.poppins(
+              labelStyle: GoogleFonts.hammersmithOne(
                 fontSize: screenWidth * 0.03,
                 color: const Color(0xFF5C2C2C),
               ),

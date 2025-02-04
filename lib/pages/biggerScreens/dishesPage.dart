@@ -532,7 +532,7 @@ class _dishesListState extends State<dishesList> {
               children: [
                 Text(
                   "New Dish",
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.hammersmithOne(
                     fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: Colors.black87,
@@ -612,7 +612,7 @@ class _dishesListState extends State<dishesList> {
                       controller: textController,
                       decoration: InputDecoration(
                         hintText: 'Dish name',
-                        hintStyle: GoogleFonts.poppins(
+                        hintStyle: GoogleFonts.hammersmithOne(
                             fontSize: 16, color: Colors.grey.shade600),
                         filled: true,
                         fillColor: Colors.grey.shade200,
@@ -621,7 +621,7 @@ class _dishesListState extends State<dishesList> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.hammersmithOne(
                           fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -631,7 +631,7 @@ class _dishesListState extends State<dishesList> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Text(
                         'Please enter a dish name.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -676,7 +676,7 @@ class _dishesListState extends State<dishesList> {
                               return '0 min';
                             }
                           }(),
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               color: Colors.grey.shade700, fontSize: 16),
                         ),
                       ),
@@ -690,7 +690,7 @@ class _dishesListState extends State<dishesList> {
                     children: [
                       Text(
                         "Enable AI Image",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
@@ -773,7 +773,7 @@ class _dishesListState extends State<dishesList> {
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
                           label:  Text('Pick from Gallery',
-                                style: GoogleFonts.poppins(color: Colors.white)),
+                                style: GoogleFonts.hammersmithOne(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -791,7 +791,7 @@ class _dishesListState extends State<dishesList> {
                             color: Colors.white,
                           ),
                           label:  Text(
-                            'Take a Picture',  style: GoogleFonts.poppins(color: Colors.white),
+                            'Take a Picture',  style: GoogleFonts.hammersmithOne(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -815,9 +815,9 @@ class _dishesListState extends State<dishesList> {
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:  Text('Cancel',  style: GoogleFonts.poppins()),
+                child:  Text('Cancel',  style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
                 onPressed: () async {
@@ -874,7 +874,7 @@ class _dishesListState extends State<dishesList> {
                 ),
                 child: Text(
                   'Create',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.hammersmithOne(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -926,7 +926,7 @@ class _dishesListState extends State<dishesList> {
                   children: [
                     Text(
                       "Update Dish",
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.hammersmithOne(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                         color: Colors
@@ -939,9 +939,9 @@ class _dishesListState extends State<dishesList> {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title:  Text("Confirm Deletion",  style: GoogleFonts.poppins()),
+                            title:  Text("Confirm Deletion",  style: GoogleFonts.hammersmithOne()),
                             content:  Text(
-                                "Are you sure you want to delete this dish?",  style: GoogleFonts.poppins()),
+                                "Are you sure you want to delete this dish?",  style: GoogleFonts.hammersmithOne()),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -951,14 +951,14 @@ class _dishesListState extends State<dishesList> {
                                       context); // Close confirmation dialog
                                   Navigator.pop(context); // Close update dialog
                                 },
-                                child:    Text("Yes, Delete",  style: GoogleFonts.poppins()),
+                                child:    Text("Yes, Delete",  style: GoogleFonts.hammersmithOne()),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(
                                       context); // Close confirmation dialog
                                 },
-                                child:   Text("Cancel",  style: GoogleFonts.poppins()),
+                                child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
                               ),
                             ],
                           ),
@@ -1053,7 +1053,7 @@ class _dishesListState extends State<dishesList> {
                       controller: textController,
                       decoration: InputDecoration(
                         hintText: 'Dish name',
-                        hintStyle: GoogleFonts.poppins(
+                        hintStyle: GoogleFonts.hammersmithOne(
                           fontSize: 16,
                           color: Colors.grey.shade600,
                         ),
@@ -1064,7 +1064,7 @@ class _dishesListState extends State<dishesList> {
                           borderSide: BorderSide.none,
                         ),
                       ),
-                      style: GoogleFonts.poppins(
+                      style: GoogleFonts.hammersmithOne(
                         fontSize: 16,
                         fontWeight: FontWeight.w500,
                       ),
@@ -1075,7 +1075,7 @@ class _dishesListState extends State<dishesList> {
                       padding: const EdgeInsets.only(bottom: 20.0),
                       child: Text(
                         'Please enter a dish name.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -1121,7 +1121,7 @@ class _dishesListState extends State<dishesList> {
                               return '0 min';
                             }
                           }(),
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                             color: Colors.grey.shade700,
                             fontSize: 16,
                           ),
@@ -1137,7 +1137,7 @@ class _dishesListState extends State<dishesList> {
                     children: [
                       Text(
                         "Update AI Image",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                           color: Colors.black87,
@@ -1220,7 +1220,7 @@ class _dishesListState extends State<dishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label:  Text('Pick from Gallery',  style: GoogleFonts.poppins(color: Colors.white)),
+                          label:  Text('Pick from Gallery',  style: GoogleFonts.hammersmithOne(color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -1238,7 +1238,7 @@ class _dishesListState extends State<dishesList> {
                             color: Colors.white,
                           ),
                           label:  Text(
-                            'Take a Picture',  style: GoogleFonts.poppins(color: Colors.white),
+                            'Take a Picture',  style: GoogleFonts.hammersmithOne(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -1263,9 +1263,9 @@ class _dishesListState extends State<dishesList> {
                 },
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.poppins()),
+                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
               ),
               // Update Button
               ElevatedButton(
@@ -1311,7 +1311,7 @@ class _dishesListState extends State<dishesList> {
                 ),
                 child: Text(
                   'Update',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.hammersmithOne(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
@@ -1859,7 +1859,7 @@ class _dishesListState extends State<dishesList> {
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
                 widget.title!,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.hammersmithOne(
                   fontSize: MediaQuery.of(context).size.width > 600
                       ? 50
                       : titleFontSize,
@@ -1965,13 +1965,13 @@ class _dishesListState extends State<dishesList> {
                           child: SearchBar(
                             hintText: 'Search Dishes',
                             hintStyle: MaterialStateProperty.all(
-                              GoogleFonts.poppins(
+                              GoogleFonts.hammersmithOne(
                                 color: Colors
                                     .grey, // Change to your preferred color
                               ),
                             ),
                             textStyle: MaterialStateProperty.all(
-                              GoogleFonts.poppins(
+                              GoogleFonts.hammersmithOne(
                                 color: Colors
                                     .black, // Change to your preferred color
                               ),
@@ -2061,19 +2061,19 @@ class _dishesListState extends State<dishesList> {
                                 isSearchVisible: false,
                                 bottomSheetTitle: Text(
                                   'Sort Options',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.hammersmithOne(
                                       fontWeight: FontWeight.bold,
                                       fontSize: 20.0),
                                 ),
                                 submitButtonChild: Text(
                                   'Done',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.hammersmithOne(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold),
                                 ),
                                 clearButtonChild: Text(
                                   'Clear',
-                                  style: GoogleFonts.poppins(
+                                  style: GoogleFonts.hammersmithOne(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold),
                                 ),
@@ -2106,7 +2106,7 @@ class _dishesListState extends State<dishesList> {
                                   //Text(dropdownValue),
                                   Text(
                                     "Sort By",
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                         fontWeight: FontWeight.bold),
                                   ),
                                   const Icon(Icons.arrow_drop_down, size: 30),
@@ -2140,7 +2140,7 @@ class _dishesListState extends State<dishesList> {
                               ),
                               child: Text(
                                 "Add Dishes",
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.hammersmithOne(
                                     fontWeight: FontWeight.bold),
                               )),
                         )
@@ -2184,7 +2184,7 @@ class _dishesListState extends State<dishesList> {
                                   ),
                                   Text(
                                     'No Dishes Found',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: screenWidth * 0.05,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -2194,7 +2194,7 @@ class _dishesListState extends State<dishesList> {
                                     _searchController.text.isEmpty
                                         ? 'Tap to Add'
                                         : '',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: screenWidth * 0.03,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,

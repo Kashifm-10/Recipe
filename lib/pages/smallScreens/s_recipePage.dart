@@ -187,7 +187,7 @@ class _smallrecipeState extends State<smallrecipe>
                   color: (Theme.of(context).primaryColor),
                 ),
                 SizedBox(width: 20),
-                Text("Processing...",  style: GoogleFonts.poppins()),
+                Text("Processing...",  style: GoogleFonts.hammersmithOne()),
               ],
             ),
           ),
@@ -227,7 +227,7 @@ class _smallrecipeState extends State<smallrecipe>
                     children: [
                       Text(
                         "Manage Links",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: 20,
                           fontWeight: FontWeight.bold,
                           color: Colors.black87,
@@ -264,7 +264,7 @@ class _smallrecipeState extends State<smallrecipe>
                               name.length > 20
                                   ? '${name.substring(0, 20)}...'
                                   : name,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.hammersmithOne(
                                 fontSize: 16,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
@@ -272,7 +272,7 @@ class _smallrecipeState extends State<smallrecipe>
                             ),
                             subtitle: Text(
                               link,
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.hammersmithOne(
                                 fontSize: 14,
                                 color: Colors.grey.shade600,
                               ),
@@ -285,19 +285,19 @@ class _smallrecipeState extends State<smallrecipe>
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title:   Text('Confirm Deletion',  style: GoogleFonts.poppins()),
+                                      title:   Text('Confirm Deletion',  style: GoogleFonts.hammersmithOne()),
                                       content: Text(
-                                          'Are you sure you want to delete "$name"?',  style: GoogleFonts.poppins()),
+                                          'Are you sure you want to delete "$name"?',  style: GoogleFonts.hammersmithOne()),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, false),
-                                          child:   Text('Cancel',  style: GoogleFonts.poppins()),
+                                          child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
                                         ),
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, true),
-                                          child:   Text('Delete',  style: GoogleFonts.poppins()),
+                                          child:   Text('Delete',  style: GoogleFonts.hammersmithOne()),
                                         ),
                                       ],
                                     );
@@ -445,7 +445,7 @@ class _smallrecipeState extends State<smallrecipe>
             ),
             title: Text(
               'Add Ingredient',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.hammersmithOne(
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -460,7 +460,7 @@ class _smallrecipeState extends State<smallrecipe>
                     TextField(
                       controller: textController,
                       decoration: InputDecoration(
-                        labelStyle: GoogleFonts.poppins(color: Colors.black),
+                        labelStyle: GoogleFonts.hammersmithOne(color: Colors.black),
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -486,7 +486,7 @@ class _smallrecipeState extends State<smallrecipe>
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -506,7 +506,7 @@ class _smallrecipeState extends State<smallrecipe>
                                 controller: quantityController,
                                 decoration: InputDecoration(
                                   labelStyle:
-                                      GoogleFonts.poppins(color: Colors.black),
+                                      GoogleFonts.hammersmithOne(color: Colors.black),
                                   labelText: 'Quantity',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -544,7 +544,7 @@ class _smallrecipeState extends State<smallrecipe>
                               DropdownButtonFormField<String>(
                                 decoration: InputDecoration(
                                   labelStyle:
-                                      GoogleFonts.poppins(color: Colors.black),
+                                      GoogleFonts.hammersmithOne(color: Colors.black),
                                   labelText: 'Unit',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -571,14 +571,14 @@ class _smallrecipeState extends State<smallrecipe>
                                 items: unitOptions.map((String unit) {
                                   return DropdownMenuItem<String>(
                                     value: unit,
-                                    child: Text(unit,  style: GoogleFonts.poppins()),
+                                    child: Text(unit,  style: GoogleFonts.hammersmithOne()),
                                   );
                                 }).toList(),
                                 onChanged: (String? value) {
                                   setState(() => selectedUnit = value);
                                 },
                                 value: selectedUnit,
-                                hint:   Text('Select',  style: GoogleFonts.poppins()),
+                                hint:   Text('Select',  style: GoogleFonts.hammersmithOne()),
                               ),
                             ],
                           ),
@@ -588,13 +588,13 @@ class _smallrecipeState extends State<smallrecipe>
 
                     Text(
                       "Note: Enter 0.5 for 1/2 and 0.25 for 1/4."
-                      ,  style: GoogleFonts.poppins(fontSize: 12),
+                      ,  style: GoogleFonts.hammersmithOne(fontSize: 12),
                     ),
                     if (isUOM || isQuantity) const SizedBox(height: 10),
                     if (isUOM)
                       Text(
                         'Please select UOM.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -602,7 +602,7 @@ class _smallrecipeState extends State<smallrecipe>
                     if (isQuantity)
                       Text(
                         'Please enter quantity.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -624,9 +624,9 @@ class _smallrecipeState extends State<smallrecipe>
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.poppins()),
+                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
               ),
 
               // Create Button
@@ -643,7 +643,7 @@ class _smallrecipeState extends State<smallrecipe>
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Ingredient name is required.',  style: GoogleFonts.poppins())),
+                          content: Text('Ingredient name is required.',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -662,7 +662,7 @@ class _smallrecipeState extends State<smallrecipe>
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.poppins())),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -677,7 +677,7 @@ class _smallrecipeState extends State<smallrecipe>
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -713,9 +713,9 @@ class _smallrecipeState extends State<smallrecipe>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Create',  style: GoogleFonts.poppins()),
+                child:   Text('Create',  style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -784,7 +784,7 @@ class _smallrecipeState extends State<smallrecipe>
               children: [
                 Text(
                   'Edit Ingredient',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.hammersmithOne(
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -793,9 +793,9 @@ class _smallrecipeState extends State<smallrecipe>
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title:   Text("Confirm Action",  style: GoogleFonts.poppins()),
+                        title:   Text("Confirm Action",  style: GoogleFonts.hammersmithOne()),
                         content:   Text(
-                            "Are you sure you want to delete this ingredient?",  style: GoogleFonts.poppins()),
+                            "Are you sure you want to delete this ingredient?",  style: GoogleFonts.hammersmithOne()),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -803,13 +803,13 @@ class _smallrecipeState extends State<smallrecipe>
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
-                            child:   Text("Yes, Delete",  style: GoogleFonts.poppins()),
+                            child:   Text("Yes, Delete",  style: GoogleFonts.hammersmithOne()),
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child:   Text("Cancel",  style: GoogleFonts.poppins()),
+                            child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
                           ),
                         ],
                       ),
@@ -841,7 +841,7 @@ class _smallrecipeState extends State<smallrecipe>
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -892,14 +892,14 @@ class _smallrecipeState extends State<smallrecipe>
                                 items: unitOptions.map((String unit) {
                                   return DropdownMenuItem<String>(
                                     value: unit,
-                                    child: Text(unit,  style: GoogleFonts.poppins()),
+                                    child: Text(unit,  style: GoogleFonts.hammersmithOne()),
                                   );
                                 }).toList(),
                                 onChanged: (String? value) {
                                   setState(() => selectedUnit = value);
                                 },
                                 value: selectedUnit,
-                                hint:   Text('Select',  style: GoogleFonts.poppins()),
+                                hint:   Text('Select',  style: GoogleFonts.hammersmithOne()),
                               ),
                               
                             ],
@@ -909,13 +909,13 @@ class _smallrecipeState extends State<smallrecipe>
                     ),
                      Text(
                       "Note: Enter 0.5 for 1/2 and 0.25 for 1/4."
-                     ,  style: GoogleFonts.poppins(fontSize: 12),
+                     ,  style: GoogleFonts.hammersmithOne(fontSize: 12),
                     ),
                     if (isUOM || isQuantity) const SizedBox(height: 10),
                     if (isUOM)
                       Text(
                         'Please select UOM.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -923,7 +923,7 @@ class _smallrecipeState extends State<smallrecipe>
                     if (isQuantity)
                       Text(
                         'Please enter quantity.',
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
                             fontSize: 14,
                             fontWeight: FontWeight.w500),
@@ -944,9 +944,9 @@ class _smallrecipeState extends State<smallrecipe>
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.poppins()),
+                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
               ),
 
               // Update Button
@@ -962,7 +962,7 @@ class _smallrecipeState extends State<smallrecipe>
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Ingredient name is required.',  style: GoogleFonts.poppins())),
+                          content: Text('Ingredient name is required.',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -979,7 +979,7 @@ class _smallrecipeState extends State<smallrecipe>
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.poppins())),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -994,7 +994,7 @@ class _smallrecipeState extends State<smallrecipe>
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -1011,7 +1011,7 @@ class _smallrecipeState extends State<smallrecipe>
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.poppins())),
+                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -1070,9 +1070,9 @@ class _smallrecipeState extends State<smallrecipe>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Update',  style: GoogleFonts.poppins()),
+                child:   Text('Update',  style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -1128,7 +1128,7 @@ class _smallrecipeState extends State<smallrecipe>
                         }
                       },
                       child: Text('Create',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -1148,7 +1148,7 @@ class _smallrecipeState extends State<smallrecipe>
             title: Center(
               child: Text(
                 'Add Recipe',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.hammersmithOne(
                   fontWeight: FontWeight.bold,
                   fontSize: 22,
                   color: widget.background,
@@ -1160,7 +1160,7 @@ class _smallrecipeState extends State<smallrecipe>
               children: [
                 Text(
                   'Write your recipe details below:',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.hammersmithOne(
                     fontSize: 16,
                     color: Colors.grey[600],
                   ),
@@ -1175,7 +1175,7 @@ class _smallrecipeState extends State<smallrecipe>
                     textInputAction: TextInputAction.newline,
                     decoration: InputDecoration(
                       hintText: 'Enter your recipe...',
-                      hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                      hintStyle: GoogleFonts.hammersmithOne(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1201,7 +1201,7 @@ class _smallrecipeState extends State<smallrecipe>
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Recipe cannot be empty!',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                             color: Colors.redAccent,
                             fontSize: 14,
                           ),
@@ -1215,12 +1215,12 @@ class _smallrecipeState extends State<smallrecipe>
               TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
                 },
-                child:   Text('Cancel',  style: GoogleFonts.poppins()),
+                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1251,7 +1251,7 @@ class _smallrecipeState extends State<smallrecipe>
                     });
                   }
                 },
-                child:   Text('Add Recipe',  style: GoogleFonts.poppins()),
+                child:   Text('Add Recipe',  style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -1295,7 +1295,7 @@ class _smallrecipeState extends State<smallrecipe>
                 Text(" "),
                 Text(
                   'Edit Recipe',
-                  style: GoogleFonts.poppins(
+                  style: GoogleFonts.hammersmithOne(
                       fontWeight: FontWeight.bold,
                       fontSize: 20,
                       color: widget.background),
@@ -1312,10 +1312,10 @@ class _smallrecipeState extends State<smallrecipe>
                         title: Text(
                           "Confirm Action",
                           style:
-                              GoogleFonts.poppins(fontWeight: FontWeight.bold),
+                              GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold),
                         ),
                         content:   Text(
-                          "Are you sure you want to delete this recipe?",  style: GoogleFonts.poppins()
+                          "Are you sure you want to delete this recipe?",  style: GoogleFonts.hammersmithOne()
                         ),
                         actions: [
                           TextButton(
@@ -1327,7 +1327,7 @@ class _smallrecipeState extends State<smallrecipe>
                             },
                             child: Text(
                               "Yes, Delete",
-                              style: GoogleFonts.poppins(color: Colors.red),
+                              style: GoogleFonts.hammersmithOne(color: Colors.red),
                             ),
                           ),
                           TextButton(
@@ -1335,7 +1335,7 @@ class _smallrecipeState extends State<smallrecipe>
                               Navigator.pop(
                                   context); // Close confirmation dialog
                             },
-                            child:   Text("Cancel",  style: GoogleFonts.poppins()),
+                            child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
                           ),
                         ],
                       ),
@@ -1356,7 +1356,7 @@ class _smallrecipeState extends State<smallrecipe>
                     maxLines: 6,
                     decoration: InputDecoration(
                       hintText: 'Edit your recipe here...',
-                      hintStyle: GoogleFonts.poppins(color: Colors.grey[400]),
+                      hintStyle: GoogleFonts.hammersmithOne(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1382,7 +1382,7 @@ class _smallrecipeState extends State<smallrecipe>
                         padding: const EdgeInsets.only(top: 8.0),
                         child: Text(
                           'Recipe cannot be empty!',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                             color: Colors.redAccent,
                             fontSize: 14,
                           ),
@@ -1396,12 +1396,12 @@ class _smallrecipeState extends State<smallrecipe>
               TextButton(
                 style: TextButton.styleFrom(
                   foregroundColor: Colors.grey.shade600,
-                  textStyle: GoogleFonts.poppins(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
                 },
-                child:   Text('Cancel',  style: GoogleFonts.poppins()),
+                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1434,7 +1434,7 @@ class _smallrecipeState extends State<smallrecipe>
                     });
                   }
                 },
-                child:   Text('Update Recipe',  style: GoogleFonts.poppins()),
+                child:   Text('Update Recipe',  style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -1483,7 +1483,7 @@ class _smallrecipeState extends State<smallrecipe>
         ),
         title: Text(
           'Add Link',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.hammersmithOne(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1538,9 +1538,9 @@ class _smallrecipeState extends State<smallrecipe>
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey.shade600,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
+              textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Cancel',  style: GoogleFonts.poppins()),
+            child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
           ),
 
           // Create Button
@@ -1567,7 +1567,7 @@ class _smallrecipeState extends State<smallrecipe>
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Please enter a valid URL',  style: GoogleFonts.poppins()),
+                      content: Text('Please enter a valid URL',  style: GoogleFonts.hammersmithOne()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1581,9 +1581,9 @@ class _smallrecipeState extends State<smallrecipe>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
+              textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Create',  style: GoogleFonts.poppins()),
+            child:   Text('Create',  style: GoogleFonts.hammersmithOne()),
           ),
         ],
       ),
@@ -1630,7 +1630,7 @@ class _smallrecipeState extends State<smallrecipe>
         ),
         title: Text(
           'New Link',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.hammersmithOne(
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -1685,9 +1685,9 @@ class _smallrecipeState extends State<smallrecipe>
             style: TextButton.styleFrom(
               foregroundColor: Colors.grey.shade600,
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
+              textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Cancel',  style: GoogleFonts.poppins()),
+            child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
           ),
 
           // Update Button
@@ -1714,7 +1714,7 @@ class _smallrecipeState extends State<smallrecipe>
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Please enter a valid URL',  style: GoogleFonts.poppins()),
+                      content: Text('Please enter a valid URL',  style: GoogleFonts.hammersmithOne()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1728,9 +1728,9 @@ class _smallrecipeState extends State<smallrecipe>
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
               ),
-              textStyle: GoogleFonts.poppins(fontSize: 16),
+              textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Create',  style: GoogleFonts.poppins()),
+            child:   Text('Create',  style: GoogleFonts.hammersmithOne()),
           ),
         ],
       ),
@@ -1763,7 +1763,7 @@ class _smallrecipeState extends State<smallrecipe>
                         Navigator.pop(context);
                       },
                       child: Text('Update',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               color: Theme.of(context)
                                   .colorScheme
                                   .inversePrimary)))
@@ -1951,7 +1951,7 @@ class _smallrecipeState extends State<smallrecipe>
                             widget.dish != null && widget.dish!.length > 15
                                 ? '${widget.dish!.substring(0, 12)}...'
                                 : widget.dish ?? '',
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.hammersmithOne(
                               fontSize: titleFontSize,
                               color: Colors.white,
                               fontWeight: FontWeight.bold,
@@ -2047,11 +2047,11 @@ class _smallrecipeState extends State<smallrecipe>
                 Tab(text: 'Ingredients'),
                 Tab(text: 'Instructions'),
               ],
-              labelStyle: GoogleFonts.poppins(
+              labelStyle: GoogleFonts.hammersmithOne(
                 fontSize: MediaQuery.of(context).size.width * 0.05,
                 fontWeight: FontWeight.bold,
               ),
-              unselectedLabelStyle: GoogleFonts.poppins(
+              unselectedLabelStyle: GoogleFonts.hammersmithOne(
                 fontSize: MediaQuery.of(context).size.width * 0.035,
               ),
               labelColor: Colors.white,
@@ -2142,7 +2142,7 @@ class _smallrecipeState extends State<smallrecipe>
                                     children: [
                                       Text(
                                         "Calculator : ",
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.hammersmithOne(
                                           fontSize: MediaQuery.of(context)
                                                       .size
                                                       .width >
@@ -2174,7 +2174,7 @@ class _smallrecipeState extends State<smallrecipe>
                                               Expanded(
                                                 child: Text(
                                                   '1',
-                                                  style: GoogleFonts.poppins(
+                                                  style: GoogleFonts.hammersmithOne(
                                                     fontSize:
                                                         MediaQuery.of(context)
                                                                     .size
@@ -2198,7 +2198,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                     child: Text(
                                                       item,
                                                       style:
-                                                          GoogleFonts.poppins(
+                                                          GoogleFonts.hammersmithOne(
                                                         fontSize: MediaQuery.of(
                                                                         context)
                                                                     .size
@@ -2304,16 +2304,16 @@ class _smallrecipeState extends State<smallrecipe>
                                                 ),
                                                 Text(
                                                   'No Ingredients Added',
-                                                  style: GoogleFonts.poppins(
+                                                  style: GoogleFonts.hammersmithOne(
                                                     fontSize:
-                                                        screenWidth * 0.05,
+                                                        screenWidth * 0.06,
                                                     fontWeight: FontWeight.bold,
                                                     color: Colors.white,
                                                   ),
                                                 ),
                                                 Text(
                                                   'Tap to Add',
-                                                  style: GoogleFonts.poppins(
+                                                  style: GoogleFonts.hammersmithOne(
                                                     fontSize:
                                                         screenWidth * 0.03,
                                                     fontWeight: FontWeight.bold,
@@ -2368,7 +2368,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                           child: Text(
                                                             "INGREDIENTS",
                                                             style: GoogleFonts
-                                                                .poppins(
+                                                                .hammersmithOne(
                                                               fontSize:
                                                                   fontSize,
                                                               color: Colors
@@ -2390,7 +2390,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                           child: Text(
                                                             'Qty',
                                                             style: GoogleFonts
-                                                                .poppins(
+                                                                .hammersmithOne(
                                                               fontSize:
                                                                   fontSize,
                                                               color: Colors
@@ -2411,7 +2411,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                           child: Text(
                                                             'Calc',
                                                             style: GoogleFonts
-                                                                .poppins(
+                                                                .hammersmithOne(
                                                               fontSize:
                                                                   fontSize,
                                                               color: Colors
@@ -2434,7 +2434,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                           child: Text(
                                                             "Unit",
                                                             style: GoogleFonts
-                                                                .poppins(
+                                                                .hammersmithOne(
                                                               fontSize:
                                                                   fontSize,
                                                               color: Colors
@@ -2453,7 +2453,7 @@ class _smallrecipeState extends State<smallrecipe>
                                       padding: EdgeInsets.all(cellPadding),
                                       child: Text(
                                         " ${item['uom']!}",
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.hammersmithOne(
                                           fontSize: fontSize,
                                           color: Colors.black,
                                           fontWeight: FontWeight.w600,
@@ -2538,7 +2538,7 @@ class _smallrecipeState extends State<smallrecipe>
                                   ),
                                   Text(
                                     'No Recipe Found',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: screenWidth * 0.05,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -2546,7 +2546,7 @@ class _smallrecipeState extends State<smallrecipe>
                                   ),
                                   Text(
                                     'Tap to Add',
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: screenWidth * 0.03,
                                       fontWeight: FontWeight.bold,
                                       color: Colors.white,
@@ -2563,7 +2563,7 @@ class _smallrecipeState extends State<smallrecipe>
                               padding: EdgeInsets.all(20.0),
                               child: Text(
                                 "How to Cook",
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.hammersmithOne(
                                   fontSize:
                                       MediaQuery.of(context).size.width > 600
                                           ? 22

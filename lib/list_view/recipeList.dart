@@ -41,7 +41,7 @@ class RecipeList extends StatelessWidget {
         },
         child: Text(
           '${text[0].toUpperCase()}${text.substring(1)}',
-          style: GoogleFonts.poppins(
+          style: GoogleFonts.hammersmithOne(
             fontSize: MediaQuery.of(context).size.width > 600
                 ? MediaQuery.of(context).size.width * 0.04
                 : MediaQuery.of(context).size.width * 0.04,

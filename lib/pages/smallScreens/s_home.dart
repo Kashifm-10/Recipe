@@ -524,11 +524,11 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                   Text(
                                     "No Connection",
                                     textAlign: TextAlign.center,
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                         fontSize: 30,
                                         fontWeight: FontWeight.bold),
                                   ),
-                                    Text('Please Connect to Internet',  style: GoogleFonts.poppins()),
+                                    Text('Please Connect to Internet',  style: GoogleFonts.hammersmithOne()),
                                   TextButton(
                                     onPressed: () {
                                       _isErrorDialogShown =
@@ -543,7 +543,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                         (Route<dynamic> route) => false,
                                       );
                                     },
-                                    child:   Text('Retry',  style: GoogleFonts.poppins()),
+                                    child:   Text('Retry',  style: GoogleFonts.hammersmithOne()),
                                   ),
                                 ],
                               ))),
@@ -578,13 +578,13 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                               controller: textController,
                               focusNode: _focusNode, // Attach the focus node
                               autofocus: false,
-                                style: GoogleFonts.poppins()
+                                style: GoogleFonts.hammersmithOne()
                                   /* DefaultTextStyle.of(context).style.copyWith(
                                         fontStyle: FontStyle.normal,
                                       ) */,
                               decoration: InputDecoration(
                                 hintText: "Search Dishes",
-                                hintStyle: GoogleFonts.poppins(
+                                hintStyle: GoogleFonts.hammersmithOne(
                                   color: Colors
                                       .grey, // Change to your preferred color
                                 ),
@@ -661,7 +661,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                       ),
                                       title: Text(
                                         suggestion.name,
-                                        style: GoogleFonts.poppins(
+                                        style: GoogleFonts.hammersmithOne(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 16),
                                       ),
@@ -696,7 +696,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                                       }
                                                     }())
                                                   : 'Invalid duration',
-                                              style: GoogleFonts.poppins(
+                                              style: GoogleFonts.hammersmithOne(
                                                   fontSize: 14,
                                                   color: Colors.grey),
                                             ),
@@ -765,7 +765,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                   const SizedBox(height: 1),
                                   Text(
                                     "Nothing Here",
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       color: Colors.grey,
                                       fontSize: 16,
                                     ),
@@ -883,7 +883,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                                     Text(
                                                       _currentLabel,
                                                       style:
-                                                          GoogleFonts.poppins(
+                                                          GoogleFonts.hammersmithOne(
                                                         fontSize: MediaQuery.of(
                                                                     context)
                                                                 .size
@@ -897,7 +897,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                                     const SizedBox(height: 4),
                                                     /* const Text(
                                                         "Subtitle or Description",
-                                                        style: GoogleFonts.poppins(
+                                                        style: GoogleFonts.hammersmithOne(
                                                           fontSize: 14,
                                                           color: Colors.white70,
                                                         ),
@@ -1095,7 +1095,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
         return AlertDialog(
           title: Text(
             'Select an Icon',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.hammersmithOne(
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
@@ -1209,7 +1209,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   },
                   child: Text(
                     'Close',
-                    style: GoogleFonts.poppins(
+                    style: GoogleFonts.hammersmithOne(
                       fontSize: 18,
                       color: Color(0xFFFE9A8B), // Peach color
                     ),
@@ -1328,7 +1328,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
         return AlertDialog(
           title: Text(
             'Select a Color',
-            style: GoogleFonts.poppins(
+            style: GoogleFonts.hammersmithOne(
               fontSize: 22,
               fontWeight: FontWeight.w600,
               color: Colors.black87,
@@ -1357,7 +1357,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
               },
               child: Text(
                 'Select',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.hammersmithOne(
                   fontSize: 18,
                   color: Color(0xFFFE9A8B), // Peach color
                 ),
@@ -1369,7 +1369,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
               },
               child: Text(
                 'Cancel',
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.hammersmithOne(
                   fontSize: 18,
                   color: Color(0xFFFE9A8B), // Peach color
                 ),
@@ -1445,7 +1445,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                     title: const Center(
                       child: Text(
                         "Edit Icon or Text",
-                        style: GoogleFonts.poppins(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: 22,
                           fontWeight: FontWeight.w600,
                           color: Colors.black87,
@@ -1462,7 +1462,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                             controller: dialogTextController,
                             decoration: InputDecoration(
                               labelText: "Edit Text",
-                              labelStyle: GoogleFonts.poppins(color: Colors.grey[700]),
+                              labelStyle: GoogleFonts.hammersmithOne(color: Colors.grey[700]),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
                                 borderSide:
@@ -1476,7 +1476,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                               contentPadding: const EdgeInsets.symmetric(
                                   vertical: 16, horizontal: 12),
                             ),
-                            style: GoogleFonts.poppins(fontSize: 16),
+                            style: GoogleFonts.hammersmithOne(fontSize: 16),
                           ),
                           const SizedBox(height: 20),
                           Row(
@@ -1551,7 +1551,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                               },
                               child: const Text(
                                 "Save",
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.hammersmithOne(
                                   fontSize: 18,
                                   color: Color(0xFFFE9A8B), // Peach color
                                 ),
@@ -1564,7 +1564,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                               },
                               child: const Text(
                                 "Cancel",
-                                style: GoogleFonts.poppins(
+                                style: GoogleFonts.hammersmithOne(
                                   fontSize: 18,
                                   color: Color(0xFFFE9A8B), // Peach color
                                 ),
@@ -1651,19 +1651,19 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                     onSubmitted: (_) => _saveText(),
                                     decoration: InputDecoration(
                                       hintText: "Enter label...",
-                                      hintStyle: GoogleFonts.poppins(
+                                      hintStyle: GoogleFonts.hammersmithOne(
                                         color: Colors.white.withOpacity(0.5),
                                       ),
                                       border: InputBorder.none,
                                     ),
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       color: Colors.white,
                                       fontSize: 16,
                                     ),
                                   )
                                 : Text(
                                     _currentLabel,
-                                    style: GoogleFonts.poppins(
+                                    style: GoogleFonts.hammersmithOne(
                                       fontSize: screenWidth * 0.03,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
@@ -1683,7 +1683,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                       children: [
                                         Text(
                                           'Veg: ', // Placeholder text
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontSize: screenWidth * 0.02,
                                             color: Colors.white,
                                           ),
@@ -1691,7 +1691,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                         Text(
                                           widget.veg
                                               .toString(), // Placeholder text
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontSize: screenWidth * 0.02,
                                             color: Colors.white,
                                           ),
@@ -1702,7 +1702,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                       children: [
                                         Text(
                                           'Non-Veg: ', // Placeholder text
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontSize: screenWidth * 0.02,
                                             color: Colors.white,
                                           ),
@@ -1710,7 +1710,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                                         Text(
                                           widget.non_veg
                                               .toString(), // Placeholder text
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontSize: screenWidth * 0.02,
                                             color:
                                                 Colors.white.withOpacity(0.8),

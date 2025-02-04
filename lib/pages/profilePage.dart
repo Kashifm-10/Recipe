@@ -27,7 +27,7 @@ class _ProfilePageState extends State<ProfilePage> {
     setState(() {
       email = prefs.getString('email');
       username = prefs.getString('name');
-      date = prefs.getString('date');
+      date = prefs.getString('date') ?? ' ';
     });
   }
 
@@ -54,7 +54,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.transparent,
         title: Text(
           "",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 40),
+          style: GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold, fontSize: 40),
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -138,7 +138,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             fit: BoxFit.scaleDown,
                             child: Text(
                               toTitleCase(user?.displayName ?? username!),
-                              style: GoogleFonts.poppins(
+                              style: GoogleFonts.hammersmithOne(
                                 fontWeight: FontWeight.bold,
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.09,
@@ -148,14 +148,14 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                           Text(
                             user?.email ?? email!,
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.hammersmithOne(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
                                 color: Colors.grey[500]),
                           ),
                           Text(
                             "Creating from: ${date!}",
-                            style: GoogleFonts.poppins(
+                            style: GoogleFonts.hammersmithOne(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
                                 color: Colors.grey[500]),
@@ -191,7 +191,7 @@ class _ProfilePageState extends State<ProfilePage> {
 
                               return Container(
                                 child: AlertDialog(
-                                  title: Text('Enter New Password',  style: GoogleFonts.poppins()),
+                                  title: Text('Enter New Password',  style: GoogleFonts.hammersmithOne()),
                                   content: Form(
                                     key: _formKey,
                                     child: Column(
@@ -215,7 +215,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: GoogleFonts.poppins(
+                                            labelStyle: GoogleFonts.hammersmithOne(
                                               color: Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
@@ -247,7 +247,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: GoogleFonts.poppins(
+                                            labelStyle: GoogleFonts.hammersmithOne(
                                               color: Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
@@ -289,7 +289,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: GoogleFonts.poppins(
+                                            labelStyle: GoogleFonts.hammersmithOne(
                                               color: Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
@@ -312,7 +312,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Navigator.of(context)
                                             .pop(); // Close the dialog
                                       },
-                                      child: Text('Cancel',  style: GoogleFonts.poppins()),
+                                      child: Text('Cancel',  style: GoogleFonts.hammersmithOne()),
                                     ),
                                     ElevatedButton(
                                       onPressed: () async {
@@ -387,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
           ..showSnackBar(snackBar);
                                         }
                                       },
-                                      child: Text('Confirm',  style: GoogleFonts.poppins()),
+                                      child: Text('Confirm',  style: GoogleFonts.hammersmithOne()),
                                     ),
                                   ],
                                 ),
@@ -406,7 +406,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         child: Text(
                           'Change Password',
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
                               color: Colors.white,
@@ -424,21 +424,21 @@ class _ProfilePageState extends State<ProfilePage> {
                                   return AlertDialog(
                                     title: const Text("Confirm Logout"),
                                     content:  Text(
-                                        "Are you sure you want to logout?",  style: GoogleFonts.poppins()),
+                                        "Are you sure you want to logout?",  style: GoogleFonts.hammersmithOne()),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
                                               .pop(false); // Cancel
                                         },
-                                        child:  Text("No",  style: GoogleFonts.poppins()),
+                                        child:  Text("No",  style: GoogleFonts.hammersmithOne()),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
                                               .pop(true); // Confirm
                                         },
-                                        child:  Text("Yes",  style: GoogleFonts.poppins()),
+                                        child:  Text("Yes",  style: GoogleFonts.hammersmithOne()),
                                       ),
                                     ],
                                   );
@@ -473,7 +473,7 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         child: Text(
                           "Logout",
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.hammersmithOne(
                               color: Colors.white,
                               fontSize:
                                   MediaQuery.of(context).size.width * 0.035,
@@ -611,7 +611,7 @@ class ProfilePage extends StatelessWidget {
               ),
               child: Text(
                 "Log Out",
-                style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+                style: GoogleFonts.hammersmithOne(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -630,8 +630,8 @@ class ProfilePage extends StatelessWidget {
       margin: EdgeInsets.symmetric(vertical: 5),
       child: ListTile(
         leading: Icon(icon, color: Color(0xFF5D4B8E)),
-        title: Text(title, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
-        subtitle: Text(subtitle, style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey[600])),
+        title: Text(title, style: GoogleFonts.hammersmithOne(fontSize: 16, fontWeight: FontWeight.bold)),
+        subtitle: Text(subtitle, style: GoogleFonts.hammersmithOne(fontSize: 14, color: Colors.grey[600])),
         onTap: onTap,
       ),
     );

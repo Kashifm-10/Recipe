@@ -116,6 +116,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
     } else {
       finalSerials.clear();
       selectedIngredients.clear();
+      await _updateFinalSerialsForCycle();
     }
   }
 
@@ -268,8 +269,10 @@ class _smallalldishesListState extends State<smallalldishesList> {
           note.name.toLowerCase().contains(searchQuery.toLowerCase());
 
       // Check if note.serial contains any of the selected serials
-      final matchesSerial = finalSerials.isEmpty ||
-          finalSerials.any((serial) => note.serial!.contains(serial));
+    /*   final matchesSerial = finalSerials.isEmpty ||
+          finalSerials.any((serial) => note.serial!.contains(serial)); */
+          final matchesSerial = finalSerials.isEmpty || finalSerials.contains(note.serial);
+
 
       if (_currentIndex == 0) {
         return matchesSearch &&
@@ -629,7 +632,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
     final titleFontSize = screenWidth * 0.08;
 
     // Update notes based on selected filter, sort, and search
-    // _filterAndSortNotes();
+     _filterAndSortNotes();
     // _filterbying();
 
     // readDishes();
@@ -671,7 +674,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
               padding: const EdgeInsets.only(top: 20.0),
               child: Text(
                 widget.title!,
-                style: GoogleFonts.poppins(
+                style: GoogleFonts.hammersmithOne(
                   fontSize: MediaQuery.of(context).size.width > 600
                       ? 50
                       : titleFontSize,
@@ -949,19 +952,19 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                         isSearchVisible: false,
                                         bottomSheetTitle: Text(
                                           'Sort Options',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 20.0),
                                         ),
                                         submitButtonChild: Text(
                                           'Done',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
                                         clearButtonChild: Text(
                                           'Clear',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -996,7 +999,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                           //Text(dropdownValue),
                                           Text(
                                             "Sort By",
-                                            style: GoogleFonts.poppins(
+                                            style: GoogleFonts.hammersmithOne(
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Icon(Icons.arrow_drop_down, size: 30),
@@ -1019,21 +1022,21 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                         enableMultipleSelection: true,
                                         bottomSheetTitle: Text(
                                           'Filter',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontWeight: FontWeight.bold,
                                             fontSize: 20.0,
                                           ),
                                         ),
                                         submitButtonChild: Text(
                                           'Done',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
                                         clearButtonChild: Text(
                                           'Clear',
-                                          style: GoogleFonts.poppins(
+                                          style: GoogleFonts.hammersmithOne(
                                             fontSize: 16,
                                             fontWeight: FontWeight.bold,
                                           ),
@@ -1070,7 +1073,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                           //Text(dropdownValue),
                                           Text(
                                             "Filter By",
-                                            style: GoogleFonts.poppins(
+                                            style: GoogleFonts.hammersmithOne(
                                                 fontWeight: FontWeight.bold),
                                           ),
                                           Icon(Icons.arrow_drop_down, size: 30),
@@ -1149,7 +1152,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                     ),
                                     child: Text(
                                       'Reset All',
-                                      style: GoogleFonts.poppins(
+                                      style: GoogleFonts.hammersmithOne(
                                           fontSize: 12), // Smaller font size
                                     ),
                                   ),
