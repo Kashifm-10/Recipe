@@ -3,6 +3,7 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:auto_animated/auto_animated.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -228,10 +229,7 @@ class _dishesListState extends State<dishesList> {
       'Authorization':
           'Bearer vk-y5TVB2IIbx3NR14FFMejRTP522iUQFw2X4N0qwF9sUDD8CWm'
     }; */
-    var headers = {
-      'Authorization':
-          'Bearer $key'
-    };
+    var headers = {'Authorization': 'Bearer $key'};
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://api.vyro.ai/v2/image/generations'));
@@ -504,7 +502,7 @@ class _dishesListState extends State<dishesList> {
 
   //function to create a note
   void createDish() {
-     ai = false;
+    ai = false;
     const red = Color(0xFFFD0821);
     const green = Color(0xFF46E82E);
     const borderWidth = 10.0;
@@ -772,8 +770,9 @@ class _dishesListState extends State<dishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label:  Text('Pick from Gallery',
-                                style: GoogleFonts.hammersmithOne(color: Colors.white)),
+                          label: Text('Pick from Gallery',
+                              style: GoogleFonts.hammersmithOne(
+                                  color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -790,8 +789,10 @@ class _dishesListState extends State<dishesList> {
                             Icons.camera,
                             color: Colors.white,
                           ),
-                          label:  Text(
-                            'Take a Picture',  style: GoogleFonts.hammersmithOne(color: Colors.white),
+                          label: Text(
+                            'Take a Picture',
+                            style:
+                                GoogleFonts.hammersmithOne(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -817,7 +818,7 @@ class _dishesListState extends State<dishesList> {
                   foregroundColor: Colors.grey.shade600,
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:  Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
                 onPressed: () async {
@@ -859,7 +860,7 @@ class _dishesListState extends State<dishesList> {
                     duration = selectedDurationHours.toStringAsFixed(1);
                     Navigator.pop(context);
                     _uploadedImageUrl = ' ';
-                     ai = false;
+                    ai = false;
                     textController.clear();
                   }
                   Navigator.pop(context);
@@ -894,7 +895,7 @@ class _dishesListState extends State<dishesList> {
   }
 
   void updateDish(Dish name, String type, String dish) async {
-     ai = false;
+    ai = false;
     final response = await Supabase.instance.client
         .from('dishes')
         .select('id') // Specify the field to fetch
@@ -939,9 +940,11 @@ class _dishesListState extends State<dishesList> {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title:  Text("Confirm Deletion",  style: GoogleFonts.hammersmithOne()),
-                            content:  Text(
-                                "Are you sure you want to delete this dish?",  style: GoogleFonts.hammersmithOne()),
+                            title: Text("Confirm Deletion",
+                                style: GoogleFonts.hammersmithOne()),
+                            content: Text(
+                                "Are you sure you want to delete this dish?",
+                                style: GoogleFonts.hammersmithOne()),
                             actions: [
                               TextButton(
                                 onPressed: () {
@@ -951,14 +954,16 @@ class _dishesListState extends State<dishesList> {
                                       context); // Close confirmation dialog
                                   Navigator.pop(context); // Close update dialog
                                 },
-                                child:    Text("Yes, Delete",  style: GoogleFonts.hammersmithOne()),
+                                child: Text("Yes, Delete",
+                                    style: GoogleFonts.hammersmithOne(color: Colors.red)),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(
                                       context); // Close confirmation dialog
                                 },
-                                child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
+                                child: Text("Cancel",
+                                    style: GoogleFonts.hammersmithOne()),
                               ),
                             ],
                           ),
@@ -1220,7 +1225,9 @@ class _dishesListState extends State<dishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label:  Text('Pick from Gallery',  style: GoogleFonts.hammersmithOne(color: Colors.white)),
+                          label: Text('Pick from Gallery',
+                              style: GoogleFonts.hammersmithOne(
+                                  color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -1237,8 +1244,10 @@ class _dishesListState extends State<dishesList> {
                             Icons.camera,
                             color: Colors.white,
                           ),
-                          label:  Text(
-                            'Take a Picture',  style: GoogleFonts.hammersmithOne(color: Colors.white),
+                          label: Text(
+                            'Take a Picture',
+                            style:
+                                GoogleFonts.hammersmithOne(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -1265,7 +1274,7 @@ class _dishesListState extends State<dishesList> {
                   foregroundColor: Colors.grey.shade600,
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
               // Update Button
               ElevatedButton(
@@ -1297,7 +1306,7 @@ class _dishesListState extends State<dishesList> {
                     Navigator.pop(context);
                     textController.clear();
                     _uploadedImageUrl = ' ';
-                     ai = false;
+                    ai = false;
                   }
                   Navigator.pop(context);
                 },
@@ -2207,9 +2216,16 @@ class _dishesListState extends State<dishesList> {
                         )
                       : Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: ListView.builder(
+                          child: LiveList(
+                            delay: Duration(
+                                milliseconds:
+                                    100), // Delay before the first item appears
+                            showItemInterval: Duration(
+                                milliseconds:
+                                    100), // Interval between showing items
+
                             itemCount: _sortededNotes.length,
-                            itemBuilder: (context, index) {
+                            itemBuilder: (context, index, animation) {
                               final note = _sortededNotes[index];
 
                               return GestureDetector(
@@ -2237,19 +2253,30 @@ class _dishesListState extends State<dishesList> {
                                         )));
                                   });
                                 },
-                                child: DishTile(
-                                  duration: note.duration,
-                                  category: note.category,
-                                  dish: note.name,
-                                  type: widget.type,
-                                  text: note.name,
-                                  fromType: 'no',
-                                  serial: note.serial,
-                                  imageURL: note.imageUrl,
-                                  onEditPressed: () => updateDish(
-                                      note, widget.type!, note.name!),
-                                  onDeletePressed: () => deleteNote(
-                                      note.id, widget.type!, note.name),
+                                child: AnimatedBuilder(
+                                  animation: animation,
+                                  builder: (context, child) {
+                                    return FadeTransition(
+                                      opacity:
+                                          animation, // This applies the fade animation
+                                      child:
+                                          child, // Your original widget (DishTile)
+                                    );
+                                  },
+                                  child: DishTile(
+                                    duration: note.duration,
+                                    category: note.category,
+                                    dish: note.name,
+                                    type: widget.type,
+                                    text: note.name,
+                                    fromType: 'no',
+                                    serial: note.serial,
+                                    imageURL: note.imageUrl,
+                                    onEditPressed: () => updateDish(
+                                        note, widget.type!, note.name!),
+                                    onDeletePressed: () => deleteNote(
+                                        note.id, widget.type!, note.name),
+                                  ),
                                 ),
                               );
                             },

@@ -3,13 +3,16 @@ import 'dart:io';
 import 'dart:math';
 import 'dart:typed_data';
 
+import 'package:auto_animated/auto_animated.dart';
 import 'package:crypto/crypto.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_popup/flutter_popup.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:frino_icons/frino_icons.dart';
+import 'package:gif/gif.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:http_parser/http_parser.dart';
@@ -135,7 +138,7 @@ class _smalldishesListState extends State<smalldishesList> {
     _speech = stt.SpeechToText();
   }
 
-   Future<void> fetchAIKey() async {
+  Future<void> fetchAIKey() async {
     final response = await supabase
         .from('keys') // Replace with your table name
         .select(
@@ -213,6 +216,7 @@ class _smalldishesListState extends State<smalldishesList> {
 
   //function to create a note
   void createDish() {
+    _dishTutorial();
     ai = false;
     const red = Color(0xFFFD0821);
     const green = Color(0xFF46E82E);
@@ -253,6 +257,7 @@ class _smalldishesListState extends State<smalldishesList> {
                     width: 70,
                     height: 35,
                     child: CustomAnimatedToggleSwitch(
+                      key: _toggleKey,
                       current: category == '0' ? false : true,
                       spacing: 36.0,
                       values: const [false, true],
@@ -412,6 +417,7 @@ class _smalldishesListState extends State<smalldishesList> {
                         height: MediaQuery.of(context).size.height * 0.03,
                         width: MediaQuery.of(context).size.width * 0.13,
                         child: CustomAnimatedToggleSwitch<bool>(
+                          key: _AIButtonKey,
                           current: ai,
                           spacing: 36.0,
                           values: const [false, true],
@@ -482,8 +488,9 @@ class _smalldishesListState extends State<smalldishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label:   Text('Pick from Gallery',
-                                style: GoogleFonts.hammersmithOne(color: Colors.white)),
+                          label: Text('Pick from Gallery',
+                              style: GoogleFonts.hammersmithOne(
+                                  color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -503,9 +510,10 @@ class _smalldishesListState extends State<smalldishesList> {
                             Icons.camera,
                             color: Colors.white,
                           ),
-                          label:   Text(
-                            'Take a Picture'
-                            ,  style: GoogleFonts.hammersmithOne(color: Colors.white),
+                          label: Text(
+                            'Take a Picture',
+                            style:
+                                GoogleFonts.hammersmithOne(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -531,9 +539,10 @@ class _smalldishesListState extends State<smalldishesList> {
                   foregroundColor: Colors.grey.shade600,
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
+                key: _createButtonKey,
                 onPressed: () async {
                   setState(() {
                     // Check if the text field is empty
@@ -608,7 +617,7 @@ class _smalldishesListState extends State<smalldishesList> {
   }
 
   void updateDish(Dish name, String type, String dish) async {
-     ai = false;
+    ai = false;
     final response = await Supabase.instance.client
         .from('dishes')
         .select('id') // Specify the field to fetch
@@ -653,9 +662,11 @@ class _smalldishesListState extends State<smalldishesList> {
                         showDialog(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title:    Text("Confirm Deletion",  style: GoogleFonts.hammersmithOne()),
-                            content:   Text(
-                                "Are you sure you want to delete this dish?",  style: GoogleFonts.hammersmithOne()),
+                            title: Text("Confirm Deletion",
+                                style: GoogleFonts.hammersmithOne()),
+                            content: Text(
+                                "Are you sure you want to delete this dish?",
+                                style: GoogleFonts.hammersmithOne()),
                             actions: [
                               TextButton(
                                 onPressed: () async {
@@ -665,14 +676,17 @@ class _smalldishesListState extends State<smalldishesList> {
                                       context); // Close confirmation dialog
                                   Navigator.pop(context); // Close update dialog
                                 },
-                                child:   Text("Yes, Delete",  style: GoogleFonts.hammersmithOne()),
+                                child: Text("Yes, Delete",
+                                    style: GoogleFonts.hammersmithOne(
+                                        color: Colors.red)),
                               ),
                               TextButton(
                                 onPressed: () {
                                   Navigator.pop(
                                       context); // Close confirmation dialog
                                 },
-                                child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
+                                child: Text("Cancel",
+                                    style: GoogleFonts.hammersmithOne()),
                               ),
                             ],
                           ),
@@ -934,8 +948,9 @@ class _smalldishesListState extends State<smalldishesList> {
                         ElevatedButton.icon(
                           onPressed: () => _pickImage(ImageSource.gallery),
                           icon: const Icon(Icons.photo, color: Colors.white),
-                          label:   Text('Pick from Gallery'
-                            ,  style: GoogleFonts.hammersmithOne(color: Colors.white)),
+                          label: Text('Pick from Gallery',
+                              style: GoogleFonts.hammersmithOne(
+                                  color: Colors.white)),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
                                 colorList[int.parse(widget.type!) - 1],
@@ -955,9 +970,10 @@ class _smalldishesListState extends State<smalldishesList> {
                             Icons.camera,
                             color: Colors.white,
                           ),
-                          label:   Text(
-                            'Take a Picture'
-                           ,  style: GoogleFonts.hammersmithOne(color: Colors.white),
+                          label: Text(
+                            'Take a Picture',
+                            style:
+                                GoogleFonts.hammersmithOne(color: Colors.white),
                           ),
                           style: ElevatedButton.styleFrom(
                             backgroundColor:
@@ -984,7 +1000,7 @@ class _smalldishesListState extends State<smalldishesList> {
                   foregroundColor: Colors.grey.shade600,
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
               // Update Button
               ElevatedButton(
@@ -1015,7 +1031,7 @@ class _smalldishesListState extends State<smalldishesList> {
                         _uploadedImageUrl == ' ' ? url : _uploadedImageUrl!);
                     Navigator.pop(context);
                     _uploadedImageUrl = ' ';
-                     ai = false;
+                    ai = false;
                     textController.clear();
                     Navigator.pop(context);
                   }
@@ -1219,7 +1235,7 @@ class _smalldishesListState extends State<smalldishesList> {
     bool isTutorialShown = prefs.getBool('tutorialShowndishes') ?? false;
 
     // If it has been shown, return early
-    if (isTutorialShown) return;
+    if (!isTutorialShown) return;
 
     // Define the tutorial targets
     final targets = [
@@ -1227,15 +1243,39 @@ class _smalldishesListState extends State<smalldishesList> {
         identify: 'floatingButton',
         keyTarget: _floatingButtonKey,
         alignSkip: Alignment.bottomCenter,
+        enableOverlayTab: true,
         contents: [
           TargetContent(
-            align: ContentAlign.top,
-            builder: (context, controller) => Text(
-              'Use this button to add new dishes to the list',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Colors.white),
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.03),
+              child: Container(
+                padding: const EdgeInsets.all(12), // Inner padding
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10), // Rounded edges
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Lottie.asset('assets/lottie_json/dishtu.json',
+                        repeat: true,
+                        height: MediaQuery.of(context).size.width * 0.3),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: Text(
+                        'Use this button to add new dishes',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.hammersmithOne(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -1244,15 +1284,43 @@ class _smalldishesListState extends State<smalldishesList> {
         identify: 'categoryButton',
         keyTarget: _categoryButtonKey,
         alignSkip: Alignment.bottomCenter,
+        enableOverlayTab: true,
         contents: [
           TargetContent(
-            align: ContentAlign.right,
-            builder: (context, controller) => Text(
-              'You can slide into category',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Colors.white),
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.04),
+              child: Container(
+                padding: const EdgeInsets.all(12), // Inner padding
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10), // Rounded edges
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Lottie.asset('assets/lottie_json/swiping.json',
+                        repeat: true,
+                        height: MediaQuery.of(context).size.width * 0.3),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: Column(
+                        children: [
+                          Text(
+                            'You can slide into categories from this',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.hammersmithOne(
+                              color: Colors.black,
+                              fontSize: MediaQuery.of(context).size.width * 0.04,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         ],
@@ -1261,16 +1329,37 @@ class _smalldishesListState extends State<smalldishesList> {
         identify: 'settingsButton',
         keyTarget: _sortButtonKey,
         alignSkip: Alignment.bottomCenter,
+        color: Colors.transparent,
+        enableOverlayTab: true,
         contents: [
           TargetContent(
             align: ContentAlign.bottom,
-            builder: (context, controller) => Text(
-              'You can sort your dishes by using this',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(color: Colors.white),
-            ),
+            builder: (context, controller) => Padding(
+                padding: EdgeInsets.only(
+                    top: MediaQuery.of(context).size.height * 0.1),
+                child: Container(
+                  padding: const EdgeInsets.all(12), // Inner padding
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10), // Rounded edges
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'You can slide into categories from this',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.hammersmithOne(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                        ),
+                      ),
+                      Lottie.asset('assets/lottie_json/swiping.json',
+                          repeat: true,
+                          height: MediaQuery.of(context).size.height * 0.25),
+                    ],
+                  ),
+                )),
           ),
         ],
       ),
@@ -1286,6 +1375,174 @@ class _smalldishesListState extends State<smalldishesList> {
 
       // Once the tutorial is shown, set the flag in SharedPreferences
       prefs.setBool('tutorialShowndishes', true);
+    });
+  }
+
+  final GlobalKey _toggleKey = GlobalKey();
+  final GlobalKey _AIButtonKey = GlobalKey();
+  final GlobalKey _createButtonKey = GlobalKey();
+
+  Future<void> _dishTutorial() async {
+    // Get SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if the tutorial has already been shown
+    bool isTutorialShown = prefs.getBool('tutorialdishes') ?? false;
+
+    // If it has been shown, return early
+    if (isTutorialShown) return;
+
+    // Define the tutorial targets
+    final targets = [
+      TargetFocus(
+        identify: 'toggleButton',
+        keyTarget: _toggleKey,
+        alignSkip: Alignment.bottomCenter,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.03),
+              child: Container(
+                padding: const EdgeInsets.all(12), // Inner padding
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10), // Rounded edges
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Lottie.asset('assets/lottie_json/vegtoggle.json',
+                        repeat: true,
+                        height: MediaQuery.of(context).size.width * 0.3),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: Text(
+                        'Use this to set as Veg/Non-Veg',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.hammersmithOne(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'AIButton',
+        keyTarget: _AIButtonKey,
+        alignSkip: Alignment.bottomCenter,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.03),
+              child: Container(
+                padding: const EdgeInsets.all(12), // Inner padding
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10), // Rounded edges
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Lottie.asset('assets/lottie_json/aitu.json',
+                        repeat: true,
+                        height: MediaQuery.of(context).size.width * 0.3),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.45,
+                      child: Text(
+                        'Enable to generate AI image for you dish',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.hammersmithOne(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+      TargetFocus(
+        identify: 'createButton',
+        keyTarget: _createButtonKey,
+        alignSkip: Alignment.bottomCenter,
+        color: Colors.transparent,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.top,
+            builder: (context, controller) => Padding(
+              padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).size.height * 0.02),
+              child: Container(
+                padding: const EdgeInsets.all(12), // Inner padding
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10), // Rounded edges
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        Lottie.asset('assets/lottie_json/creating.json',
+                            repeat: true,
+                            height: MediaQuery.of(context).size.width * 0.3),
+                        SizedBox(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          child: Text(
+                            'Use this to complete creating your dish',
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.hammersmithOne(
+                              color: Colors.black,
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.04,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    Text(
+                      'Note: Long press on dish to update after adding.',
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.hammersmithOne(
+                        color: Colors.black,
+                        fontSize: MediaQuery.of(context).size.width * 0.035,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ];
+
+    final tutorial = TutorialCoachMark(
+      targets: targets,
+    );
+
+    // Show the tutorial after a delay
+    Future.delayed(const Duration(milliseconds: 500), () {
+      tutorial.show(context: context);
+
+      // Once the tutorial is shown, set the flag in SharedPreferences
+      prefs.setBool('tutorialdishes', true);
     });
   }
 
@@ -1321,7 +1578,7 @@ class _smalldishesListState extends State<smalldishesList> {
       'seed': '5'
     }); */ //old fetch without new
 
-     Future<void> generateAIImage(String serial, bool useSeed) async {
+  Future<void> generateAIImage(String serial, bool useSeed) async {
     // Get the prompt from the TextField
     String prompt = textController.text.isNotEmpty
         ? textController.text
@@ -1331,10 +1588,7 @@ class _smalldishesListState extends State<smalldishesList> {
       'Authorization':
           'Bearer vk-y5TVB2IIbx3NR14FFMejRTP522iUQFw2X4N0qwF9sUDD8CWm'
     }; */
-    var headers = {
-      'Authorization':
-          'Bearer $key'
-    };
+    var headers = {'Authorization': 'Bearer $key'};
 
     var request = http.MultipartRequest(
         'POST', Uri.parse('https://api.vyro.ai/v2/image/generations'));
@@ -1549,61 +1803,61 @@ class _smalldishesListState extends State<smalldishesList> {
     }
   }
 
-void showLoadingDialog(BuildContext context) {
-  showDialog(
-    context: context,
-    barrierDismissible: false,
-    builder: (BuildContext context) {
-      return WillPopScope(
-        onWillPop: () async => false, // Prevent back button dismiss
-        child: Dialog(
-          backgroundColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(15),
-          ),
-          child: Container(
-            height: MediaQuery.of(context).size.height * 0.1,
-            width: MediaQuery.of(context).size.width * 0.07,
-            decoration: BoxDecoration(
-              color: Colors.transparent,
+  void showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return WillPopScope(
+          onWillPop: () async => false, // Prevent back button dismiss
+          child: Dialog(
+            backgroundColor: Colors.transparent,
+            shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(15),
             ),
-            padding: EdgeInsets.symmetric(
-              horizontal: MediaQuery.of(context).size.width * 0.2,
-            ),
-            child: ai
-                ? Container(
-                    decoration: BoxDecoration(
-                      color: colorList[int.parse(widget.type!) - 1],
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    width: 10,
-                    child: ColorFiltered(
-                      colorFilter: const ColorFilter.mode(
-                          Colors.white, BlendMode.srcATop),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.1,
+              width: MediaQuery.of(context).size.width * 0.07,
+              decoration: BoxDecoration(
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(15),
+              ),
+              padding: EdgeInsets.symmetric(
+                horizontal: MediaQuery.of(context).size.width * 0.2,
+              ),
+              child: ai
+                  ? Container(
+                      decoration: BoxDecoration(
+                        color: colorList[int.parse(widget.type!) - 1],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      width: 10,
+                      child: ColorFiltered(
+                        colorFilter: const ColorFilter.mode(
+                            Colors.white, BlendMode.srcATop),
+                        child: Lottie.asset(
+                          'assets/lottie_json/pulsing_ai2.json',
+                          repeat: true,
+                        ),
+                      ),
+                    )
+                  : Container(
+                      decoration: BoxDecoration(
+                        color: colorList[int.parse(widget.type!) - 1],
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                      width: 10,
                       child: Lottie.asset(
-                        'assets/lottie_json/pulsing_ai2.json',
+                        'assets/lottie_json/creating.json',
                         repeat: true,
                       ),
                     ),
-                  )
-                : Container(
-                    decoration: BoxDecoration(
-                      color: colorList[int.parse(widget.type!) - 1],
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    width: 10,
-                    child: Lottie.asset(
-                      'assets/lottie_json/creating.json',
-                      repeat: true,
-                    ),
-                  ),
+            ),
           ),
-        ),
-      );
-    },
-  );
-}
+        );
+      },
+    );
+  }
 
   void showUpdatingingDialog(BuildContext context) {
     showDialog(
@@ -1623,26 +1877,176 @@ void showLoadingDialog(BuildContext context) {
               borderRadius: BorderRadius.circular(15), // Match dialog shape
             ),
             padding: const EdgeInsets.all(0.0),
-            child:  Row(
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
-                  "Updating"
-                 ,  style: GoogleFonts.hammersmithOne(
+                  "Updating",
+                  style: GoogleFonts.hammersmithOne(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: Colors.white, // Set text color to white
                   ),
                 ),
-                SizedBox(width: 16),
-                CircularProgressIndicator(
+                const SizedBox(width: 16),
+                const CircularProgressIndicator(
                   strokeWidth: 5,
                   color: Colors.white, // Set progress indicator color to white
                 ),
               ],
             ),
           ),
+        );
+      },
+    );
+  }
+
+  Widget buildGifWithLoader(String imageUrl) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Loader
+        const SizedBox(
+          height: 100,
+          child: Center(child: CircularProgressIndicator( color: Colors.black,)),
+        ),
+
+        // GIF with NetworkImage
+        /* Image.network(
+          imageUrl,
+          fit: BoxFit.fill,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(15.0), // Rounded corners only for GIF
+                child: Gif(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.fill,
+                  autostart: Autostart.loop,
+                ),
+              );
+            } else {
+              return const SizedBox(); // Hide until fully loaded
+            }
+          },
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.error, size: 50, color: Colors.red),
+        ), */
+        ClipRRect(
+          borderRadius: BorderRadius.circular(15.0),
+          child: Gif(
+            image: AssetImage(imageUrl), // Replace with actual asset path
+            fit: BoxFit.fill,
+            autostart: Autostart.loop,
+          ),
+        )
+      ],
+    );
+  }
+
+  void dishHelp(BuildContext context) {
+    final PageController _pageController = PageController();
+    int _currentPage = 0;
+
+    // Define the instructions for each page
+    final List<String> instructions = [
+      'How to Add Dishes',
+      'How to Update Dishes',
+      'How to filter by categories',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width *
+                      0.02), // Remove padding
+              content: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height *
+                    0.7, // Adjust dialog size
+                child: Column(
+                  children: [
+                    // Instructions text at the top (dynamic per page)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        instructions[
+                            _currentPage], // Display instruction for current page
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.03,
+                    ),
+                    // PageView for horizontally swiping images
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentPage =
+                                index; // Update the current page index
+                          });
+                        },
+                        //network gifs
+                        /*  children: [
+                          buildGifWithLoader(
+                              "https://res.cloudinary.com/dcrm8qosr/image/upload/v1738935842/dish_xtxitt.gif"),
+                          buildGifWithLoader(
+                              "https://res.cloudinary.com/dcrm8qosr/image/upload/v1738935886/update_mxsvxk.jpg"),
+                          buildGifWithLoader(
+                              "https://res.cloudinary.com/dcrm8qosr/image/upload/v1738935603/cat_s0gwqv.gif"),
+                        ], */
+                        //asset gifs
+                        children: [
+                          buildGifWithLoader("assets/images/dish.gif"),
+                          buildGifWithLoader("assets/images/update.jpg"),
+                          buildGifWithLoader("assets/images/cat.gif"),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+
+                    // Dots to indicate the current page
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          3, // Number of pages
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            width: _currentPage == index ? 12.0 : 8.0,
+                            height: 8.0,
+                            decoration: BoxDecoration(
+                              color: _currentPage == index
+                                  ? Colors.blue
+                                  : Colors.grey,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
         );
       },
     );
@@ -1687,15 +2091,60 @@ void showLoadingDialog(BuildContext context) {
                 },
               ),
             ),
+            centerTitle: true,
             title: Padding(
               padding: EdgeInsets.only(top: screenHeight * 0.015),
-              child: Text(
-                widget.title!,
-                style: GoogleFonts.hammersmithOne(
-                  fontSize: titleFontSize,
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                ),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    widget.title!,
+                    style: GoogleFonts.hammersmithOne(
+                      fontSize: titleFontSize,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  CustomPopup(
+                    arrowColor: Colors.white,
+                    barrierColor: Colors.transparent,
+                    backgroundColor: Colors.white,
+                    content: TextButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        dishHelp(context);
+                      },
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.transparent),
+                        shape: MaterialStateProperty.all(
+                          RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        overlayColor: MaterialStateProperty.all(
+                            Colors.transparent), // Disable splash effect
+                      ),
+                      child: Text(
+                        'How to add, update, or delete.',
+                        style: GoogleFonts.hammersmithOne(
+                          fontSize: MediaQuery.of(context).size.width * 0.035,
+                          color: Colors.black,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(right: 10.0),
+                      child: SizedBox(
+                        width: MediaQuery.of(context).size.width * 0.08,
+                        child: Image.asset(
+                          "assets/images/help.png",
+                          fit: BoxFit.contain,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),
@@ -2155,7 +2604,8 @@ void showLoadingDialog(BuildContext context) {
                         )
                       : Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: ListView.builder(
+                          child:
+                              /* ListView.builder(
                             itemCount: _sortededNotes.length,
                             itemBuilder: (context, index) {
                               final note = _sortededNotes[index];
@@ -2198,6 +2648,71 @@ void showLoadingDialog(BuildContext context) {
                                       note, widget.type!, note.name!),
                                   onDeletePressed: () => deleteNote(
                                       note.id, widget.type!, note.name),
+                                ),
+                              );
+                            },
+                          ), */
+                              LiveList(
+                            delay: const Duration(
+                                milliseconds:
+                                    0), // Delay before the first item appears
+                            showItemInterval: const Duration(
+                                milliseconds:
+                                    100), // Interval between showing items
+
+                            itemCount: _sortededNotes.length,
+                            itemBuilder: (context, index, animation) {
+                              final note = _sortededNotes[index];
+
+                              return GestureDetector(
+                                onLongPress: () {
+                                  // Call your update function when a long press is detected
+                                  updateDish(note, widget.type!, note.name);
+                                },
+                                onTap: () {
+                                  setState(() {
+                                    Navigator.of(context).push(PageTransition(
+                                        curve: Curves.linear,
+                                        type: PageTransitionType.rightToLeft,
+                                        duration: const Duration(
+                                            milliseconds:
+                                                300), // Adjust duration to slow down the transition
+                                        child: smallrecipe(
+                                          serial: note.serial,
+                                          type: widget.type,
+                                          dish: note.name,
+                                          category: note.category,
+                                          access: true,
+                                          background: colorList[
+                                              int.parse(widget.type!) - 1],
+                                          imageURL: note.imageUrl,
+                                        )));
+                                  });
+                                },
+                                child: AnimatedBuilder(
+                                  animation: animation,
+                                  builder: (context, child) {
+                                    return FadeTransition(
+                                      opacity:
+                                          animation, // This applies the fade animation
+                                      child:
+                                          child, // Your original widget (DishTile)
+                                    );
+                                  },
+                                  child: DishTile(
+                                    duration: note.duration,
+                                    category: note.category,
+                                    dish: note.name,
+                                    type: widget.type,
+                                    text: note.name,
+                                    fromType: 'no',
+                                    serial: note.serial,
+                                    imageURL: note.imageUrl,
+                                    onEditPressed: () => updateDish(
+                                        note, widget.type!, note.name!),
+                                    onDeletePressed: () => deleteNote(
+                                        note.id, widget.type!, note.name),
+                                  ),
                                 ),
                               );
                             },

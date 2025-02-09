@@ -3,11 +3,13 @@ import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gif/gif.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_popup/flutter_popup.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({Key? key}) : super(key: key);
@@ -16,7 +18,10 @@ class ProfilePage extends StatefulWidget {
   State<ProfilePage> createState() => _ProfilePageState();
 }
 
-class _ProfilePageState extends State<ProfilePage> {
+class _ProfilePageState extends State<ProfilePage>
+    with TickerProviderStateMixin {
+  late GifController _controller;
+
   final firebase_auth.User? user =
       firebase_auth.FirebaseAuth.instance.currentUser;
   String? email = '';
@@ -34,6 +39,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    _controller = GifController(vsync: this);
+
     _getUserDataFromPrefs();
   }
 
@@ -42,6 +49,146 @@ class _ProfilePageState extends State<ProfilePage> {
       if (word.isEmpty) return word; // Handle empty strings safely
       return word[0].toUpperCase() + word.substring(1).toLowerCase();
     }).join(' ');
+  }
+
+  void showSwipeableImageDialog(BuildContext context) {
+    final PageController _pageController = PageController();
+    int _currentPage = 0;
+
+    // Define the instructions for each page
+    final List<String> instructions = [
+      'How to Add Dishes',
+      'How to Update Dishes',
+      'Step 3: Start exploring the app features and track your progress.',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width *
+                      0.02), // Remove padding
+              content: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height *
+                    0.7, // Adjust dialog size
+                child: Column(
+                  children: [
+                    // Instructions text at the top (dynamic per page)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        instructions[
+                            _currentPage], // Display instruction for current page
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+                    // PageView for horizontally swiping images
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentPage =
+                                index; // Update the current page index
+                          });
+                        },
+                        children: [
+                          ClipRRect(
+                            borderRadius: BorderRadius.circular(
+                                20.0), // Adjust the radius as needed
+                            child: Gif(
+                              height: 1,
+                              image: const AssetImage("assets/images/dish.gif"),
+                              fit: BoxFit.fill,
+                              //controller: _controller, // if duration and fps is null, original gif fps will be used.
+                              //fps: 30,
+                              //duration: const Duration(seconds: 3),
+                              autostart: Autostart.loop,
+                              //placeholder: (context) => const Text('Loading...'),
+                              /*   onFetchCompleted: () {
+                                   _controller.reset();
+                                   _controller.forward();
+                                 }, */
+                            ),
+                          ),
+                          Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 5.0),
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(
+                                  20.0), // Adjust the radius as needed
+                              child: Gif(
+                                height: 1,
+                                image: const AssetImage(
+                                    "assets/images/update.jpg"),
+                                fit: BoxFit.fill,
+                                //controller: _controller, // if duration and fps is null, original gif fps will be used.
+                                //fps: 30,
+                                //duration: const Duration(seconds: 3),
+                                autostart: Autostart.loop,
+                                //placeholder: (context) => const Text('Loading...'),
+                                /*   onFetchCompleted: () {
+                                     _controller.reset();
+                                     _controller.forward();
+                                   }, */
+                              ),
+                            ),
+                          ),
+                          /* _SwipeableImagePage(
+                            imageUrl: 'assets/images/update.jpg',
+                          ), */
+                          _SwipeableImagePage(
+                            imageUrl: 'assets/images/logo.jpg',
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+
+                    // Dots to indicate the current page
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          3, // Number of pages
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            width: _currentPage == index ? 12.0 : 8.0,
+                            height: 8.0,
+                            decoration: BoxDecoration(
+                              color: _currentPage == index
+                                  ? Colors.blue
+                                  : Colors.grey,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
@@ -54,7 +201,8 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.transparent,
         title: Text(
           "",
-          style: GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold, fontSize: 40),
+          style: GoogleFonts.hammersmithOne(
+              fontWeight: FontWeight.bold, fontSize: 40),
         ),
         leading: Padding(
           padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -142,7 +290,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                 fontWeight: FontWeight.bold,
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.09,
-                                color: Color.fromARGB(255, 10, 10, 9),
+                                color: const Color.fromARGB(255, 10, 10, 9),
                               ),
                             ),
                           ),
@@ -169,7 +317,56 @@ class _ProfilePageState extends State<ProfilePage> {
                           user?.phoneNumber ?? 'Phone',
                         ),
                       ), */
-
+                      /* CustomPopup(
+                        arrowColor: Colors.white,
+                        barrierColor: Colors.transparent,
+                        backgroundColor: Colors.white,
+                        content: ElevatedButton(
+                          onPressed: () {
+                            showSwipeableImageDialog(context);
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white
+                              /*   const Color.fromARGB(255, 241, 128, 181)
+                                    .withOpacity(0.5) */, // Blue color
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8)),
+                            shadowColor: Colors.transparent,
+                            minimumSize: const Size(100, 40),
+                          ),
+                          child: Text(
+                            'How to add/update/delete dish',
+                            style: GoogleFonts.hammersmithOne(
+                                fontSize:
+                                    MediaQuery.of(context).size.width * 0.035,
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        child: Container(
+                          padding: EdgeInsets.symmetric(
+                              vertical: 12, horizontal: 24),
+                          decoration: BoxDecoration(
+                            color: const Color.fromARGB(255, 241, 128, 181)
+                                .withOpacity(0.3), // Background color
+                            borderRadius: BorderRadius.circular(8),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.transparent, // No shadow
+                              ),
+                            ],
+                          ),
+                          child: Text(
+                            'Help',
+                            style: GoogleFonts.hammersmithOne(
+                              fontSize:
+                                  MediaQuery.of(context).size.width * 0.035,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ), */
                       ElevatedButton(
                         onPressed: () {
                           showDialog(
@@ -191,7 +388,8 @@ class _ProfilePageState extends State<ProfilePage> {
 
                               return Container(
                                 child: AlertDialog(
-                                  title: Text('Enter New Password',  style: GoogleFonts.hammersmithOne()),
+                                  title: Text('Enter New Password',
+                                      style: GoogleFonts.hammersmithOne()),
                                   content: Form(
                                     key: _formKey,
                                     child: Column(
@@ -207,7 +405,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             hintText:
                                                 'Enter your current password',
                                             filled: true,
-                                            fillColor: Color(0xFFFEE1D5),
+                                            fillColor: const Color(0xFFFEE1D5),
                                             border: OutlineInputBorder(
                                               borderRadius:
                                                   BorderRadius.circular(12),
@@ -215,8 +413,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: GoogleFonts.hammersmithOne(
-                                              color: Color(0xFF5C2C2C),
+                                            labelStyle:
+                                                GoogleFonts.hammersmithOne(
+                                              color: const Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.never,
@@ -229,7 +428,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             return null;
                                           },
                                         ),
-                                        SizedBox(height: 10),
+                                        const SizedBox(height: 10),
 
                                         // New Password Field
                                         TextFormField(
@@ -239,7 +438,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             labelText: 'New Password',
                                             hintText: 'Enter your new password',
                                             filled: true,
-                                            fillColor: Color(0xFFFEE1D5),
+                                            fillColor: const Color(0xFFFEE1D5),
                                             border: OutlineInputBorder(
                                               borderRadius:
                                                   BorderRadius.circular(12),
@@ -247,8 +446,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: GoogleFonts.hammersmithOne(
-                                              color: Color(0xFF5C2C2C),
+                                            labelStyle:
+                                                GoogleFonts.hammersmithOne(
+                                              color: const Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.never,
@@ -269,7 +469,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             return null;
                                           },
                                         ),
-                                        SizedBox(height: 10),
+                                        const SizedBox(height: 10),
 
                                         // Confirm Password Field
                                         TextFormField(
@@ -281,7 +481,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                             hintText:
                                                 'Re-enter your new password',
                                             filled: true,
-                                            fillColor: Color(0xFFFEE1D5),
+                                            fillColor: const Color(0xFFFEE1D5),
                                             border: OutlineInputBorder(
                                               borderRadius:
                                                   BorderRadius.circular(12),
@@ -289,8 +489,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                             /*  prefixIcon: Icon(Icons.lock,
                                                 color: Color(0xFF5C2C2C)), */
-                                            labelStyle: GoogleFonts.hammersmithOne(
-                                              color: Color(0xFF5C2C2C),
+                                            labelStyle:
+                                                GoogleFonts.hammersmithOne(
+                                              color: const Color(0xFF5C2C2C),
                                             ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.never,
@@ -312,7 +513,8 @@ class _ProfilePageState extends State<ProfilePage> {
                                         Navigator.of(context)
                                             .pop(); // Close the dialog
                                       },
-                                      child: Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                                      child: Text('Cancel',
+                                          style: GoogleFonts.hammersmithOne()),
                                     ),
                                     ElevatedButton(
                                       onPressed: () async {
@@ -383,11 +585,12 @@ class _ProfilePageState extends State<ProfilePage> {
                                             ),
                                           );
                                           ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
+                                            ..hideCurrentSnackBar()
+                                            ..showSnackBar(snackBar);
                                         }
                                       },
-                                      child: Text('Confirm',  style: GoogleFonts.hammersmithOne()),
+                                      child: Text('Confirm',
+                                          style: GoogleFonts.hammersmithOne()),
                                     ),
                                   ],
                                 ),
@@ -413,9 +616,9 @@ class _ProfilePageState extends State<ProfilePage> {
                               fontWeight: FontWeight.bold),
                         ),
                       ),
-/*                       SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.01),
- */
+                      /* SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.01), */
+
                       ElevatedButton(
                         onPressed: () async {
                           bool confirmLogout = await showDialog<bool>(
@@ -423,22 +626,27 @@ class _ProfilePageState extends State<ProfilePage> {
                                 builder: (BuildContext context) {
                                   return AlertDialog(
                                     title: const Text("Confirm Logout"),
-                                    content:  Text(
-                                        "Are you sure you want to logout?",  style: GoogleFonts.hammersmithOne()),
+                                    content: Text(
+                                        "Are you sure you want to logout?",
+                                        style: GoogleFonts.hammersmithOne()),
                                     actions: [
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
                                               .pop(false); // Cancel
                                         },
-                                        child:  Text("No",  style: GoogleFonts.hammersmithOne()),
+                                        child: Text("No",
+                                            style:
+                                                GoogleFonts.hammersmithOne()),
                                       ),
                                       TextButton(
                                         onPressed: () {
                                           Navigator.of(context)
                                               .pop(true); // Confirm
                                         },
-                                        child:  Text("Yes",  style: GoogleFonts.hammersmithOne()),
+                                        child: Text("Yes",
+                                            style:
+                                                GoogleFonts.hammersmithOne()),
                                       ),
                                     ],
                                   );
@@ -487,9 +695,9 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
 
                 // Logout Button
-                Row(
+                const Row(
                   children: [
-                    const SizedBox(width: 30),
+                    SizedBox(width: 30),
                   ],
                 ),
               ],
@@ -638,3 +846,24 @@ class ProfilePage extends StatelessWidget {
   }
 }
  */
+
+class _SwipeableImagePage extends StatelessWidget {
+  final String imageUrl;
+
+  _SwipeableImagePage({
+    required this.imageUrl,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Image.asset(
+          imageUrl,
+          fit: BoxFit.cover,
+          width: double.infinity,
+        ),
+      ],
+    );
+  }
+}

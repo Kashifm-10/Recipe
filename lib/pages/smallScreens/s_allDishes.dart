@@ -1,3 +1,4 @@
+import 'package:auto_animated/auto_animated.dart';
 import 'package:drop_down_list/drop_down_list.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:flutter/cupertino.dart';
@@ -269,10 +270,10 @@ class _smallalldishesListState extends State<smallalldishesList> {
           note.name.toLowerCase().contains(searchQuery.toLowerCase());
 
       // Check if note.serial contains any of the selected serials
-    /*   final matchesSerial = finalSerials.isEmpty ||
+      /*   final matchesSerial = finalSerials.isEmpty ||
           finalSerials.any((serial) => note.serial!.contains(serial)); */
-          final matchesSerial = finalSerials.isEmpty || finalSerials.contains(note.serial);
-
+      final matchesSerial =
+          finalSerials.isEmpty || finalSerials.contains(note.serial);
 
       if (_currentIndex == 0) {
         return matchesSearch &&
@@ -632,7 +633,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
     final titleFontSize = screenWidth * 0.08;
 
     // Update notes based on selected filter, sort, and search
-     _filterAndSortNotes();
+    _filterAndSortNotes();
     // _filterbying();
 
     // readDishes();
@@ -1224,7 +1225,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
                           ),
                         ), */
                         Expanded(
-                          child: ListView.builder(
+                          child: 
+                          /* ListView.builder(
                             itemCount: _sortededNotes.length,
                             itemBuilder: (context, index) {
                               final note = _sortededNotes[index];
@@ -1258,6 +1260,63 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                     imageURL: note.imageUrl,
                                     fromType:
                                         typeList[int.parse(note.type!) - 1]),
+                              );
+                            },
+                          ), */
+                          LiveList(
+                            delay: const Duration(
+                                milliseconds:
+                                    0), // Delay before the first item appears
+                            showItemInterval: const Duration(
+                                milliseconds:
+                                    100), // Interval between showing items
+                            itemCount: _sortededNotes.length,
+                            itemBuilder: (context, index, animation) {
+                              final note = _sortededNotes[index];
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    Navigator.of(context).push(PageTransition(
+                                      curve: Curves.linear,
+                                      type: PageTransitionType.rightToLeft,
+                                      duration: const Duration(
+                                          milliseconds:
+                                              300), // Adjust duration to slow down the transition
+                                      child: smallrecipe(
+                                        serial: note.serial,
+                                        type: note.type,
+                                        dish: note.name,
+                                        category: note.category,
+                                        access: false,
+                                        imageURL: note.imageUrl,
+                                        background: widget.scafColor,
+                                      ),
+                                    ));
+                                  });
+                                },
+                                child: AnimatedBuilder(
+                                  animation: animation,
+                                  builder: (context, child) {
+                                    return FadeTransition(
+                                      opacity:
+                                          animation, // This applies the fade animation
+                                      child:
+                                          child, // Your original widget (DishTile)
+                                    );
+                                  },
+                                  child: DishTile(
+                                    duration: note.duration,
+                                    category: note.category,
+                                    dish: note.name,
+                                    type: note.type,
+                                    text: note.name,
+                                    serial: note.serial,
+                                    imageURL: note.imageUrl,
+                                    fromType:
+                                        typeList[int.parse(note.type!) - 1],
+                                  ),
+                                ),
                               );
                             },
                           ),

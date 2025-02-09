@@ -73,7 +73,7 @@ class ingredientList extends StatelessWidget {
                 itemBuilder: (context, index) {
                   final item = items[index];
                   return GestureDetector(
-                    onLongPress: () {
+                    onLongPress: () async{
                       if (access) onEditPressed!();
                     },
                     child: Container(
@@ -227,7 +227,7 @@ class ingredientList extends StatelessWidget {
                   itemBuilder: (context, index) {
                     final item = items[index];
                     return GestureDetector(
-                      onLongPress: () {
+                      onLongPress: ()async {
                         if (access) onEditPressed!();
                       },
                       child: Container(

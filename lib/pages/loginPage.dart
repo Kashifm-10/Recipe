@@ -227,7 +227,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: _buildTextField(
                           controller: _emailController,
                           label: 'Email Address',
-                          hintText: 'Enter your email',
+                          hintText: ' ',
                           keyboardType: TextInputType.emailAddress,
                           icon: Icons.email,
                           screenWidth: screenWidth,
@@ -239,7 +239,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: _buildTextField(
                           controller: _passwordController,
                           label: 'Password',
-                          hintText: 'Enter your password',
+                          hintText: ' ',
                           obscureText: true,
                           icon: Icons.lock,
                           screenWidth: screenWidth,

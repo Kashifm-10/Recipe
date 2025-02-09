@@ -105,8 +105,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         );
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('user_email', _emailController.text);
-        await prefs.setString('user_name', _usernameController.text);
+        await prefs.setString('email', _emailController.text);
+        await prefs.setString('name', _usernameController.text);
 
         Navigator.pushReplacement(
           context,

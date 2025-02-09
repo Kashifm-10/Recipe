@@ -5,7 +5,9 @@ import 'package:recipe/collections/dishes.dart';
 import 'package:recipe/pages/biggerScreens/recipePage.dart';
 import 'package:recipe/notInUse/dish.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class DishTile extends StatelessWidget {
   DishTile(
@@ -56,14 +58,62 @@ class DishTile extends StatelessWidget {
     Colors.deepPurple.shade300,
   ];
 
+  
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    final GlobalKey _floatingButtonKey = GlobalKey();
+    Future<void> createTutorial() async {
+      // Get SharedPreferences instance
+      final prefs = await SharedPreferences.getInstance();
 
+      // Check if the tutorial has already been shown
+      bool isTutorialShown = prefs.getBool('tutorialShowndishes') ?? false;
+
+      // If it has been shown, return early
+      if (isTutorialShown) return;
+
+      // Define the tutorial targets
+      final targets = [
+        TargetFocus(
+          identify: 'floatingButton',
+          keyTarget: _floatingButtonKey,
+          alignSkip: Alignment.bottomCenter,
+          contents: [
+            TargetContent(
+              align: ContentAlign.bottom,
+              builder: (context, controller) => Text(
+                'Use this button to add new dishes to the list',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ];
+
+      final tutorial = TutorialCoachMark(
+        targets: targets,
+      );
+
+      // Show the tutorial after a delay
+      Future.delayed(const Duration(milliseconds: 500), () {
+        tutorial.show(context: context);
+
+        // Once the tutorial is shown, set the flag in SharedPreferences
+         prefs.setBool('tutorialShowndishes', true);
+      });
+    }
+
+    createTutorial();
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
       child: Container(
+        key: _floatingButtonKey,
         width: screenWidth * 0.1,
         height: screenWidth > 600 ? screenHeight * 0.081 : screenHeight * 0.07,
         decoration: BoxDecoration(
@@ -167,8 +217,8 @@ class DishTile extends StatelessWidget {
                       Text(
                         screenWidth > 600
                             ? text
-                            : text.length > 24
-                                ? "${text.substring(0, 22)}..."
+                            : text.length > 28
+                                ? "${text.substring(0, 25)}..."
                                 : text,
                         style: GoogleFonts.hammersmithOne(
                           color: Colors.black,

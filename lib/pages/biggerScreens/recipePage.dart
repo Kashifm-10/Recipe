@@ -59,7 +59,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   String? type;
   List<String>? fetchedlink;
   List<String>? fetchedTitle;
-  List<int>? fetchedlinkid;
+  List<int?>? fetchedlinkid;
   bool _isLoading = true; // Manage loading state
 
   @override
@@ -803,7 +803,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
-                            child:   Text("Yes, Delete",  style: GoogleFonts.hammersmithOne()),
+                            child:   Text("Yes, Delete",  style: GoogleFonts.hammersmithOne(color: Colors.red)),
                           ),
                           TextButton(
                             onPressed: () {
@@ -1595,7 +1595,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
     if (link.isNotEmpty) {
       // Extract all titles into a List<String>
       List<String> fetchedTitles = link.map((item) => item.link).toList();
-      List<int> fetchedTitlesId = link.map((item) => item.id).toList();
+      List<int?> fetchedTitlesId = link.map((item) => item.id).toList();
       List<String> fetchedName = link.map((item) => item.linkName).toList();
       fetchedlink = fetchedTitles;
       fetchedlinkid = fetchedTitlesId;

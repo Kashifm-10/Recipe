@@ -74,14 +74,17 @@ class AuthService {
 
       // Convert the response to a list of maps
       final data = List<Map<String, dynamic>>.from(response);
-      String access = data.first['access'];
-      String date = data.first['date'];
-
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('access', access);
-      await prefs.setString('date', date);
-      await prefs.setBool("isLoggedIn", true);
-
+      if (data.isNotEmpty) {
+        String access = data.first['access'];
+        String date = data.first['date'];
+        
+        await prefs.setString('email', userEmail);
+        await prefs.setString('name', userName);
+        await prefs.setString('access', access);
+        await prefs.setString('date', date);
+        await prefs.setBool("isLoggedIn", true);
+      }
       if (data.isEmpty) {
         String password = generateRandomPassword();
         // Email is not taken, proceed with registration
@@ -91,7 +94,8 @@ class AuthService {
             {
               'name': userName,
               'email': userEmail.toLowerCase(),
-              'date':(DateFormat('dd-MM-yyyy').format(DateTime.now())).toString(),
+              'date':
+                  (DateFormat('dd-MM-yyyy').format(DateTime.now())).toString(),
               'access': false,
               'password':
                   password, // No password needed for Google sign-in, or set a placeholder
@@ -101,8 +105,8 @@ class AuthService {
           // Handle success
 
           // Save user email and username to SharedPreferences
-          await prefs.setString('user_email', userEmail);
-          await prefs.setString('user_name', userName);
+          await prefs.setString('email', userEmail);
+          await prefs.setString('name', userName);
 
           // Optionally navigate to home screen
           Navigator.pushAndRemoveUntil(
@@ -115,9 +119,25 @@ class AuthService {
           );
         } catch (e) {
           print('Error: $e');
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('An error occurred: $e')),
+          var snackBar = SnackBar(
+            /// need to set following properties for best effect of awesome_snackbar_content
+            elevation: 0,
+            behavior: SnackBarBehavior.floating,
+            backgroundColor: Colors.transparent,
+            content: AwesomeSnackbarContent(
+              color: Colors.red,
+              title: 'Login failed!',
+              message: 'Something went wrong $e',
+
+              /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+              contentType: ContentType.failure,
+              inMaterialBanner: true,
+            ),
           );
+
+          ScaffoldMessenger.of(context)
+            ..hideCurrentSnackBar()
+            ..showSnackBar(snackBar);
         }
       }
       // Navigate to a new page after successful login
@@ -131,25 +151,25 @@ class AuthService {
       );
     } catch (e) {
       print("Google sign-in error: $e");
-       const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Login failed!',
-            message: 'No Internet Connection',
+      var snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Login failed!',
+          message: 'Something went wrong $e',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
 
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
   }
 

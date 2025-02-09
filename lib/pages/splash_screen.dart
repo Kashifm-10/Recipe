@@ -18,7 +18,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-     loginCheck();
+    loginCheck();
     // Extend content to the edges (under status bar)
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
 
@@ -27,7 +27,7 @@ class _SplashScreenState extends State<SplashScreen> {
         overlays: [SystemUiOverlay.top]);
 
     // Navigate to the home page after 3 seconds
-     Timer(const Duration(milliseconds: 3500), () {
+    Timer(const Duration(milliseconds: 3500), () {
       if (isLoggedIn!) {
         Navigator.pushAndRemoveUntil(
           context,
@@ -44,7 +44,7 @@ class _SplashScreenState extends State<SplashScreen> {
           (Route<dynamic> route) => false,
         );
       }
-    }); 
+    });
   }
 
   void loginCheck() async {
@@ -62,34 +62,40 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.white, // Set background color to white
 
       body: Stack(
-  children: [
-    // Background image
-    Positioned.fill(
-      child: Image.asset(
-        'assets/images/splash.png',
-        fit: BoxFit.cover,
+        children: [
+          // Background image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/splash.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+          // Lottie animation in the center
+          Positioned(
+            top: screenWidth < 600
+                ? screenHeight * 0.15
+                : screenHeight *
+                    0.07, // You can adjust this value for the desired vertical offset
+            left: (screenWidth - screenWidth * 0.9) /
+                2, // To center it horizontally
+            child: Lottie.asset(
+              'assets/lottie_json/splash.json',
+              width: screenWidth * 0.9,
+            ),
+          ),
+          Positioned(
+            top: screenWidth < 600
+                ? screenHeight * 0.3
+                : screenHeight *
+                    0.22, // You can adjust this value for the desired vertical offset
+            left: (screenWidth * 0.1), // To center it horizontally
+            child: Lottie.asset(
+              'assets/lottie_json/splashload.json',
+              width: screenWidth * 0.8,
+            ),
+          ),
+        ],
       ),
-    ),
-    // Lottie animation in the center
-    Positioned(
-      top: screenWidth<600 ? screenHeight *0.15: screenHeight*0.07, // You can adjust this value for the desired vertical offset
-      left: (screenWidth - screenWidth * 0.9) / 2, // To center it horizontally
-      child: Lottie.asset(
-        'assets/lottie_json/splash.json',
-        width: screenWidth * 0.9,
-      ),
-    ),
-Positioned(
-      top: screenWidth<600 ?screenHeight *0.3:screenHeight*0.22, // You can adjust this value for the desired vertical offset
-      left: (screenWidth * 0.1) , // To center it horizontally
-      child: Lottie.asset(
-        'assets/lottie_json/splashload.json',
-        width: screenWidth * 0.8,
-      ),
-    ),
-  ],
-),
-
     );
   }
 }

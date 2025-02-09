@@ -15,7 +15,7 @@ class database extends ChangeNotifier {
   static Future<void> initialize() async {
     final dir = await getApplicationDocumentsDirectory();
     isar = await Isar.open(
-        [DishSchema, IngredientsSchema, RecipeSchema, LinksSchema, TitleSchema],
+        [DishSchema, IngredientsSchema, RecipeSchema, TitleSchema],
         directory: dir.path);
   }
 
@@ -648,6 +648,7 @@ class database extends ChangeNotifier {
 
     currentLink.clear();
     currentLink.addAll(data.map((item) => Links(
+          id: item['id'],
           link: item['link'],
           linkName: item['linkname'],
           serial: item['serial'],
@@ -656,7 +657,7 @@ class database extends ChangeNotifier {
         )));
 
     // Sort by 'id' if server-side ordering is not available or reliable
-    currentLink.sort((a, b) => a.id.compareTo(b.id));
+    currentLink.sort((a, b) => a.id!.compareTo(b.id!));
 
     notifyListeners();
 

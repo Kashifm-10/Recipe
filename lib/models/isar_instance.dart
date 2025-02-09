@@ -24,7 +24,7 @@ class IsarInstance {
     isar = await Isar.open(
       [DishSchema, 
       RecipeSchema, 
-      IngredientsSchema, LinksSchema, TitleSchema],
+      IngredientsSchema, TitleSchema],
       directory: dir.path,
       inspector: true,
     );

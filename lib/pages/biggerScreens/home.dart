@@ -953,8 +953,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   color: colorList[i], // Pass Color object directly
                   initialLabel: categories[i]['label'],
                   type: categories[i]['type'],
-                  veg: typeCategoryCountList[i]['category0']!,
-                  non_veg: typeCategoryCountList[i]['category1']!,
+                  veg:typeCategoryCountList.isEmpty?0: typeCategoryCountList[i]['category0']!,
+                  non_veg: typeCategoryCountList.isEmpty?0:typeCategoryCountList[i]['category1']!,
                   homeIcons: homeIcons[i],
                 ),
               ),
@@ -967,8 +967,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     color: colorList[i + 1], // Pass Color object directly
                     initialLabel: categories[i + 1]['label'],
                     type: categories[i + 1]['type'],
-                    veg: typeCategoryCountList[i + 1]['category0']!,
-                    non_veg: typeCategoryCountList[i + 1]['category1']!,
+                    veg: typeCategoryCountList.isEmpty?0:typeCategoryCountList[i + 1]['category0']!,
+                    non_veg: typeCategoryCountList.isEmpty?0:typeCategoryCountList[i + 1]['category1']!,
                     homeIcons: homeIcons[i + 1],
                   ),
                 )
