@@ -512,41 +512,55 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                     WidgetsBinding.instance.addPostFrameCallback((_) {
                       showDialog(
                         context: context,
-                        builder: (context) => AlertDialog(
-                          content: Container(
-                              height: screenHeight * 0.15,
+                        barrierDismissible:
+                            false, // Prevent closing by tapping outside
+                        builder: (context) => WillPopScope(
+                          onWillPop: () async {
+                            // Prevent the dialog from being dismissed on back press
+                            return false; // Returning false means the back press is not allowed
+                          },
+                          child: AlertDialog(
+                            content: Container(
+                              height: screenHeight * 0.17,
                               width: screenWidth * 0.4,
                               child: Center(
-                                  child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Icon(Icons.wifi_off_rounded, size: 50),
-                                  Text(
-                                    "No Connection",
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.hammersmithOne(
-                                        fontSize: 30,
-                                        fontWeight: FontWeight.bold),
-                                  ),
-                                    Text('Please Connect to Internet',  style: GoogleFonts.hammersmithOne()),
-                                  TextButton(
-                                    onPressed: () {
-                                      _isErrorDialogShown =
-                                          false; // Reset dialog state
-
-                                      Navigator.of(context).pop();
-                                      Navigator.pushAndRemoveUntil(
-                                        context,
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                const MySmallHomePage()),
-                                        (Route<dynamic> route) => false,
-                                      );
-                                    },
-                                    child:   Text('Retry',  style: GoogleFonts.hammersmithOne()),
-                                  ),
-                                ],
-                              ))),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                     Icon(Icons.wifi_off_rounded,
+                                        size: screenWidth*0.15),
+                                    Text(
+                                      "No Connection",
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.hammersmithOne(
+                                          fontSize: screenWidth * 0.05,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    Text('Please Connect to Internet',
+                                        style: GoogleFonts.hammersmithOne(fontSize: screenWidth * 0.03)),
+                                    TextButton(
+                                      onPressed: () {
+                                        _isErrorDialogShown =
+                                            false; // Reset dialog state
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                        Navigator.pushAndRemoveUntil(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                  const MySmallHomePage()),
+                                          (Route<dynamic> route) =>
+                                              false, // Remove all previous routes
+                                        );
+                                      },
+                                      child: Text('Retry',
+                                          style: GoogleFonts.hammersmithOne(fontSize: screenWidth * 0.04)),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
                       );
                     });
@@ -573,15 +587,18 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                           padding: EdgeInsets.symmetric(
                               horizontal: screenWidth * 0.09),
                           child: DropDownSearchField(
+                            hideKeyboardOnDrag: true,
+                            hideSuggestionsOnKeyboardHide: false,
                             displayAllSuggestionWhenTap: true,
                             textFieldConfiguration: TextFieldConfiguration(
                               controller: textController,
                               focusNode: _focusNode, // Attach the focus node
                               autofocus: false,
-                                style: GoogleFonts.hammersmithOne()
-                                  /* DefaultTextStyle.of(context).style.copyWith(
+                              style: GoogleFonts.hammersmithOne()
+                              /* DefaultTextStyle.of(context).style.copyWith(
                                         fontStyle: FontStyle.normal,
-                                      ) */,
+                                      ) */
+                              ,
                               decoration: InputDecoration(
                                 hintText: "Search Dishes",
                                 hintStyle: GoogleFonts.hammersmithOne(
@@ -595,9 +612,11 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                     Positioned(
                                       right: 3.0,
                                       child: IconButton(
-                                        icon: const Icon(
+                                        icon: Icon(
                                           Ionicons.close_circle_outline,
-                                          color: Colors.grey,
+                                          color: _focusNode.hasFocus
+                                              ? Colors.grey
+                                              : Colors.white,
                                         ),
                                         onPressed: () {
                                           // Clear the search field and close dropdown
@@ -882,8 +901,8 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                                   children: [
                                                     Text(
                                                       _currentLabel,
-                                                      style:
-                                                          GoogleFonts.hammersmithOne(
+                                                      style: GoogleFonts
+                                                          .hammersmithOne(
                                                         fontSize: MediaQuery.of(
                                                                     context)
                                                                 .size

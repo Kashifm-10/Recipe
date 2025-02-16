@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_popup/flutter_popup.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:isar/isar.dart';
 import 'package:lottie/lottie.dart';
 import 'package:provider/provider.dart';
@@ -519,7 +520,7 @@ class _smallrecipeState extends State<smallrecipe>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            content: Container(
+            content: SizedBox(
               width:
                   MediaQuery.of(context).size.width * 0.6, // Adjust the width
               child: SingleChildScrollView(
@@ -902,7 +903,7 @@ class _smallrecipeState extends State<smallrecipe>
                 ),
               ],
             ),
-            content: Container(
+            content: SizedBox(
               width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
               child: SingleChildScrollView(
                 child: Column(
@@ -1580,7 +1581,7 @@ class _smallrecipeState extends State<smallrecipe>
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Container(
+        content: SizedBox(
           width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1728,7 +1729,7 @@ class _smallrecipeState extends State<smallrecipe>
             fontWeight: FontWeight.bold,
           ),
         ),
-        content: Container(
+        content: SizedBox(
           width: MediaQuery.of(context).size.width * 0.6, // Wider dialog
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -1999,7 +2000,7 @@ class _smallrecipeState extends State<smallrecipe>
     // Adjust sizes dynamically
     final iconSize =
         screenWidth * 0.07; // Adjust icon size based on screen width
-    final titleFontSize = screenWidth * 0.075;
+    final titleFontSize = screenWidth * 0.1;
     // current notes
     List<Ingredients> currentNotes = noteDatabase.currentIng;
     List<Recipe> currentRecipe = noteDatabase.currentRecipe;
@@ -2007,7 +2008,7 @@ class _smallrecipeState extends State<smallrecipe>
       length: 2, // Number of tabs
       child: Scaffold(
         backgroundColor: widget.background,
-        appBar: PreferredSize(
+/*         appBar: PreferredSize(
           preferredSize: Size.fromHeight(screenHeight * 0.12),
           child: AppBar(
             toolbarHeight: screenHeight * 0.08,
@@ -2168,548 +2169,995 @@ class _smallrecipeState extends State<smallrecipe>
             ),
           ),
         ),
-
+ */
         // floatingActionButton: floatingActionButtonMenu(context),
-        body: TabBarView(
-          controller: _tabController,
+        body: Column(
           children: [
-            Stack(
-              children: [
-                // Image container
-                Positioned(
-                  top: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    width: screenWidth,
-                    height: screenHeight * 0.27,
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(screenWidth > 600
-                            ? 30.0
-                            : 0), // Adjust the radius as needed
-                        topRight: Radius.circular(screenWidth > 600 ? 30.0 : 0),
-                      ),
-                      child: CachedNetworkImage(
-                        imageUrl: widget.imageURL ?? '',
-                        fit: BoxFit.fitWidth,
-                        placeholder: (context, url) => Center(
-                            child: CircularProgressIndicator(
-                                color: widget.background)),
-                        errorWidget: (context, url, error) =>
-                            CachedNetworkImage(
-                          imageUrl: images[int.parse(widget.type!) - 1],
-                          fit: BoxFit.fitWidth,
-                          placeholder: (context, url) => Center(
+            Container(
+                color: widget.background,
+                height: screenHeight * 0.35,
+                child: Stack(
+                  children: [
+                    Positioned(
+                      top: 0,
+                      left: 0,
+                      right: 0,
+                      child: SizedBox(
+                        width: screenWidth,
+                        height: screenHeight * 0.45,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.only(
+                            topLeft: Radius.circular(screenWidth > 600
+                                ? 30.0
+                                : 0), // Adjust the radius based on screen size
+                            topRight:
+                                Radius.circular(screenWidth > 600 ? 30.0 : 30),
+                            bottomLeft: Radius.circular(screenWidth > 600
+                                ? 30.0
+                                : 0), // Adjust the radius based on screen size
+                            bottomRight:
+                                Radius.circular(screenWidth > 600 ? 30.0 : 0),
+                          ),
+                          child: CachedNetworkImage(
+                            imageUrl: widget.imageURL ?? '',
+                            fit: BoxFit.cover,
+                            placeholder: (context, url) => Center(
                               child: CircularProgressIndicator(
-                                  color: widget.background)),
-                          errorWidget: (context, url, error) =>
-                              Icon(Icons.error),
+                                  color: Colors.white),
+                            ),
+                            errorWidget: (context, url, error) =>
+                                CachedNetworkImage(
+                              imageUrl: (widget.type != null &&
+                                      int.tryParse(widget.type!) != null)
+                                  ? images[int.parse(widget.type!) - 1]
+                                  : images[
+                                      0], // fallback to first image if type is invalid
+                              fit: BoxFit.cover,
+                              placeholder: (context, url) => Center(
+                                child: CircularProgressIndicator(
+                                    color: Colors.white),
+                              ),
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            ),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ),
-
-                // Expanded container with slight overlap
-                Positioned(
-                  top: screenHeight *
-                      0.25, // Adjust this value to control the overlap
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: widget.background,
-                      borderRadius: const BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
+                    Positioned(
+                      top: screenHeight * 0.05,
+                      left: screenWidth *
+                          0.03, // Added a slight offset to prevent overlap with screen edges
+                      child: Container(
+                        width: screenWidth * 0.09, // Adjust the width
+                        height: screenWidth * 0.09, // Adjust the height
+                        decoration: BoxDecoration(
+                          color: Colors.white
+                              .withOpacity(0.8), // Set background with opacity
+                          borderRadius: BorderRadius.circular(
+                              100), // Makes the container round
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  Colors.black.withOpacity(0.2), // Soft shadow
+                              blurRadius: 6,
+                              spreadRadius: 2,
+                              offset: Offset(0, 3), // Slight shadow below
+                            ),
+                          ],
+                        ),
+                        child: IconButton(
+                          icon: Icon(
+                            FontAwesomeIcons.arrowLeft,
+                            color: Colors
+                                .black54, // Change icon color to black for contrast
+                            size: screenWidth * 0.045,
+                          ),
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
                       ),
                     ),
-                    child:
-                        // Ingredients Tab
-                        SingleChildScrollView(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                    Positioned(
+                      top: screenHeight * 0.05,
+                      right: screenWidth *
+                          0.03, // Added a slight offset to prevent overlap with screen edges
+                      child: Row(
                         children: [
-                          Padding(
-                            padding:  EdgeInsets.only(
-                                top: screenHeight*0.015, right: screenWidth * 0.06, bottom: 10),
-                            child: currentNotes.isNotEmpty
-                                ? Row(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(
-                                        "Calculator : ",
-                                        style: GoogleFonts.hammersmithOne(
-                                          fontSize: MediaQuery.of(context)
-                                                      .size
-                                                      .width >
-                                                  600
-                                              ? 20
-                                              : screenWidth * 0.04,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white,
+                          Container(
+                            width: screenWidth * 0.09, // Adjust the width
+                            height: screenWidth * 0.09, // Adjust the height
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(
+                                  0.8), // Set background with opacity
+                              borderRadius: BorderRadius.circular(
+                                  100), // Makes the container round
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black
+                                      .withOpacity(0.2), // Soft shadow
+                                  blurRadius: 6,
+                                  spreadRadius: 2,
+                                  offset: Offset(0, 3), // Slight shadow below
+                                ),
+                              ],
+                            ),
+                            child: Padding(
+                              padding: EdgeInsets.all(screenWidth * 0.015),
+                              child: GestureDetector(
+                                key: _link,
+                                onTap: () {
+                                  if (fetchedlink == null) {
+                                    if (widget.access!) {
+                                      createLink();
+                                    } else {
+                                      const snackBar = SnackBar(
+                                        /// need to set following properties for best effect of awesome_snackbar_content
+                                        elevation: 0,
+                                        behavior: SnackBarBehavior.floating,
+                                        backgroundColor: Colors.transparent,
+                                        content: AwesomeSnackbarContent(
+                                          title: 'OOPS!',
+                                          message: 'No links available',
+
+                                          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                          contentType: ContentType.warning,
+                                          inMaterialBanner: true,
                                         ),
-                                      ),
-                                      DropdownButtonHideUnderline(
-                                        child: DropdownButton2<String>(
-                                          isExpanded: true,
-                                          hint: Row(
-                                            children: [
-                                              Icon(
-                                                Icons.list,
-                                                size: MediaQuery.of(context)
-                                                            .size
-                                                            .width >
-                                                        600
-                                                    ? 16
-                                                    : 8,
-                                                color: Colors.white,
-                                              ),
-                                              SizedBox(
-                                                width: 4,
-                                              ),
-                                              Expanded(
-                                                child: Text(
-                                                  '1',
-                                                  style: GoogleFonts
-                                                      .hammersmithOne(
-                                                    fontSize:
-                                                        MediaQuery.of(context)
-                                                                    .size
-                                                                    .width >
-                                                                600
-                                                            ? 14
-                                                            : screenWidth *
-                                                                0.025,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                          items: items
-                                              .map((String item) =>
-                                                  DropdownMenuItem<String>(
-                                                    value: item,
-                                                    child: Text(
-                                                      item,
-                                                      style: GoogleFonts
-                                                          .hammersmithOne(
-                                                        fontSize: MediaQuery.of(
-                                                                        context)
-                                                                    .size
-                                                                    .width >
-                                                                600
-                                                            ? 14
-                                                            : screenWidth *
-                                                                0.025,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                        color: Colors.black,
-                                                      ),
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                  ))
-                                              .toList(),
-                                          value: selectedValue,
-                                          onChanged: (String? value) {
-                                            setState(() {
-                                              selectedValue = value;
-                                            });
-                                          },
-                                          buttonStyleData: ButtonStyleData(
-                                            height: screenHeight * 0.02,
-                                            width: screenWidth * 0.12,
-                                            padding: EdgeInsets.only(
-                                                left: screenWidth * 0.025,
-                                                right: screenWidth * 0.025),
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              /* border: Border.all(
-                                      color: Colors.black26,
-                                    ), */
-                                              color: Colors.white,
-                                            ),
-                                            elevation: 0,
-                                          ),
-                                          iconStyleData: const IconStyleData(
-                                            icon: Icon(
-                                              Icons.keyboard_arrow_down,
-                                            ),
-                                            iconSize: 14,
-                                            iconEnabledColor: Colors.black,
-                                            iconDisabledColor: Colors.grey,
-                                          ),
-                                          dropdownStyleData: DropdownStyleData(
-                                            maxHeight: 200,
-                                            width: screenWidth * 0.12,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              color: Colors.white,
-                                            ),
-                                            offset: const Offset(0, -5),
-                                            scrollbarTheme: ScrollbarThemeData(
-                                              radius: const Radius.circular(5),
-                                              thickness: MaterialStateProperty
-                                                  .all<double>(1),
-                                              thumbVisibility:
-                                                  MaterialStateProperty.all<
-                                                      bool>(true),
-                                            ),
-                                          ),
-                                          menuItemStyleData:
-                                               MenuItemStyleData(
-                                            height: screenHeight * 0.03,
-                                            padding: EdgeInsets.only(
-                                                left: screenWidth * 0.025, right: 14),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  )
-                                : null,
+                                      );
+                                      ScaffoldMessenger.of(context)
+                                        ..hideCurrentSnackBar()
+                                        ..showSnackBar(snackBar);
+                                      return;
+                                    }
+                                  } else {
+                                    final fetchedLinksId =
+                                        fetchedlinkid is List<int>
+                                            ? fetchedlinkid as List<int>
+                                            : [fetchedlinkid as int];
+                                    final fetchedLinks =
+                                        fetchedlink is List<String>
+                                            ? fetchedlink as List<String>
+                                            : [fetchedlink as String];
+                                    final fetchedlinkNames =
+                                        fetchedTitle is List<String>
+                                            ? fetchedTitle as List<String>
+                                            : [fetchedTitle as String];
+
+                                    _launchUrl(fetchedLinks, fetchedLinksId,
+                                        fetchedlinkNames);
+                                  }
+                                },
+                                onLongPress: widget.access!
+                                    ? fetchedlink == null
+                                        ? createLink
+                                        : newLink
+                                    : null,
+                                child: SvgPicture.asset(
+                                  'assets/icons/youtube.svg',
+                                  color: Colors.red
+                                      .shade700, // Make sure to use your correct asset path
+                                  width: screenWidth * 0.075,
+                                ),
+                              ),
+                            ),
                           ),
-                          Padding(
-                            padding: const EdgeInsets.only(left: 20.0),
-                            child: _isLoading
-                                ? Center(
-                                    child: ColorFiltered(
-                                    colorFilter: ColorFilter.mode(
-                                        Colors.white, BlendMode.srcIn),
-                                    child: Lottie.asset(
-                                      'assets/lottie_json/loadingspoons.json',
-                                      width: screenWidth * 0.4,
+                          SizedBox(
+                            width: 10,
+                          ),
+                          Container(
+                            width: screenWidth * 0.09, // Adjust the width
+                            height: screenWidth * 0.09, // Adjust the height
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(
+                                  0.8), // Set background with opacity
+                              borderRadius: BorderRadius.circular(
+                                  100), // Makes the container round
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black
+                                      .withOpacity(0.2), // Soft shadow
+                                  blurRadius: 6,
+                                  spreadRadius: 2,
+                                  offset: Offset(0, 3), // Slight shadow below
+                                ),
+                              ],
+                            ),
+                            child: CustomPopup(
+                              arrowColor: Colors.white,
+                              barrierColor: Colors.transparent,
+                              backgroundColor: Colors.white,
+                              content: TextButton(
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                  //  dishHelp(context);
+                                },
+                                style: ButtonStyle(
+                                  backgroundColor: MaterialStateProperty.all(
+                                      Colors.transparent),
+                                  shape: MaterialStateProperty.all(
+                                    RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
-                                  )) // Show loading indicator
-                                : currentNotes.isEmpty
-                                    ? Center(
-                                        child: Padding(
-                                          padding: EdgeInsets.symmetric(
-                                              vertical: screenHeight * 0.1),
-                                          child: GestureDetector(
-                                            onTap: createIngredient,
-                                            child: Column(
-                                              children: [
-                                                Lottie.asset(
-                                                  'assets/lottie_json/noingredients.json',
-                                                  width: screenWidth * 0.5,
-                                                ),
-                                                const SizedBox(
-                                                  height: 10,
-                                                ),
-                                                Text(
-                                                  'No Ingredients Added',
-                                                  style: GoogleFonts
-                                                      .hammersmithOne(
-                                                    fontSize:
-                                                        screenWidth * 0.06,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                                Text(
-                                                  'Tap to Add',
-                                                  style: GoogleFonts
-                                                      .hammersmithOne(
-                                                    fontSize:
-                                                        screenWidth * 0.03,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ), // Show this if list is empty
-                                      )
-                                    : Column(
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.only(),
-                                            child: Container(
-                                              width: MediaQuery.of(context)
-                                                      .size
-                                                      .width *
-                                                  1,
-                                              child: Table(
-                                                columnWidths: {
-                                                  0: FlexColumnWidth(
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.07),
-                                                  1: FlexColumnWidth(
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.015),
-                                                  2: FlexColumnWidth(
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.015),
-                                                  3: FlexColumnWidth(
-                                                      MediaQuery.of(context)
-                                                              .size
-                                                              .width *
-                                                          0.025),
-                                                  // 4: FlexColumnWidth(.1),
-                                                },
-                                                children: [
-                                                  TableRow(
-                                                    children: [
-                                                      TableCell(
-                                                        child: Padding(
-                                                          padding: EdgeInsets.only(
-                                                              top: cellPadding),
-                                                          child: Text(
-                                                            "INGREDIENTS",
-                                                            style: GoogleFonts
-                                                                .hammersmithOne(
-                                                              fontSize:
-                                                                  fontSize,
-                                                              color: Colors
-                                                                  .grey[850],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      TableCell(
-                                                        child: Padding(
-                                                          padding: EdgeInsets.only(
-                                                              left:
-                                                                  cellPadding -
-                                                                      1,
-                                                              top: cellPadding),
-                                                          child: Text(
-                                                            'Qty',
-                                                            style: GoogleFonts
-                                                                .hammersmithOne(
-                                                              fontSize:
-                                                                  fontSize,
-                                                              color: Colors
-                                                                  .grey[850],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      TableCell(
-                                                        child: Padding(
-                                                          padding: EdgeInsets.only(
-                                                              top: cellPadding),
-                                                          child: Text(
-                                                            'Calc',
-                                                            style: GoogleFonts
-                                                                .hammersmithOne(
-                                                              fontSize:
-                                                                  fontSize,
-                                                              color: Colors
-                                                                  .grey[850],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      TableCell(
-                                                        child: Padding(
-                                                          padding: EdgeInsets.only(
-                                                              top: cellPadding,
-                                                              left:
-                                                                  cellPadding),
-                                                          child: Text(
-                                                            "Unit",
-                                                            style: GoogleFonts
-                                                                .hammersmithOne(
-                                                              fontSize:
-                                                                  fontSize,
-                                                              color: Colors
-                                                                  .grey[850],
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                            ),
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      /*  TableCell(
-                                                                        child: Padding(
-                                      padding: EdgeInsets.all(cellPadding),
-                                      child: Text(
-                                        " ${item['uom']!}",
-                                        style: GoogleFonts.hammersmithOne(
-                                          fontSize: fontSize,
-                                          color: Colors.black,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                                                        ),
-                                                                      ), */
-                                                    ],
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            height: MediaQuery.of(context)
-                                                    .size
-                                                    .height *
-                                                0.5, // You can set the height you need
-                                            child: ListView.builder(
-                                              shrinkWrap:
-                                                  true, // Ensures ListView only takes as much space as needed
-                                              itemCount: currentNotes.length,
-                                              itemBuilder: (context, index) {
-                                                final note =
-                                                    currentNotes[index];
-                                                return ingredientList(
-                                                  count: selectedValue!,
-                                                  dish: widget.dish,
-                                                  text: note.name!,
-                                                  quantity: double.parse(
-                                                      note.quantity!),
-                                                  uom: note.uom,
-                                                  access: widget.access!,
-                                                  onEditPressed: () async {
-                                                    await updateIng(
-                                                        note, note.name!);
-                                                  },
-                                                  onDeletePressed: () =>
-                                                      deleteIng(note.name!),
-                                                );
-                                              },
-                                            ),
-                                          ),
-                                        ],
-                                      ),
+                                  ),
+                                  overlayColor: MaterialStateProperty.all(Colors
+                                      .transparent), // Disable splash effect
+                                ),
+                                child: Text(
+                                  'How to add, update, or delete.',
+                                  style: GoogleFonts.hammersmithOne(
+                                    fontSize:
+                                        MediaQuery.of(context).size.width *
+                                            0.035,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                              ),
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 7),
+                                child: SizedBox(
+                                  width:
+                                      MediaQuery.of(context).size.width * 0.08,
+                                  child: Image.asset(
+                                    "assets/images/help.png",
+                                    fit: BoxFit.contain,
+                                  ),
+                                ),
+                              ),
+                            ),
                           ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-              ],
-            ),
-
-            // Instructions Tab
-
-            SingleChildScrollView(
-              child: _isLoading
-                  ? Center(
-                      child: ColorFiltered(
-                      colorFilter:
-                          ColorFilter.mode(Colors.white, BlendMode.srcIn),
-                      child: Lottie.asset(
-                        'assets/lottie_json/loadingspoons.json',
-                        width: screenWidth * 0.4,
-                      ),
-                    )) // Show loading indicator
-                  : currentRecipe.isEmpty
-                      ? Center(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                                vertical: screenWidth * 0.45),
-                            child: GestureDetector(
-                              onTap: createRecipe,
-                              child: Column(
-                                children: [
-                                  Lottie.asset(
-                                    'assets/lottie_json/norecipe.json',
-                                    width: screenWidth * 1,
-                                  ),
-                                  const SizedBox(
-                                    height: 10,
-                                  ),
-                                  Text(
-                                    'No Recipe Found',
-                                    style: GoogleFonts.hammersmithOne(
-                                      fontSize: screenWidth * 0.05,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
+                    Positioned(
+                      bottom: 0,
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: screenWidth,
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: screenWidth * 0.03),
+                              child: Padding(
+                                padding: const EdgeInsets.only(bottom: 5.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    SizedBox(
+                                      width: screenWidth * 0.65,
+                                      child: Text(
+                                        widget.dish ?? '',
+                                        style: GoogleFonts.hammersmithOne(
+                                          fontSize: titleFontSize,
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 2, // Allows up to 2 lines
+                                        overflow: TextOverflow
+                                            .ellipsis, // Adds "..." if text exceeds space
+                                        softWrap: true, // Ensures wrapping
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                    'Tap to Add',
-                                    style: GoogleFonts.hammersmithOne(
-                                      fontSize: screenWidth * 0.03,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ), // Show this if list is empty
-                        )
-                      : Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  top:
-                                      MediaQuery.of(context).size.height * 0.02,
-                                  bottom: MediaQuery.of(context).size.height *
-                                      0.01),
-                              child: Text(
-                                "How to Cook",
-                                style: GoogleFonts.hammersmithOne(
-                                  fontSize:
-                                      MediaQuery.of(context).size.width > 600
-                                          ? 22
-                                          : MediaQuery.of(context).size.width *
-                                              0.05,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.black87,
+                                    if (widget.access!)
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            bottom: screenHeight * 0.015),
+                                        child: Container(
+                                          width: screenWidth *
+                                              0.09, // Adjust the width
+                                          height: screenWidth *
+                                              0.09, // Adjust the height
+                                          decoration: BoxDecoration(
+                                            color:
+                                                Colors.white.withOpacity(0.8),
+                                            borderRadius:
+                                                BorderRadius.circular(100),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.black
+                                                    .withOpacity(0.2),
+                                                blurRadius: 6,
+                                                spreadRadius: 2,
+                                                offset: Offset(0, 3),
+                                              ),
+                                            ],
+                                          ),
+                                          child: IconButton(
+                                            key: _add,
+                                            onPressed: () =>
+                                                add(selectedTabIndex),
+                                            icon: Image.asset(
+                                              'assets/icons/add.png',
+                                              color: Colors.black54,
+                                              width: screenWidth * 0.03,
+                                            ),
+                                            tooltip: 'Add item',
+                                          ),
+                                        ),
+                                      ),
+                                  ],
                                 ),
                               ),
                             ),
-                            ListView.builder(
-                              physics:
-                                  const NeverScrollableScrollPhysics(), // Disable individual scrolling
-                              shrinkWrap:
-                                  true, // Ensures the ListView takes minimal height
-                              padding:
-                                  EdgeInsets.zero, // Remove any default padding
+                          ),
+                          SizedBox(
+                            width: MediaQuery.of(context)
+                                .size
+                                .width, // Ensure full width
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topLeft: Radius.circular(
+                                    30), // Adjust the radius as needed
+                                topRight: Radius.circular(30),
+                              ),
+                              child: Container(
+                                color: widget.background,
+                                height: screenHeight * 0.05,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 10.0),
+                                  child: TabBar(
+                                    controller: _tabController,
+                                    tabs: const [
+                                      Tab(text: 'Ingredients'),
+                                      Tab(text: 'How to Cook'),
+                                    ],
+                                    labelStyle: GoogleFonts.hammersmithOne(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.05,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    unselectedLabelStyle:
+                                        GoogleFonts.hammersmithOne(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.045,
+                                    ),
+                                    labelColor: Colors.white,
+                                    unselectedLabelColor: Colors.black87,
+                                    indicator: const UnderlineTabIndicator(
+                                      borderSide: BorderSide(
+                                          width: 3.0, color: Colors.white),
+                                      insets: EdgeInsets.symmetric(
+                                          horizontal: 30.0),
+                                    ),
+                                    indicatorSize: TabBarIndicatorSize.tab,
+                                    overlayColor: MaterialStateProperty.all(
+                                      Colors.white.withOpacity(0.1),
+                                    ),
+                                    splashBorderRadius:
+                                        BorderRadius.circular(8),
+                                    dividerColor: Colors.transparent,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  ],
+                )),
+            Container(
+              decoration: BoxDecoration(
+                color: widget.background,
+                borderRadius: const BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  SizedBox(
+                    height: screenHeight * 0.65,
+                    child: TabBarView(
+                      controller: _tabController,
+                      children: [
+                        Stack(
+                          children: [
+                            // Image container
 
-                              itemCount: currentRecipe.length,
-                              itemBuilder: (context, index) {
-                                final note = currentRecipe[index];
-                                return RecipeList(
-                                  dish: widget.dish,
-                                  //  type: widget.type!,
-                                  text: note.name!,
-                                  access: widget.access,
-                                  onEditPressed: () =>
-                                      updateRecipe(note, note.name!),
-                                  onDeletePressed: () =>
-                                      deleteRecipe(note.name!),
-                                );
-                              },
+                            // Expanded container with slight overlap
+                            Positioned(
+                              top:
+                                  0, // Adjust this value to control the overlap
+                              left: 0,
+                              right: 0,
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: widget.background,
+                                  borderRadius: const BorderRadius.only(
+                                    topLeft: Radius.circular(20),
+                                    topRight: Radius.circular(20),
+                                  ),
+                                ),
+                                child:
+                                    // Ingredients Tab
+                                    SingleChildScrollView(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.end,
+                                    children: [
+                                      Padding(
+                                        padding: EdgeInsets.only(
+                                            top: screenHeight * 0.015,
+                                            right: screenWidth * 0.06,
+                                            bottom: 10),
+                                        child: currentNotes.isNotEmpty
+                                            ? Row(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  Text(
+                                                    "Calculator : ",
+                                                    style: GoogleFonts
+                                                        .hammersmithOne(
+                                                      fontSize:
+                                                          MediaQuery.of(context)
+                                                                      .size
+                                                                      .width >
+                                                                  600
+                                                              ? 20
+                                                              : screenWidth *
+                                                                  0.04,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  DropdownButtonHideUnderline(
+                                                    child:
+                                                        DropdownButton2<String>(
+                                                      isExpanded: true,
+                                                      hint: Row(
+                                                        children: [
+                                                          Icon(
+                                                            Icons.list,
+                                                            size: MediaQuery.of(
+                                                                            context)
+                                                                        .size
+                                                                        .width >
+                                                                    600
+                                                                ? 16
+                                                                : 8,
+                                                            color: Colors.white,
+                                                          ),
+                                                          SizedBox(
+                                                            width: 4,
+                                                          ),
+                                                          Expanded(
+                                                            child: Text(
+                                                              '1',
+                                                              style: GoogleFonts
+                                                                  .hammersmithOne(
+                                                                fontSize: MediaQuery.of(context)
+                                                                            .size
+                                                                            .width >
+                                                                        600
+                                                                    ? 14
+                                                                    : screenWidth *
+                                                                        0.025,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .black,
+                                                              ),
+                                                              overflow:
+                                                                  TextOverflow
+                                                                      .ellipsis,
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                      items: items
+                                                          .map((String item) =>
+                                                              DropdownMenuItem<
+                                                                  String>(
+                                                                value: item,
+                                                                child: Text(
+                                                                  item,
+                                                                  style: GoogleFonts
+                                                                      .hammersmithOne(
+                                                                    fontSize: MediaQuery.of(context).size.width >
+                                                                            600
+                                                                        ? 14
+                                                                        : screenWidth *
+                                                                            0.025,
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    color: Colors
+                                                                        .black,
+                                                                  ),
+                                                                  overflow:
+                                                                      TextOverflow
+                                                                          .ellipsis,
+                                                                ),
+                                                              ))
+                                                          .toList(),
+                                                      value: selectedValue,
+                                                      onChanged:
+                                                          (String? value) {
+                                                        setState(() {
+                                                          selectedValue = value;
+                                                        });
+                                                      },
+                                                      buttonStyleData:
+                                                          ButtonStyleData(
+                                                        height:
+                                                            screenHeight * 0.02,
+                                                        width:
+                                                            screenWidth * 0.12,
+                                                        padding: EdgeInsets.only(
+                                                            left: screenWidth *
+                                                                0.025,
+                                                            right: screenWidth *
+                                                                0.025),
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          /* border: Border.all(
+                                                  color: Colors.black26,
+                                                ), */
+                                                          color: Colors.white,
+                                                        ),
+                                                        elevation: 0,
+                                                      ),
+                                                      iconStyleData:
+                                                          const IconStyleData(
+                                                        icon: Icon(
+                                                          Icons
+                                                              .keyboard_arrow_down,
+                                                        ),
+                                                        iconSize: 14,
+                                                        iconEnabledColor:
+                                                            Colors.black,
+                                                        iconDisabledColor:
+                                                            Colors.grey,
+                                                      ),
+                                                      dropdownStyleData:
+                                                          DropdownStyleData(
+                                                        maxHeight: 200,
+                                                        width:
+                                                            screenWidth * 0.12,
+                                                        decoration:
+                                                            BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(5),
+                                                          color: Colors.white,
+                                                        ),
+                                                        offset:
+                                                            const Offset(0, -5),
+                                                        scrollbarTheme:
+                                                            ScrollbarThemeData(
+                                                          radius: const Radius
+                                                              .circular(5),
+                                                          thickness:
+                                                              MaterialStateProperty
+                                                                  .all<double>(
+                                                                      1),
+                                                          thumbVisibility:
+                                                              MaterialStateProperty
+                                                                  .all<bool>(
+                                                                      true),
+                                                        ),
+                                                      ),
+                                                      menuItemStyleData:
+                                                          MenuItemStyleData(
+                                                        height:
+                                                            screenHeight * 0.03,
+                                                        padding: EdgeInsets.only(
+                                                            left: screenWidth *
+                                                                0.025,
+                                                            right: 14),
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              )
+                                            : null,
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(left: 20.0),
+                                        child: _isLoading
+                                            ? Center(
+                                                child: ColorFiltered(
+                                                colorFilter: ColorFilter.mode(
+                                                    Colors.white,
+                                                    BlendMode.srcIn),
+                                                child: Lottie.asset(
+                                                  'assets/lottie_json/loadingspoons.json',
+                                                  width: screenWidth * 0.4,
+                                                ),
+                                              )) // Show loading indicator
+                                            : currentNotes.isEmpty
+                                                ? Center(
+                                                    child: Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              vertical:
+                                                                  screenHeight *
+                                                                      0.04),
+                                                      child: GestureDetector(
+                                                        onTap: createIngredient,
+                                                        child: Column(
+                                                          children: [
+                                                            Lottie.asset(
+                                                              'assets/lottie_json/empty.json',
+                                                              repeat: false,
+                                                              width:
+                                                                  screenWidth *
+                                                                      0.6,
+                                                            ),
+                                                            const SizedBox(
+                                                              height: 10,
+                                                            ),
+                                                            Text(
+                                                              'No Ingredients Added',
+                                                              style: GoogleFonts
+                                                                  .hammersmithOne(
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.06,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                            Text(
+                                                              'Tap to Add',
+                                                              style: GoogleFonts
+                                                                  .hammersmithOne(
+                                                                fontSize:
+                                                                    screenWidth *
+                                                                        0.03,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .bold,
+                                                                color: Colors
+                                                                    .white,
+                                                              ),
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ), // Show this if list is empty
+                                                  )
+                                                : Column(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children: [
+                                                      Padding(
+                                                        padding:
+                                                            EdgeInsets.all(0),
+                                                        child: SizedBox(
+                                                          width: MediaQuery.of(
+                                                                      context)
+                                                                  .size
+                                                                  .width *
+                                                              1,
+                                                          child: Table(
+                                                            columnWidths: {
+                                                              0: FlexColumnWidth(
+                                                                  MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.07),
+                                                              1: FlexColumnWidth(
+                                                                  MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.015),
+                                                              2: FlexColumnWidth(
+                                                                  MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.015),
+                                                              3: FlexColumnWidth(
+                                                                  MediaQuery.of(
+                                                                              context)
+                                                                          .size
+                                                                          .width *
+                                                                      0.025),
+                                                              // 4: FlexColumnWidth(.1),
+                                                            },
+                                                            children: [
+                                                              TableRow(
+                                                                children: [
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsets
+                                                                          .only(
+                                                                              top: cellPadding),
+                                                                      child:
+                                                                          Text(
+                                                                        "INGREDIENTS",
+                                                                        style: GoogleFonts
+                                                                            .hammersmithOne(
+                                                                          fontSize:
+                                                                              fontSize,
+                                                                          color:
+                                                                              Colors.grey[850],
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsets.only(
+                                                                          left: cellPadding -
+                                                                              1,
+                                                                          top:
+                                                                              cellPadding),
+                                                                      child:
+                                                                          Text(
+                                                                        'Qty',
+                                                                        style: GoogleFonts
+                                                                            .hammersmithOne(
+                                                                          fontSize:
+                                                                              fontSize,
+                                                                          color:
+                                                                              Colors.grey[850],
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                        textAlign:
+                                                                            TextAlign.left,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsets
+                                                                          .only(
+                                                                              top: cellPadding),
+                                                                      child:
+                                                                          Text(
+                                                                        'Calc',
+                                                                        style: GoogleFonts
+                                                                            .hammersmithOne(
+                                                                          fontSize:
+                                                                              fontSize,
+                                                                          color:
+                                                                              Colors.grey[850],
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                        textAlign:
+                                                                            TextAlign.left,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  TableCell(
+                                                                    child:
+                                                                        Padding(
+                                                                      padding: EdgeInsets.only(
+                                                                          top:
+                                                                              cellPadding,
+                                                                          left:
+                                                                              cellPadding),
+                                                                      child:
+                                                                          Text(
+                                                                        "Unit",
+                                                                        style: GoogleFonts
+                                                                            .hammersmithOne(
+                                                                          fontSize:
+                                                                              fontSize,
+                                                                          color:
+                                                                              Colors.grey[850],
+                                                                          fontWeight:
+                                                                              FontWeight.w600,
+                                                                        ),
+                                                                        textAlign:
+                                                                            TextAlign.left,
+                                                                      ),
+                                                                    ),
+                                                                  ),
+                                                                  /*  TableCell(
+                                                                                    child: Padding(
+                                                  padding: EdgeInsets.all(cellPadding),
+                                                  child: Text(
+                                                    " ${item['uom']!}",
+                                                    style: GoogleFonts.hammersmithOne(
+                                                      fontSize: fontSize,
+                                                      color: Colors.black,
+                                                      fontWeight: FontWeight.w600,
+                                                    ),
+                                                  ),
+                                                                                    ),
+                                                                                  ), */
+                                                                ],
+                                                              ),
+                                                            ],
+                                                          ),
+                                                        ),
+                                                      ),
+                                                      SizedBox(
+                                                        height: MediaQuery.of(
+                                                                    context)
+                                                                .size
+                                                                .height *
+                                                            0.5, // You can set the height you need
+                                                        child: ListView.builder(
+                                                          shrinkWrap:
+                                                              true, // Ensures ListView only takes as much space as needed
+                                                          itemCount:
+                                                              currentNotes
+                                                                  .length,
+                                                          itemBuilder:
+                                                              (context, index) {
+                                                            final note =
+                                                                currentNotes[
+                                                                    index];
+                                                            return ingredientList(
+                                                              count:
+                                                                  selectedValue!,
+                                                              dish: widget.dish,
+                                                              text: note.name!,
+                                                              quantity: double
+                                                                  .parse(note
+                                                                      .quantity!),
+                                                              uom: note.uom,
+                                                              access: widget
+                                                                  .access!,
+                                                              onEditPressed:
+                                                                  () async {
+                                                                await updateIng(
+                                                                    note,
+                                                                    note.name!);
+                                                              },
+                                                              onDeletePressed:
+                                                                  () => deleteIng(
+                                                                      note.name!),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
                             ),
                           ],
                         ),
+
+                        // Instructions Tab
+
+                        SingleChildScrollView(
+                          child: _isLoading
+                              ? Center(
+                                  child: ColorFiltered(
+                                  colorFilter: ColorFilter.mode(
+                                      Colors.white, BlendMode.srcIn),
+                                  child: Lottie.asset(
+                                    'assets/lottie_json/loadingspoons.json',
+                                    width: screenWidth * 0.4,
+                                  ),
+                                )) // Show loading indicator
+                              : currentRecipe.isEmpty
+                                  ? Center(
+                                      child: Padding(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: screenWidth * 0.27),
+                                        child: GestureDetector(
+                                          onTap: createRecipe,
+                                          child: Column(
+                                            children: [
+                                              Lottie.asset(
+                                                'assets/lottie_json/noingredients.json',
+                                                width: screenWidth * 0.55,
+                                              ),
+                                              const SizedBox(
+                                                height: 10,
+                                              ),
+                                              Text(
+                                                'No Recipe Found',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                  fontSize: screenWidth * 0.06,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              Text(
+                                                'Tap to Add',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                  fontSize: screenWidth * 0.03,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ), // Show this if list is empty
+                                    )
+                                  : Column(
+                                      children: [
+                                        Padding(
+                                          padding: EdgeInsets.only(
+                                              top: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.02,
+                                              bottom: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.01),
+                                          child: Text(
+                                            "How to Cook",
+                                            style: GoogleFonts.hammersmithOne(
+                                              fontSize: MediaQuery.of(context)
+                                                          .size
+                                                          .width >
+                                                      600
+                                                  ? 22
+                                                  : MediaQuery.of(context)
+                                                          .size
+                                                          .width *
+                                                      0.05,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.black87,
+                                            ),
+                                          ),
+                                        ),
+                                        ListView.builder(
+                                          physics:
+                                              const NeverScrollableScrollPhysics(), // Disable individual scrolling
+                                          shrinkWrap:
+                                              true, // Ensures the ListView takes minimal height
+                                          padding: EdgeInsets
+                                              .zero, // Remove any default padding
+
+                                          itemCount: currentRecipe.length,
+                                          itemBuilder: (context, index) {
+                                            final note = currentRecipe[index];
+                                            return RecipeList(
+                                              dish: widget.dish,
+                                              //  type: widget.type!,
+                                              text: note.name!,
+                                              access: widget.access,
+                                              onEditPressed: () => updateRecipe(
+                                                  note, note.name!),
+                                              onDeletePressed: () =>
+                                                  deleteRecipe(note.name!),
+                                            );
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ],
         ),
