@@ -1,4 +1,7 @@
+import 'dart:math';
+
 import 'package:auto_animated/auto_animated.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:drop_down_list/drop_down_list.dart';
 import 'package:drop_down_list/model/selected_list_item.dart';
 import 'package:flutter/cupertino.dart';
@@ -30,6 +33,7 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'dart:async'; // For using Timer
 
+
 class smallalldishesList extends StatefulWidget {
   smallalldishesList({super.key, required this.title, required this.scafColor});
   String? title;
@@ -51,6 +55,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
   List<String> finalSerials = [];
   bool _isSearchVisible = false;
   final FocusNode _focusNode = FocusNode();
+    bool connectivity = true;
+
 
   late SharedPreferences prefs;
 
@@ -79,6 +85,16 @@ class _smallalldishesListState extends State<smallalldishesList> {
     SelectedListItem(name: 'Newest', value: 'Newest'),
     SelectedListItem(name: 'Oldest', value: 'Oldest'),
   ];
+  final Random _random = Random();
+
+    final List<String> _lottieFiles = [
+    'assets/lottie_json/cat.json',
+    'assets/lottie_json/ghost.json',
+    'assets/lottie_json/fall.json',
+    'assets/lottie_json/cups.json'
+  ];
+
+  late final String selectedLottie;
   void _onSortChanged(List<dynamic> selectedList) {
     if (selectedList.isNotEmpty) {
       final String selectedValue =
@@ -124,6 +140,9 @@ class _smallalldishesListState extends State<smallalldishesList> {
   @override
   void initState() {
     super.initState();
+        printCurrentConnection();
+    selectedLottie = _lottieFiles[_random.nextInt(_lottieFiles.length)];
+
     _createTutorial();
     fetchSortingOptions();
     _filterAndSortNotes();
@@ -141,6 +160,41 @@ class _smallalldishesListState extends State<smallalldishesList> {
 
     _speech = stt.SpeechToText();
   }
+
+    Future<void> printCurrentConnection() async {
+    setState(() {
+      connectivity = true;
+    });
+    // Check the connectivity status
+    final connectivityResult = await Connectivity().checkConnectivity();
+
+    // Print the type of connection
+    if (connectivityResult.last == ConnectivityResult.mobile) {
+      print('Mobile network is available.$connectivity');
+    } else if (connectivityResult.last == ConnectivityResult.wifi) {
+      print('Wi-Fi is available. $connectivity');
+    } else if (connectivityResult.last == ConnectivityResult.ethernet) {
+      print('Ethernet connection is available.');
+    } else if (connectivityResult.last == ConnectivityResult.vpn) {
+      print('VPN connection is active. ');
+    } /* else if (connectivityResult.last == ConnectivityResult.bluetooth) {
+    print('Bluetooth connection is available.');
+  } else if (connectivityResult.last == ConnectivityResult.other) {
+    print('Connected to a network that is not mobile, Wi-Fi, Ethernet, VPN, or Bluetooth.');
+  } */
+    else if (connectivityResult.last == ConnectivityResult.none) {
+      setState(() {
+        connectivity = false;
+      });
+      print('No available network types. $connectivity');
+    } else {
+      setState(() {
+        connectivity = false;
+      });
+      print('Unknown connectivity status. $connectivity');
+    }
+  }
+
 
   Future<void> fetchSortingOptions() async {
     final response = await supabase
@@ -626,6 +680,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
     final currentAllIng = noteDatabase.currentAllIng;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    
 
     // Adjust sizes dynamically
     final iconSize =
@@ -710,7 +765,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                 scrollDirection: Axis.horizontal,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10.0),
-                  child: Row(
+                  child: connectivity? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       Container(
@@ -731,9 +786,9 @@ class _smallalldishesListState extends State<smallalldishesList> {
                           children: [
                             Container(
                               margin: const EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width * 0.11,
+                              width: MediaQuery.of(context).size.width * 0.125,
                               height:
-                                  MediaQuery.of(context).size.height * 0.035,
+                                  MediaQuery.of(context).size.height * 0.036,
                               decoration: BoxDecoration(
                                 color: Colors.transparent,
                                 borderRadius: !_isSearchVisible
@@ -760,7 +815,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                           ? Icons.arrow_back
                                           : Icons.search,
                                       size: MediaQuery.of(context).size.width *
-                                          0.05,
+                                          0.045,
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -992,7 +1047,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                       ],
                                     ),
                                     child: Padding(
-                                      padding: EdgeInsets.only(left: 5.0),
+                                      padding: EdgeInsets.only(left: 6.0),
                                       child: Row(
                                         mainAxisAlignment:
                                             MainAxisAlignment.center,
@@ -1001,7 +1056,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                           Text(
                                             "Sort By",
                                             style: GoogleFonts.hammersmithOne(
-                                                fontWeight: FontWeight.bold),
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: screenWidth * 0.03),
                                           ),
                                           Icon(Icons.arrow_drop_down, size: 30),
                                         ],
@@ -1089,7 +1145,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                         ],
                       ),
                     ],
-                  ),
+                  ): null,
                 ),
               ),
             ),
@@ -1107,7 +1163,69 @@ class _smallalldishesListState extends State<smallalldishesList> {
                         ),
                       ),
                     )
-                  : Row(
+                  : _sortededNotes.isEmpty
+                      ? Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                vertical: screenWidth * 0.3),
+                            child: GestureDetector(
+                              onTap:  null,
+                              child: Column(
+                                children: [
+                                  Lottie.asset(
+                                    selectedLottie,
+                                    width: screenWidth * 0.5,
+                                  ),
+                                  const SizedBox(
+                                    height: 0,
+                                  ),
+                                  Text(
+                                    connectivity
+                                        ? 'No Dishes Found'
+                                        : 'No Internet Connection',
+                                    style: GoogleFonts.hammersmithOne(
+                                      fontSize: screenWidth * 0.05,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  if (connectivity)
+                                    Text(
+                                      _searchController.text.isEmpty
+                                          ? 'Tap to Add'
+                                          : '',
+                                      style: GoogleFonts.hammersmithOne(
+                                        fontSize: screenWidth * 0.03,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  if (!connectivity)
+                                    Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: ElevatedButton(
+                                        onPressed: () {Navigator.pushReplacement(
+                                          context,
+                                          MaterialPageRoute(
+                                              builder: (context) =>
+                                                   smallalldishesList(title: widget.title, scafColor:  widget.scafColor)),
+                                           // Remove all previous routes
+                                        );},
+                                        child: Text(
+                                          'Retry',
+                                          style: GoogleFonts.hammersmithOne(
+                                            fontSize: screenWidth * 0.035,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    )
+                                ],
+                              ),
+                            ),
+                          ), // Show this if list is empty
+                        ): Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         /* Padding(
@@ -1225,8 +1343,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
                           ),
                         ), */
                         Expanded(
-                          child: 
-                          /* ListView.builder(
+                          child:
+                              /* ListView.builder(
                             itemCount: _sortededNotes.length,
                             itemBuilder: (context, index) {
                               final note = _sortededNotes[index];
@@ -1263,7 +1381,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                               );
                             },
                           ), */
-                          LiveList(
+                              LiveList(
                             delay: const Duration(
                                 milliseconds:
                                     0), // Delay before the first item appears
