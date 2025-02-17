@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:isar/isar.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:recipe/firebase_options.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/notInUse/brin_db.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -18,8 +19,9 @@ Future<void> main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  await Firebase.initializeApp();
-  await database.initialize();
+  await Firebase.initializeApp(    options: DefaultFirebaseOptions.currentPlatform,
+);
+ // await database.initialize();
   await Supabase.initialize(
     url: 'https://vgkxpwyszheougrhippw.supabase.co',
     anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZna3hwd3lzemhlb3VncmhpcHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2NjA3NzgsImV4cCI6MjA0NTIzNjc3OH0.YzFunbFqLYXYn9-trGWtgElmi9rVp-D5_m_yuTXy0qo',

@@ -23,6 +23,9 @@ plugins {
 
     // Android application plugin, set to version 8.1.1 (or the latest compatible version)
     id "com.android.application" version "8.1.1" apply false
+    // START: FlutterFire Configuration
+    id "com.google.gms.google-services" version "4.3.15" apply false
+    // END: FlutterFire Configuration
 
     // Kotlin plugin for Android, ensure version is compatible with your project
     id "org.jetbrains.kotlin.android" version "1.9.0" apply false  // Update to 1.9.0 for compatibility

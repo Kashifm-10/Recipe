@@ -1,10 +1,6 @@
-import 'package:isar/isar.dart';
-
-part 'homeTitle.g.dart'; // Ensure this matches the generated file name
-
-@Collection()
+ 
 class Title {
-  Id id = Isar.autoIncrement;
+  late int id;
 
   late String title;
   String? type;

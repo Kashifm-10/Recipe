@@ -1,10 +1,6 @@
-import 'package:isar/isar.dart';
-
-part 'dishes.g.dart'; // Ensure this matches the generated file name
-
-@Collection()
+ 
 class Dish {
-  Id id = Isar.autoIncrement;
+  late int id;
 
   late String name;
   String? serial;

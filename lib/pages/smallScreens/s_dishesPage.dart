@@ -53,7 +53,7 @@ class smalldishesList extends StatefulWidget {
 class _smalldishesListState extends State<smalldishesList> {
   //text controller to access what the user typed
   TextEditingController textController = TextEditingController();
-  final isar = IsarInstance().isar;
+ // final isar = IsarInstance().isar;
   List<Dish> _filteredNotes = [];
   List<Dish> _sortededNotes = [];
   List<Title> currentTitles = [];

@@ -1,10 +1,6 @@
-import 'package:isar/isar.dart';
-
-part 'ingredients.g.dart'; // required for code generation
-
-@collection
+ 
 class Ingredients {
-  Id id = Isar.autoIncrement;
+  late int id;
 
   String? name;
   String? serial;

@@ -50,7 +50,7 @@ class smallrecipe extends StatefulWidget {
   State<smallrecipe> createState() => _smallrecipeState();
 }
 
-final isar = IsarInstance().isar;
+//final isar = IsarInstance().isar;
 
 class _smallrecipeState extends State<smallrecipe>
     with SingleTickerProviderStateMixin {

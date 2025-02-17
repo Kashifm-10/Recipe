@@ -12,12 +12,12 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 class database extends ChangeNotifier {
   static late Isar isar;
 
-  static Future<void> initialize() async {
+ /*  static Future<void> initialize() async {
     final dir = await getApplicationDocumentsDirectory();
     isar = await Isar.open(
         [DishSchema, IngredientsSchema, RecipeSchema, TitleSchema],
         directory: dir.path);
-  }
+  } */
 
   final List<Title> currentTitles = [];
 
@@ -363,7 +363,7 @@ class database extends ChangeNotifier {
             : '')
         .join(' ');
 
-    final existingNote = await isar.dishs.get(id);
+   // final existingNote = await isar.dishs.get(id);
     final updatedNote = {
       'name': formattedName,
       'duration': duration,
@@ -385,7 +385,7 @@ class database extends ChangeNotifier {
   Future<void> deleteDish(int id, String type, String serial) async {
     final response =
         await Supabase.instance.client.from('dishes').delete().eq('id', id);
-    await isar.writeTxn(() => isar.dishs.delete(id));
+ //   await isar.writeTxn(() => isar.dishs.delete(id));
     deleteRecipesBySerial(serial);
     deleteIngredientsBySerial(serial);
     deleteLinksBySerial(serial);

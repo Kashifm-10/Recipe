@@ -47,7 +47,7 @@ class recipe extends StatefulWidget {
   State<recipe> createState() => _recipeState();
 }
 
-final isar = IsarInstance().isar;
+//final isar = IsarInstance().isar;
 
 class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
   //text controller to access what the user typed
