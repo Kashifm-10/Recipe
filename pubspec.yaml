@@ -92,6 +92,10 @@ dependencies:
   gif: ^2.3.0
   flutter_popup: ^3.3.4
   connectivity_plus: ^6.1.3
+  image_cropper: ^9.0.0
+  crop_your_image: ^2.0.0
+  image_editor_plus: ^1.0.6
+  responsive_sizer: ^3.3.1
 
 dev_dependencies:
   flutter_test:
@@ -112,7 +116,11 @@ dev_dependencies:
 flutter_icons:
   android: true
   ios: true
-  image_path: "assets/images/logo.jpg"
+  image_path: "assets/images/banner.png"
+  
+  #flutter pub get
+  #flutter pub run flutter_launcher_icons:main
+
 # The following section is specific to Flutter packages.
 flutter:
   # The following line ensures that the Material Icons font is
@@ -128,9 +136,15 @@ flutter:
     - assets/images/log_bg.png
     - assets/images/bg_home.jpg
     - assets/images/test.jpg
-    - assets/images/update.jpg
-    - assets/images/dish.gif
-    - assets/images/cat.gif
+    - assets/help/update.jpg
+    - assets/help/ingadd.png
+    - assets/help/ingup.png
+    - assets/help/recipeadd.png
+    - assets/help/recipeup.png
+    - assets/help/youadd.png
+    - assets/help/youup.png
+    - assets/help/dish.gif
+    - assets/help/cat.gif
     - assets/images/help.png
     - assets/icons/google_icon.svg
     - assets/icons/youtube.svg
@@ -179,6 +193,9 @@ flutter:
     - assets/lottie_json/empty.json
     - assets/lottie_json/delete.json
     - assets/lottie_json/helping.json
+    - assets/lottie_json/calc.json
+    - assets/lottie_json/rocket.json
+    - assets/lottie_json/loadingfruits.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see

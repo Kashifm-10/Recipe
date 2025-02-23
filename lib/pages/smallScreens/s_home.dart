@@ -488,10 +488,14 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                   color: Colors.white,
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const ProfilePage()),
+                  Navigator.of(context).push(
+                    PageTransition(
+                        curve: Curves.linear,
+                        type: PageTransitionType.bottomToTop,
+                        duration: const Duration(
+                            milliseconds:
+                                300), // Adjust duration to slow down the transition
+                        child: const ProfilePage()),
                   );
                 },
               ),
@@ -527,8 +531,8 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
-                                     Icon(Icons.wifi_off_rounded,
-                                        size: screenWidth*0.15),
+                                    Icon(Icons.wifi_off_rounded,
+                                        size: screenWidth * 0.15),
                                     Text(
                                       "No Connection",
                                       textAlign: TextAlign.center,
@@ -537,7 +541,8 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                           fontWeight: FontWeight.bold),
                                     ),
                                     Text('Please Connect to Internet',
-                                        style: GoogleFonts.hammersmithOne(fontSize: screenWidth * 0.03)),
+                                        style: GoogleFonts.hammersmithOne(
+                                            fontSize: screenWidth * 0.03)),
                                     TextButton(
                                       onPressed: () {
                                         _isErrorDialogShown =
@@ -554,7 +559,8 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                         );
                                       },
                                       child: Text('Retry',
-                                          style: GoogleFonts.hammersmithOne(fontSize: screenWidth * 0.04)),
+                                          style: GoogleFonts.hammersmithOne(
+                                              fontSize: screenWidth * 0.04)),
                                     ),
                                   ],
                                 ),
@@ -574,7 +580,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                       children: [
                         // Title
                         Padding(
-                            padding: EdgeInsets.only(top: 0.0),
+                            padding: const EdgeInsets.only(top: 0.0),
                             child: Image.asset(
                               'assets/images/banner.png',
                               width: screenWidth * 0.4,
@@ -1230,7 +1236,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                     'Close',
                     style: GoogleFonts.hammersmithOne(
                       fontSize: 18,
-                      color: Color(0xFFFE9A8B), // Peach color
+                      color: const Color(0xFFFE9A8B), // Peach color
                     ),
                   ),
                 ),
@@ -1378,7 +1384,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 'Select',
                 style: GoogleFonts.hammersmithOne(
                   fontSize: 18,
-                  color: Color(0xFFFE9A8B), // Peach color
+                  color: const Color(0xFFFE9A8B), // Peach color
                 ),
               ),
             ),
@@ -1390,7 +1396,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 'Cancel',
                 style: GoogleFonts.hammersmithOne(
                   fontSize: 18,
-                  color: Color(0xFFFE9A8B), // Peach color
+                  color: const Color(0xFFFE9A8B), // Peach color
                 ),
               ),
             ),

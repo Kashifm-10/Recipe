@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gif/gif.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -110,7 +111,7 @@ class _ProfilePageState extends State<ProfilePage>
                                 20.0), // Adjust the radius as needed
                             child: Gif(
                               height: 1,
-                              image: const AssetImage("assets/images/dish.gif"),
+                              image: const AssetImage("assets/help/dish.gif"),
                               fit: BoxFit.fill,
                               //controller: _controller, // if duration and fps is null, original gif fps will be used.
                               //fps: 30,
@@ -193,48 +194,59 @@ class _ProfilePageState extends State<ProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    // Adjust sizes dynamically
+    final iconSize =
+        screenWidth * 0.08; // Adjust icon size based on screen width
+    final titleFontSize = screenWidth * 0.1;
+
     return Scaffold(
+      extendBody: true,
       resizeToAvoidBottomInset: false,
       extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        foregroundColor: Colors.white,
-        backgroundColor: Colors.transparent,
-        title: Text(
-          "",
-          style: GoogleFonts.hammersmithOne(
-              fontWeight: FontWeight.bold, fontSize: 40),
-        ),
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 10, bottom: 10),
-          child: IconButton(
-            icon: const Icon(
-              FontAwesomeIcons.arrowLeft,
-              color: Colors.white,
-              size: 40,
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(screenHeight * 0.075),
+        child: GestureDetector(
+          onVerticalDragEnd: (details) {
+            // Check the swipe direction (down)
+            if (details.velocity.pixelsPerSecond.dy > 500) {
+              Navigator.pop(context);
+            }
+          },
+          child: AppBar(
+            toolbarHeight: screenHeight * 0.08,
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            foregroundColor: Colors.white,
+            leading: Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.015, left: 10),
+              child: IconButton(
+                icon: Icon(FontAwesomeIcons.arrowDown, size: iconSize),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
             ),
-            onPressed: () {
-              Navigator.pop(context); // Navigate back when pressed
-            },
+            centerTitle: true,
+            title: Padding(
+              padding: EdgeInsets.only(top: screenHeight * 0.015),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.start,
+                children: [
+                  Text(
+                    "Profile",
+                    style: GoogleFonts.hammersmithOne(
+                      fontSize: titleFontSize,
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
         ),
-        /* actions: [
-          IconButton(
-            icon: const Icon(Icons.exit_to_app, color: Colors.white, size: 40),
-            onPressed: () async {
-              // Sign out the user
-              await GoogleSignIn().signOut();
-              await FirebaseAuth.instance.signOut();
-              final prefs = await SharedPreferences.getInstance();
-              await prefs.setBool("isLoggedIn", false);
-
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => LoginScreen()),
-                (Route<dynamic> route) => false,
-              );
-            },
-          ),
-        ], */
       ),
       body: Stack(
         children: [
@@ -253,15 +265,27 @@ class _ProfilePageState extends State<ProfilePage>
                 horizontal: 20.0,
                 vertical: MediaQuery.of(context).size.height * 0.12),
             child: Column(
+              mainAxisSize: MainAxisSize.max,
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 // Profile Picture
-                CircleAvatar(
-                  radius: 60,
-                  backgroundImage: NetworkImage(user?.photoURL ??
-                      'https://images.deepai.org/art-image/d02f0423812a476e90df7368aafb8062/cookbook-minimalist-logo-b477d8-thumb.jpg'),
-                  backgroundColor: Colors.white.withOpacity(0.3),
+                Container(
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white, // Border color
+                      width: 4, // Border width
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    radius: 55,
+                    backgroundImage: NetworkImage(
+                      user?.photoURL ??
+                          'https://res.cloudinary.com/dcrm8qosr/image/upload/v1740335403/logo.png',
+                    ),
+                    backgroundColor: Colors.white.withOpacity(0.3),
+                  ),
                 ),
                 SizedBox(height: MediaQuery.of(context).size.height * 0.03),
 
@@ -271,38 +295,46 @@ class _ProfilePageState extends State<ProfilePage>
                   padding: const EdgeInsets.symmetric(
                       horizontal: 12, vertical: 15), // Adjust padding as needed
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.5), // White background
+                    color: Colors.white.withOpacity(0.8), // White background
                     borderRadius: BorderRadius.circular(12), // Rounded corners
                     boxShadow: const [],
                   ),
                   child: Column(
+                    mainAxisSize: MainAxisSize.min,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisSize: MainAxisSize.min,
                         children: [
+                          Text(
+                            "Hey,",
+                            style: GoogleFonts.hammersmithOne(
+                              fontSize: 18.sp,
+                              color: const Color.fromARGB(255, 10, 10, 9),
+                            ),
+                          ),
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
                               toTitleCase(user?.displayName ?? username!),
                               style: GoogleFonts.hammersmithOne(
                                 fontWeight: FontWeight.bold,
-                                fontSize:
-                                    MediaQuery.of(context).size.width * 0.09,
+                                fontSize: 18.sp,
                                 color: const Color.fromARGB(255, 10, 10, 9),
                               ),
                             ),
                           ),
+                          SizedBox(height: 10),
                           Text(
-                            user?.email ?? email!,
+                            "Creating from: ${date!}",
                             style: GoogleFonts.hammersmithOne(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
                                 color: Colors.grey[500]),
                           ),
                           Text(
-                            "Creating from: ${date!}",
+                            user?.email ?? email!,
                             style: GoogleFonts.hammersmithOne(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
@@ -405,7 +437,9 @@ class _ProfilePageState extends State<ProfilePage>
                                             hintText:
                                                 'Enter your current password',
                                             filled: true,
-                                            fillColor: const Color(0xFFFEE1D5),
+                                            fillColor: const Color.fromARGB(
+                                                    255, 236, 158, 194)
+                                                .withOpacity(0.3),
                                             border: OutlineInputBorder(
                                               borderRadius:
                                                   BorderRadius.circular(12),
@@ -415,7 +449,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                 color: Color(0xFF5C2C2C)), */
                                             labelStyle:
                                                 GoogleFonts.hammersmithOne(
-                                              color: const Color(0xFF5C2C2C),
+                                              color: Colors.grey.shade100,
                                             ),
                                             floatingLabelBehavior:
                                                 FloatingLabelBehavior.never,
@@ -696,6 +730,7 @@ class _ProfilePageState extends State<ProfilePage>
 
                 // Logout Button
                 const Row(
+                  mainAxisSize: MainAxisSize.max,
                   children: [
                     SizedBox(width: 30),
                   ],

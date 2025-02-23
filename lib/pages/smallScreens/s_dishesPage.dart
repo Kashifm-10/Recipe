@@ -41,6 +41,8 @@ import 'dart:async'; // For using Timer
 import 'package:drop_down_list/drop_down_list.dart';
 import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
+import 'package:image_cropper/image_cropper.dart';
+
 
 class smalldishesList extends StatefulWidget {
   smalldishesList({super.key, required this.type, required this.title});
@@ -180,7 +182,7 @@ class _smalldishesListState extends State<smalldishesList> {
         .from('keys') // Replace with your table name
         .select(
             'key') // Replace with the column name where the serial is stored
-        .eq('name', 'imagine')
+        .eq('id', '1')
         .single();
 
     setState(() {
@@ -685,7 +687,7 @@ class _smalldishesListState extends State<smalldishesList> {
                 Row(
                   children: [
                     Text(
-                      "Update Dish",
+                      "Edit Dish",
                       style: GoogleFonts.hammersmithOne(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
@@ -1586,15 +1588,61 @@ class _smalldishesListState extends State<smalldishesList> {
   }
 
   // Pick an image from the gallery or camera
-  Future<void> _pickImage(ImageSource source) async {
+Future<void> _pickImage(ImageSource source) async {
+  try {
     final pickedFile = await picker.pickImage(source: source);
+    
+    if (pickedFile == null) {
+      debugPrint("No image selected.");
+      return;
+    }
 
-    if (pickedFile != null) {
+    File imageFile = File(pickedFile.path);
+
+    if (!await imageFile.exists()) {
+      debugPrint("Error: Picked file does not exist!");
+      return;
+    }
+
+    File? croppedFile = await _cropImage(imageFile);
+
+    if (croppedFile != null && mounted) {
       setState(() {
-        _image = File(pickedFile.path);
+        _image = croppedFile;
       });
     }
+  } catch (e) {
+    debugPrint("Error picking image: $e");
   }
+}
+
+Future<File?> _cropImage(File imageFile) async {
+  try {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: imageFile.path,
+      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1), // 1:1 ratio
+      compressQuality: 100, // Max quality
+      uiSettings: [
+        AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          toolbarColor: Colors.blue,
+          toolbarWidgetColor: Colors.white,
+          lockAspectRatio: true, // Lock to 1:1
+        ),
+        IOSUiSettings(
+          title: 'Crop Image',
+          aspectRatioLockEnabled: true,
+        ),
+      ],
+    );
+
+    return croppedFile != null ? File(croppedFile.path) : null;
+  } catch (e) {
+    debugPrint("Error cropping image: $e");
+    return null;
+  }
+}
+
 
 /*   Future<void> generateAIImage(String serial) async {
     // Get the prompt from the TextField
@@ -2099,9 +2147,9 @@ class _smalldishesListState extends State<smalldishesList> {
                         ], */
                         //asset gifs
                         children: [
-                          buildGifWithLoader("assets/images/dish.gif"),
-                          buildGifWithLoader("assets/images/update.jpg"),
-                          buildGifWithLoader("assets/images/cat.gif"),
+                          buildGifWithLoader("assets/help/dish.gif"),
+                          buildGifWithLoader("assets/help/update.jpg"),
+                          buildGifWithLoader("assets/help/cat.gif"),
                         ],
                       ),
                     ),
@@ -2215,7 +2263,7 @@ class _smalldishesListState extends State<smalldishesList> {
                             Colors.transparent), // Disable splash effect
                       ),
                       child: Text(
-                        'How to add, update, or delete.',
+  'How to Add, Edit, or Remove a Dish',
                         style: GoogleFonts.hammersmithOne(
                           fontSize: MediaQuery.of(context).size.width * 0.035,
                           color: Colors.black,

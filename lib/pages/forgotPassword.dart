@@ -124,6 +124,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     }
   }
 
+  //"https://cdn-icons-png.flaticon.com/128/17632/17632141.png" "https://cdn-icons-png.flaticon.com/128/1830/1830839.png"
+
   String getEmailTemplate(String otp) {
     return '''
    <table width="100%" bgcolor="#fff5e6" cellpadding="0" cellspacing="0" style="margin: 0; padding: 0; font-family: Arial, sans-serif;">
@@ -134,26 +136,22 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         <tr>
           <td align="center" style="padding: 20px;">
             <!-- Logo -->
-            <img src="https://cdn-icons-png.flaticon.com/128/1830/1830839.png" alt="Logo" width="60" style="display: block; margin: 0 auto;">
+            <img src="https://res.cloudinary.com/dcrm8qosr/image/upload/v1740335403/logo.png" alt="Logo" width="60" style="display: block; margin: 0 auto;">
 
-            <!-- Title -->
-            <h1 style="color: #ff6f00; font-size: 24px; margin: 10px 0;">Cook Book</h1>
-
-            <!-- Separator -->
-            <img src="https://cdn-icons-png.flaticon.com/128/17632/17632141.png" alt="Icon" width="30" style="margin: 10px auto;">
-
-            <!-- Message -->
+           <!-- Message -->
             <p style="color: #333; font-size: 14px; line-height: 1.5; margin: 10px 0;">
               Your new password for accessing delicious recipes is:
             </p>
 
+            <!-- Separator -->
+            <img src="https://cdn-icons-png.flaticon.com/128/17632/17632141.png" alt="Icon" width="30" style="margin: 10px auto;">
+
+           
             <!-- OTP -->
-            <p style="color: #ff6f00; font-size: 20px; font-weight: bold; margin: 20px 0;">
+            <p style="color: #ff6f00; font-size: 18px; font-weight: bold; margin: 00px 0;">
               $otp
             </p>
-
-            <!-- Footer -->
-            <p style="color: #777; font-size: 10px; margin: 0;">
+            <p style="color: #777; font-size: 12px; margin: 10px 0;">
               Thank you for choosing <strong>Cook Book</strong>. Bon Appétit!
             </p>
           </td>
@@ -170,7 +168,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     const String upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const String lowerCase = 'abcdefghijklmnopqrstuvwxyz';
     const String numbers = '0123456789';
-    const String specialChars = '@#%^&*!()_+[]{}|;:,.<>?';
+    const String specialChars = '@#%&*!?';//'@#%^&*!()_+[]{}|;:,.<>?';
 
     // Combine all characters into one pool (without special characters initially)
     final String allCharacters = upperCase + lowerCase + numbers;
@@ -198,9 +196,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return passwordChars.join();
   }
 
-  
-
   Future<void> _signInWithEmailPassword() async {
+    setState(() {
+      _isGoogleSignInInProgress = true;
+    });
     try {
       final response = await Supabase.instance.client
           .from('users')
@@ -212,7 +211,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (data.isNotEmpty) {
         _sendForgotMail();
       } else {
-         const snackBar = SnackBar(
+        setState(() {
+          _isGoogleSignInInProgress = false;
+        });
+        const snackBar = SnackBar(
           /// need to set following properties for best effect of awesome_snackbar_content
           elevation: 0,
           behavior: SnackBarBehavior.floating,
@@ -233,53 +235,52 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       print("Email sign-in error: $e");
-             const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Login failed!',
-            message: 'No Internet Connection',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Login failed!',
+          message: 'No Internet Connection',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
-
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
   }
 
   Future<void> _sendForgotMail() async {
-    setState(() {
+    /*  setState(() {
       _isGoogleSignInInProgress = true;
-    });
+    }); */
 
     final recipient = _emailController.text.trim();
     if (recipient.isEmpty) {
-       const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Invalid!',
-            message: 'Please enter a valid email address',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Invalid!',
+          message: 'Please enter a valid email address',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
       return;
     }
 
@@ -320,7 +321,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         fit: BoxFit.contain,
       ),
       dialogWidth: kIsWeb ? 0.3 : null,
-      
       context: context,
       actions: [
         IconsButton(
@@ -363,8 +363,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           backgroundColor: Colors.transparent,
           title: Text(
             "",
-            style:
-                GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold, fontSize: 40),
+            style: GoogleFonts.hammersmithOne(
+                fontWeight: FontWeight.bold, fontSize: 40),
           ),
           leading: Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -498,7 +498,10 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ),
                         SizedBox(height: screenHeight * 0.02),
                         ElevatedButton.icon(
-                          onPressed: _signInWithEmailPassword,
+                          onPressed: () {
+                            FocusScope.of(context).requestFocus(FocusNode());
+                            _signInWithEmailPassword();
+                          },
                           icon: _isSending
                               ? LoadingAnimationWidget.inkDrop(
                                   size: screenWidth * 0.04,

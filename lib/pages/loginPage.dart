@@ -14,6 +14,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -60,7 +61,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   : const MySmallHomePage()),
         );
       } else {
-       const snackBar = SnackBar(
+        const snackBar = SnackBar(
           /// need to set following properties for best effect of awesome_snackbar_content
           elevation: 0,
           behavior: SnackBarBehavior.floating,
@@ -80,25 +81,24 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       print("Email sign-in error: $e");
-            const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Login failed!',
-            message: 'No Internet Connection',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Login failed!',
+          message: 'No Internet Connection',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
-
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
     setState(() {
       _isEmailSignInInProgress = false;
@@ -113,25 +113,24 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await AuthService().signInWithGoogle(context);
     } catch (e) {
-             const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'OOPS!',
-            message: 'Something went wrong',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'OOPS!',
+          message: 'Something went wrong',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
-
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     } finally {
       setState(() {
         _isGoogleSignInInProgress = false;
@@ -216,33 +215,31 @@ class _LoginScreenState extends State<LoginScreen> {
                       Text(
                         'Login',
                         style: GoogleFonts.hammersmithOne(
-                          fontSize: screenWidth * 0.06,
+                          fontSize: 6.w, // Responsive font size
                           fontWeight: FontWeight.bold,
                           color: const Color(0xFF5C2C2C),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.03),
+                      SizedBox(height: 3.h), // Responsive height
                       SizedBox(
-                        height: screenHeight * 0.05,
+                        height: 5.h, // Responsive text field height
                         child: _buildTextField(
                           controller: _emailController,
                           label: 'Email Address',
                           hintText: ' ',
                           keyboardType: TextInputType.emailAddress,
                           icon: Icons.email,
-                          screenWidth: screenWidth,
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+                      SizedBox(height: 2.h), // Responsive spacing
                       SizedBox(
-                        height: screenHeight * 0.05,
+                        height: 5.h, // Responsive text field height
                         child: _buildTextField(
                           controller: _passwordController,
                           label: 'Password',
                           hintText: ' ',
                           obscureText: true,
                           icon: Icons.lock,
-                          screenWidth: screenWidth,
                         ),
                       ),
                       SizedBox(height: screenHeight * 0.02),
@@ -375,7 +372,6 @@ class _LoginScreenState extends State<LoginScreen> {
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
     required IconData icon,
-    required double screenWidth,
   }) {
     final ValueNotifier<bool> isObscured = ValueNotifier(obscureText);
 
@@ -395,13 +391,12 @@ class _LoginScreenState extends State<LoginScreen> {
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            //prefixIcon: Icon(icon, color: const Color(0xFF5C2C2C)),
             suffixIcon: label.toLowerCase() == 'password'
                 ? IconButton(
                     icon: Icon(
                       value ? HeroiconsMicro.eyeSlash : HeroiconsMicro.eye,
                       color: const Color(0xFF5C2C2C),
-                      size: screenWidth * 0.04,
+                      size: 4.w, // Responsive icon size
                     ),
                     onPressed: () {
                       isObscured.value = !value;
@@ -409,7 +404,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   )
                 : null,
             labelStyle: GoogleFonts.hammersmithOne(
-              fontSize: screenWidth * 0.03,
+              fontSize: 3.w, // Responsive font size
               color: const Color(0xFF5C2C2C),
             ),
             floatingLabelBehavior: FloatingLabelBehavior.never,

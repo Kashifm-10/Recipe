@@ -4,6 +4,7 @@ import 'package:dropdown_button2/dropdown_button2.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_popup/flutter_popup.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gif/gif.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:isar/isar.dart';
@@ -21,6 +22,7 @@ import 'package:flutter_speed_dial/flutter_speed_dial.dart';
 import 'package:recipe/models/isar_instance.dart';
 import 'package:recipe/list_view/recipeList.dart';
 import 'package:linkable/linkable.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -54,11 +56,14 @@ final isar = IsarInstance().isar;
 
 class _smallrecipeState extends State<smallrecipe>
     with SingleTickerProviderStateMixin {
+  List<Ingredients> currentNotes = [];
+  List<Recipe> currentRecipe = [];
   //text controller to access what the user typed
   TextEditingController textController = TextEditingController();
   List<Map<String, String>> linkData = [];
   late TabController _tabController;
   int selectedTabIndex = 0;
+  String? help;
 
   String? type;
   List<String>? fetchedlink;
@@ -69,6 +74,7 @@ class _smallrecipeState extends State<smallrecipe>
   @override
   void initState() {
     super.initState();
+    currentNotes.clear();
     _createTutorial();
     Timer(const Duration(seconds: 2), () {
       setState(() {
@@ -108,6 +114,7 @@ class _smallrecipeState extends State<smallrecipe>
 
   final GlobalKey _link = GlobalKey();
   final GlobalKey _add = GlobalKey();
+  final GlobalKey _calc = GlobalKey();
 
   Future<void> _createTutorial() async {
     // Get SharedPreferences instance
@@ -231,6 +238,74 @@ class _smallrecipeState extends State<smallrecipe>
     });
   }
 
+  Future<void> _calcTutorial() async {
+    // Get SharedPreferences instance
+    final prefs = await SharedPreferences.getInstance();
+
+    // Check if the tutorial has already been shown
+    bool isTutorialShown = prefs.getBool('tutorialShowncalc') ?? false;
+
+    // If it has been shown, return early
+    if (isTutorialShown) return;
+    prefs.setBool('tutorialShowncalc', true);
+
+    // Define the tutorial targets
+    final targets = [
+      TargetFocus(
+        identify: '_calc',
+        keyTarget: _calc,
+        alignSkip: Alignment.bottomCenter,
+        enableOverlayTab: true,
+        contents: [
+          TargetContent(
+            align: ContentAlign.bottom,
+            builder: (context, controller) => Padding(
+              padding: EdgeInsets.only(
+                  top: MediaQuery.of(context).size.height * 0.03),
+              child: Container(
+                padding: const EdgeInsets.all(12), // Inner padding
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10), // Rounded edges
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    Lottie.asset('assets/lottie_json/calc.json',
+                        repeat: true,
+                        height: MediaQuery.of(context).size.width * 0.3),
+                    SizedBox(
+                      width: MediaQuery.of(context).size.width * 0.4,
+                      child: Text(
+                        'Use this button to calculate or multiple the quantity',
+                        textAlign: TextAlign.center,
+                        style: GoogleFonts.hammersmithOne(
+                          color: Colors.black,
+                          fontSize: MediaQuery.of(context).size.width * 0.04,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    ];
+
+    final tutorial = TutorialCoachMark(
+      targets: targets,
+    );
+
+    // Show the tutorial after a delay
+    Future.delayed(const Duration(milliseconds: 0), () {
+      tutorial.show(context: context);
+
+      // Once the tutorial is shown, set the flag in SharedPreferences
+    });
+  }
+
   void _showLoadingDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -249,7 +324,7 @@ class _smallrecipeState extends State<smallrecipe>
                   strokeWidth: 5,
                   color: (Theme.of(context).primaryColor),
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Text("Processing...", style: GoogleFonts.hammersmithOne()),
               ],
             ),
@@ -328,17 +403,17 @@ class _smallrecipeState extends State<smallrecipe>
                                   ? '${name.substring(0, 20)}...'
                                   : name,
                               style: GoogleFonts.hammersmithOne(
-                                fontSize: 16,
+                                fontSize: 16.sp,
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black87,
                               ),
                             ),
                             subtitle: Text(
-                              link.length > 30
-                                  ? '${link.substring(0, 30)}...'
+                              link.length > 25
+                                  ? '${link.substring(0, 22)}...'
                                   : link,
                               style: GoogleFonts.hammersmithOne(
-                                fontSize: 14,
+                                fontSize: 13.sp,
                                 color: Colors.grey.shade600,
                               ),
                             ),
@@ -531,8 +606,8 @@ class _smallrecipeState extends State<smallrecipe>
                     TextField(
                       controller: textController,
                       decoration: InputDecoration(
-                        labelStyle:
-                            GoogleFonts.hammersmithOne(color: Colors.black),
+                        labelStyle: GoogleFonts.hammersmithOne(
+                            color: Colors.black, fontSize: 14.sp),
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -554,13 +629,15 @@ class _smallrecipeState extends State<smallrecipe>
                         filled: true,
                         fillColor: Colors.grey[50],
                       ),
+                      style: GoogleFonts.hammersmithOne(
+                          fontSize: 14.sp), // Adjust the font size here
                     ),
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
                         style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500),
                       ),
 
@@ -578,7 +655,7 @@ class _smallrecipeState extends State<smallrecipe>
                                 controller: quantityController,
                                 decoration: InputDecoration(
                                   labelStyle: GoogleFonts.hammersmithOne(
-                                      color: Colors.black),
+                                      color: Colors.black, fontSize: 14.sp),
                                   labelText: 'Quantity',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -601,6 +678,10 @@ class _smallrecipeState extends State<smallrecipe>
                                   filled: true,
                                   fillColor: Colors.grey[50],
                                 ),
+                                style: GoogleFonts.hammersmithOne(
+                                    fontSize:
+                                        14.sp), // Adjust the font size here
+
                                 keyboardType: TextInputType.number,
                               ),
                             ],
@@ -644,15 +725,19 @@ class _smallrecipeState extends State<smallrecipe>
                                   return DropdownMenuItem<String>(
                                     value: unit,
                                     child: Text(unit,
-                                        style: GoogleFonts.hammersmithOne()),
+                                        style: GoogleFonts.hammersmithOne(
+                                            fontSize: 14.sp)),
                                   );
                                 }).toList(),
                                 onChanged: (String? value) {
                                   setState(() => selectedUnit = value);
                                 },
                                 value: selectedUnit,
-                                hint: Text('Select',
-                                    style: GoogleFonts.hammersmithOne()),
+                                hint: Text(
+                                  'Select',
+                                  style: GoogleFonts.hammersmithOne(
+                                      fontSize: 14.sp),
+                                ),
                               ),
                             ],
                           ),
@@ -662,7 +747,7 @@ class _smallrecipeState extends State<smallrecipe>
 
                     Text(
                       "Note: Enter 0.5 for 1/2 and 0.25 for 1/4.",
-                      style: GoogleFonts.hammersmithOne(fontSize: 12),
+                      style: GoogleFonts.hammersmithOne(fontSize: 13.sp),
                     ),
                     if (isUOM || isQuantity) const SizedBox(height: 10),
                     if (isUOM)
@@ -670,7 +755,7 @@ class _smallrecipeState extends State<smallrecipe>
                         'Please select UOM.',
                         style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500),
                       ),
                     if (isQuantity)
@@ -678,7 +763,7 @@ class _smallrecipeState extends State<smallrecipe>
                         'Please enter quantity.',
                         style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500),
                       ),
                   ],
@@ -698,7 +783,7 @@ class _smallrecipeState extends State<smallrecipe>
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16.sp),
                 ),
                 child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
@@ -791,7 +876,7 @@ class _smallrecipeState extends State<smallrecipe>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16.sp),
                 ),
                 child: Text('Create', style: GoogleFonts.hammersmithOne()),
               ),
@@ -898,8 +983,7 @@ class _smallrecipeState extends State<smallrecipe>
                       ),
                     );
                   },
-                  icon:
-                      Icon(Icons.delete, color: Colors.red.shade800, size: 20),
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 ),
               ],
             ),
@@ -913,20 +997,25 @@ class _smallrecipeState extends State<smallrecipe>
                     TextField(
                       controller: textController,
                       decoration: InputDecoration(
+                        labelStyle: GoogleFonts.hammersmithOne(
+                            color: Colors.black, fontSize: 14.sp),
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
+                          borderSide: BorderSide(color: Colors.grey[300]!),
                         ),
                         filled: true,
-                        fillColor: Colors.grey[100],
+                        fillColor: Colors.grey[50],
                       ),
+                      style: GoogleFonts.hammersmithOne(
+                          fontSize: 14.sp), // Adjust the font size here
                     ),
                     if (isName)
                       Text(
                         'Please enter a ingredient name.',
                         style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500),
                       ),
 
@@ -942,13 +1031,21 @@ class _smallrecipeState extends State<smallrecipe>
                               TextField(
                                 controller: quantityController,
                                 decoration: InputDecoration(
+                                  labelStyle: GoogleFonts.hammersmithOne(
+                                      color: Colors.black, fontSize: 14.sp),
                                   labelText: 'Quantity',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
+                                    borderSide:
+                                        BorderSide(color: Colors.grey[300]!),
                                   ),
                                   filled: true,
-                                  fillColor: Colors.grey[100],
+                                  fillColor: Colors.grey[50],
                                 ),
+                                style: GoogleFonts.hammersmithOne(
+                                    fontSize:
+                                        14.sp), // Adjust the font size here
+
                                 keyboardType: TextInputType.number,
                               ),
                             ],
@@ -963,6 +1060,8 @@ class _smallrecipeState extends State<smallrecipe>
                             children: [
                               DropdownButtonFormField<String>(
                                 decoration: InputDecoration(
+                                  labelStyle: GoogleFonts.hammersmithOne(
+                                      color: Colors.black, fontSize: 14.sp),
                                   labelText: 'Unit',
                                   border: OutlineInputBorder(
                                     borderRadius: BorderRadius.circular(8),
@@ -975,7 +1074,8 @@ class _smallrecipeState extends State<smallrecipe>
                                   return DropdownMenuItem<String>(
                                     value: unit,
                                     child: Text(unit,
-                                        style: GoogleFonts.hammersmithOne()),
+                                        style: GoogleFonts.hammersmithOne(
+                                            fontSize: 14.sp)),
                                   );
                                 }).toList(),
                                 onChanged: (String? value) {
@@ -983,7 +1083,8 @@ class _smallrecipeState extends State<smallrecipe>
                                 },
                                 value: selectedUnit,
                                 hint: Text('Select',
-                                    style: GoogleFonts.hammersmithOne()),
+                                    style: GoogleFonts.hammersmithOne(
+                                        fontSize: 14.sp)),
                               ),
                             ],
                           ),
@@ -992,7 +1093,7 @@ class _smallrecipeState extends State<smallrecipe>
                     ),
                     Text(
                       "Note: Enter 0.5 for 1/2 and 0.25 for 1/4.",
-                      style: GoogleFonts.hammersmithOne(fontSize: 12),
+                      style: GoogleFonts.hammersmithOne(fontSize: 13.sp),
                     ),
                     if (isUOM || isQuantity) const SizedBox(height: 10),
                     if (isUOM)
@@ -1000,7 +1101,7 @@ class _smallrecipeState extends State<smallrecipe>
                         'Please select UOM.',
                         style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500),
                       ),
                     if (isQuantity)
@@ -1008,7 +1109,7 @@ class _smallrecipeState extends State<smallrecipe>
                         'Please enter quantity.',
                         style: GoogleFonts.hammersmithOne(
                             color: Colors.red.shade700,
-                            fontSize: 14,
+                            fontSize: 14.sp,
                             fontWeight: FontWeight.w500),
                       ),
                   ],
@@ -1027,7 +1128,7 @@ class _smallrecipeState extends State<smallrecipe>
                   foregroundColor: Colors.grey.shade600,
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16.sp),
                 ),
                 child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
@@ -1159,7 +1260,7 @@ class _smallrecipeState extends State<smallrecipe>
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
+                  textStyle: GoogleFonts.hammersmithOne(fontSize: 16.sp),
                 ),
                 child: Text('Update', style: GoogleFonts.hammersmithOne()),
               ),
@@ -1382,7 +1483,7 @@ class _smallrecipeState extends State<smallrecipe>
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text(" "),
+                const Text(" "),
                 Text(
                   'Edit Recipe',
                   style: GoogleFonts.hammersmithOne(
@@ -1433,8 +1534,7 @@ class _smallrecipeState extends State<smallrecipe>
                       ),
                     );
                   },
-                  icon:
-                      Icon(Icons.delete, color: Colors.red.shade800, size: 20),
+                  icon: const Icon(Icons.delete, color: Colors.red, size: 20),
                 ),
               ],
             ),
@@ -1663,7 +1763,7 @@ class _smallrecipeState extends State<smallrecipe>
                     SnackBar(
                       content: Text('Please enter a valid URL',
                           style: GoogleFonts.hammersmithOne()),
-                      duration: Duration(seconds: 2),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 }
@@ -1811,7 +1911,7 @@ class _smallrecipeState extends State<smallrecipe>
                     SnackBar(
                       content: Text('Please enter a valid URL',
                           style: GoogleFonts.hammersmithOne()),
-                      duration: Duration(seconds: 2),
+                      duration: const Duration(seconds: 2),
                     ),
                   );
                 }
@@ -1925,6 +2025,175 @@ class _smallrecipeState extends State<smallrecipe>
     }
   }
 
+  Widget buildGifWithLoader(String imageUrl) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        // Loader
+        SizedBox(
+          height: 100,
+          child: Center(
+            child: Lottie.asset(
+              'assets/lottie_json/helping.json',
+            ),
+          ),
+        ),
+
+        // GIF with NetworkImage
+        /* Image.network(
+          imageUrl,
+          fit: BoxFit.fill,
+          loadingBuilder: (context, child, loadingProgress) {
+            if (loadingProgress == null) {
+              return ClipRRect(
+                borderRadius:
+                    BorderRadius.circular(15.0), // Rounded corners only for GIF
+                child: Gif(
+                  image: NetworkImage(imageUrl),
+                  fit: BoxFit.fill,
+                  autostart: Autostart.loop,
+                ),
+              );
+            } else {
+              return const SizedBox(); // Hide until fully loaded
+            }
+          },
+          errorBuilder: (context, error, stackTrace) =>
+              const Icon(Icons.error, size: 50, color: Colors.red),
+        ), */
+        ClipRRect(
+          borderRadius: BorderRadius.circular(15.0),
+          child: Gif(
+            image: AssetImage(imageUrl), // Replace with actual asset path
+            fit: BoxFit.fill,
+            autostart: Autostart.loop,
+          ),
+        )
+      ],
+    );
+  }
+
+  void dishHelp(BuildContext context) {
+    final PageController _pageController = PageController();
+    int _currentPage = 0;
+
+    // Define the instructions for each page
+    final List<String> instructions = [
+      help == '0'
+          ? 'How to Add Ingredient'
+          : help == '1'
+              ? 'How to Add Reipe'
+              : 'How to Add Link',
+      help == '0'
+          ? 'How to Update Ingredient'
+          : help == '1'
+              ? 'How to Update Reipe'
+              : 'How to Update Link',
+    ];
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              contentPadding: EdgeInsets.symmetric(
+                  horizontal: MediaQuery.of(context).size.width *
+                      0.02), // Remove padding
+              content: Container(
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.height *
+                    0.5, // Adjust dialog size
+                child: Column(
+                  children: [
+                    // Instructions text at the top (dynamic per page)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 20.0),
+                      child: Text(
+                        instructions[
+                            _currentPage], // Display instruction for current page
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.03,
+                    ),
+                    // PageView for horizontally swiping images
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (index) {
+                          setState(() {
+                            _currentPage =
+                                index; // Update the current page index
+                          });
+                        },
+                        //network gifs
+                        /*  children: [
+                          buildGifWithLoader(
+                              "https://res.cloudinary.com/dcrm8qosr/image/upload/v1738935842/dish_xtxitt.gif"),
+                          buildGifWithLoader(
+                              "https://res.cloudinary.com/dcrm8qosr/image/upload/v1738935886/update_mxsvxk.jpg"),
+                          buildGifWithLoader(
+                              "https://res.cloudinary.com/dcrm8qosr/image/upload/v1738935603/cat_s0gwqv.gif"),
+                        ], */
+                        //asset gifs
+                        children: [
+                          buildGifWithLoader(help == '0'
+                              ? "assets/help/ingadd.png"
+                              : help == '1'
+                                  ? "assets/help/recipeadd.png"
+                                  : "assets/help/youadd.png"),
+                          buildGifWithLoader(help == '0'
+                              ? "assets/help/ingup.png"
+                              : help == '1'
+                                  ? "assets/help/recipeup.png"
+                                  : "assets/help/youup.png"),
+                          //  buildGifWithLoader(help=='0'?"assets/help/cat.gif":help=='1'?"assets/help/cat.gif":"assets/help/cat.gif"),
+                        ],
+                      ),
+                    ),
+                    SizedBox(
+                      height: MediaQuery.of(context).size.height * 0.02,
+                    ),
+
+                    // Dots to indicate the current page
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(
+                          2, // Number of pages
+                          (index) => AnimatedContainer(
+                            duration: const Duration(milliseconds: 300),
+                            margin: const EdgeInsets.symmetric(horizontal: 5),
+                            width: _currentPage == index ? 12.0 : 8.0,
+                            height: 8.0,
+                            decoration: BoxDecoration(
+                              color: _currentPage == index
+                                  ? Colors.blue
+                                  : Colors.grey,
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   /* void add() {
     showDialog(
       context: context,
@@ -2002,11 +2271,18 @@ class _smallrecipeState extends State<smallrecipe>
         screenWidth * 0.07; // Adjust icon size based on screen width
     final titleFontSize = screenWidth * 0.1;
     // current notes
-    List<Ingredients> currentNotes = noteDatabase.currentIng;
-    List<Recipe> currentRecipe = noteDatabase.currentRecipe;
+    currentNotes = noteDatabase.currentIng;
+    currentRecipe = noteDatabase.currentRecipe;
+    Future.delayed(const Duration(seconds: 3), () {
+      if (currentNotes.isNotEmpty) {
+        _calcTutorial();
+      }
+    });
+
     return DefaultTabController(
       length: 2, // Number of tabs
       child: Scaffold(
+        resizeToAvoidBottomInset: false,
         backgroundColor: widget.background,
 /*         appBar: PreferredSize(
           preferredSize: Size.fromHeight(screenHeight * 0.12),
@@ -2201,7 +2477,7 @@ class _smallrecipeState extends State<smallrecipe>
                           child: CachedNetworkImage(
                             imageUrl: widget.imageURL ?? '',
                             fit: BoxFit.cover,
-                            placeholder: (context, url) => Center(
+                            placeholder: (context, url) => const Center(
                               child: CircularProgressIndicator(
                                   color: Colors.white),
                             ),
@@ -2213,12 +2489,12 @@ class _smallrecipeState extends State<smallrecipe>
                                   : images[
                                       0], // fallback to first image if type is invalid
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => Center(
+                              placeholder: (context, url) => const Center(
                                 child: CircularProgressIndicator(
                                     color: Colors.white),
                               ),
                               errorWidget: (context, url, error) =>
-                                  Icon(Icons.error),
+                                  const Icon(Icons.error),
                             ),
                           ),
                         ),
@@ -2242,7 +2518,7 @@ class _smallrecipeState extends State<smallrecipe>
                                   Colors.black.withOpacity(0.2), // Soft shadow
                               blurRadius: 6,
                               spreadRadius: 2,
-                              offset: Offset(0, 3), // Slight shadow below
+                              offset: const Offset(0, 3), // Slight shadow below
                             ),
                           ],
                         ),
@@ -2279,7 +2555,8 @@ class _smallrecipeState extends State<smallrecipe>
                                       .withOpacity(0.2), // Soft shadow
                                   blurRadius: 6,
                                   spreadRadius: 2,
-                                  offset: Offset(0, 3), // Slight shadow below
+                                  offset:
+                                      const Offset(0, 3), // Slight shadow below
                                 ),
                               ],
                             ),
@@ -2343,7 +2620,7 @@ class _smallrecipeState extends State<smallrecipe>
                               ),
                             ),
                           ),
-                          SizedBox(
+                          const SizedBox(
                             width: 10,
                           ),
                           Container(
@@ -2360,7 +2637,8 @@ class _smallrecipeState extends State<smallrecipe>
                                       .withOpacity(0.2), // Soft shadow
                                   blurRadius: 6,
                                   spreadRadius: 2,
-                                  offset: Offset(0, 3), // Slight shadow below
+                                  offset:
+                                      const Offset(0, 3), // Slight shadow below
                                 ),
                               ],
                             ),
@@ -2368,32 +2646,102 @@ class _smallrecipeState extends State<smallrecipe>
                               arrowColor: Colors.white,
                               barrierColor: Colors.transparent,
                               backgroundColor: Colors.white,
-                              content: TextButton(
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                  //  dishHelp(context);
-                                },
-                                style: ButtonStyle(
-                                  backgroundColor: MaterialStateProperty.all(
-                                      Colors.transparent),
-                                  shape: MaterialStateProperty.all(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                  overlayColor: MaterialStateProperty.all(Colors
-                                      .transparent), // Disable splash effect
-                                ),
-                                child: Text(
-                                  'How to add, update, or delete.',
-                                  style: GoogleFonts.hammersmithOne(
-                                    fontSize:
-                                        MediaQuery.of(context).size.width *
-                                            0.035,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              ),
+                              content: Column(
+  crossAxisAlignment: CrossAxisAlignment.center,
+  mainAxisSize: MainAxisSize.min,
+  children: [
+    Text(
+      'How to Add, Edit, or Remove',
+      style: GoogleFonts.hammersmithOne(
+        fontSize: MediaQuery.of(context).size.width * 0.035,
+        color: Colors.black,
+      ),
+    ),
+    Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        TextButton(
+          onPressed: () async {
+            setState(() {
+              help = '0';
+            });
+            Navigator.pop(context);
+            dishHelp(context);
+          },
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+          ),
+          child: Text(
+            'Ingredient',
+            style: GoogleFonts.hammersmithOne(
+              fontSize: MediaQuery.of(context).size.width * 0.035,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const Text("|"),
+        TextButton(
+          onPressed: () async {
+            setState(() {
+              help = '1';
+            });
+            Navigator.pop(context);
+            dishHelp(context);
+          },
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+          ),
+          child: Text(
+            'Recipe',
+            style: GoogleFonts.hammersmithOne(
+              fontSize: MediaQuery.of(context).size.width * 0.035,
+              color: Colors.black,
+            ),
+          ),
+        ),
+        const Text("|"),
+        TextButton(
+          onPressed: () async {
+            setState(() {
+              help = '2';
+            });
+            Navigator.pop(context);
+            dishHelp(context);
+          },
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all(Colors.transparent),
+            shape: MaterialStateProperty.all(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            overlayColor: MaterialStateProperty.all(Colors.transparent),
+          ),
+          child: Text(
+            'Link',
+            style: GoogleFonts.hammersmithOne(
+              fontSize: MediaQuery.of(context).size.width * 0.035,
+              color: Colors.black,
+            ),
+          ),
+        ),
+      ],
+    ),
+  ],
+),
+
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 7),
@@ -2462,7 +2810,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                     .withOpacity(0.2),
                                                 blurRadius: 6,
                                                 spreadRadius: 2,
-                                                offset: Offset(0, 3),
+                                                offset: const Offset(0, 3),
                                               ),
                                             ],
                                           ),
@@ -2588,7 +2936,8 @@ class _smallrecipeState extends State<smallrecipe>
                                             top: screenHeight * 0.015,
                                             right: screenWidth * 0.06,
                                             bottom: 10),
-                                        child: currentNotes.isNotEmpty
+                                        child: currentNotes.isNotEmpty &&
+                                                !_isLoading
                                             ? Row(
                                                 crossAxisAlignment:
                                                     CrossAxisAlignment.center,
@@ -2605,14 +2954,14 @@ class _smallrecipeState extends State<smallrecipe>
                                                                       .width >
                                                                   600
                                                               ? 20
-                                                              : screenWidth *
-                                                                  0.04,
+                                                              : 4.5.w,
                                                       fontWeight:
                                                           FontWeight.w600,
                                                       color: Colors.white,
                                                     ),
                                                   ),
                                                   DropdownButtonHideUnderline(
+                                                    key: _calc,
                                                     child:
                                                         DropdownButton2<String>(
                                                       isExpanded: true,
@@ -2629,7 +2978,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                                 : 8,
                                                             color: Colors.white,
                                                           ),
-                                                          SizedBox(
+                                                          const SizedBox(
                                                             width: 4,
                                                           ),
                                                           Expanded(
@@ -2692,10 +3041,8 @@ class _smallrecipeState extends State<smallrecipe>
                                                       },
                                                       buttonStyleData:
                                                           ButtonStyleData(
-                                                        height:
-                                                            screenHeight * 0.02,
-                                                        width:
-                                                            screenWidth * 0.12,
+                                                        height: 2.5.h,
+                                                        width: 13.w,
                                                         padding: EdgeInsets.only(
                                                             left: screenWidth *
                                                                 0.025,
@@ -2774,9 +3121,10 @@ class _smallrecipeState extends State<smallrecipe>
                                         child: _isLoading
                                             ? Center(
                                                 child: ColorFiltered(
-                                                colorFilter: ColorFilter.mode(
-                                                    Colors.white,
-                                                    BlendMode.srcIn),
+                                                colorFilter:
+                                                    const ColorFilter.mode(
+                                                        Colors.white,
+                                                        BlendMode.srcIn),
                                                 child: Lottie.asset(
                                                   'assets/lottie_json/loadingspoons.json',
                                                   width: screenWidth * 0.4,
@@ -2843,7 +3191,8 @@ class _smallrecipeState extends State<smallrecipe>
                                                     children: [
                                                       Padding(
                                                         padding:
-                                                            EdgeInsets.all(0),
+                                                            const EdgeInsets
+                                                                .all(0),
                                                         child: SizedBox(
                                                           width: MediaQuery.of(
                                                                       context)
@@ -3006,6 +3355,7 @@ class _smallrecipeState extends State<smallrecipe>
                                                           itemCount:
                                                               currentNotes
                                                                   .length,
+
                                                           itemBuilder:
                                                               (context, index) {
                                                             final note =
@@ -3052,7 +3402,7 @@ class _smallrecipeState extends State<smallrecipe>
                           child: _isLoading
                               ? Center(
                                   child: ColorFiltered(
-                                  colorFilter: ColorFilter.mode(
+                                  colorFilter: const ColorFilter.mode(
                                       Colors.white, BlendMode.srcIn),
                                   child: Lottie.asset(
                                     'assets/lottie_json/loadingspoons.json',
