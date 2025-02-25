@@ -849,7 +849,7 @@ class _dishesListState extends State<dishesList> {
 
                     context.read<database>().addDish(
                         serial.toString(),
-                        textController.text,
+                        textController.text.trim(),
                         widget.type!,
                         selectedDurationHours.toStringAsFixed(1),
                         category,
@@ -1296,7 +1296,7 @@ class _dishesListState extends State<dishesList> {
                     // Update dish information
                     context.read<database>().updateDish(
                         dishId, // Dish ID to update
-                        textController.text,
+                        textController.text.trim(),
                         widget.type!,
                         selectedDurationHours,
                         category,

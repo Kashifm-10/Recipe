@@ -117,7 +117,7 @@ flutter_icons:
   android: true
   ios: true
   image_path: "assets/images/banner.png"
-  
+
   #flutter pub get
   #flutter pub run flutter_launcher_icons:main
 
@@ -151,8 +151,6 @@ flutter:
     - assets/icons/logout.svg
     - assets/icons/add.svg
     - assets/icons/steak_icon.svg
-    - assets/icons/no_items.png
-    - assets/icons/no_recipe.png
     - assets/icons/all.png
     - assets/icons/breakfast.png
     - assets/icons/gravy.png

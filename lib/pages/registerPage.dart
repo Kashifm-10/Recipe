@@ -84,7 +84,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     final response = await Supabase.instance.client
         .from('users')
         .select('email')
-        .eq('email', _emailController.text.toLowerCase());
+        .eq('email', _emailController.text.toLowerCase().trim());
 
     final data = List<Map<String, dynamic>>.from(response);
 
@@ -92,18 +92,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
       try {
         await Supabase.instance.client.from('users').insert([
           {
-            'name': _usernameController.text.toLowerCase(),
-            'email': _emailController.text.toLowerCase(),
+            'name': _usernameController.text.toLowerCase().trim(),
+            'email': _emailController.text.toLowerCase().trim(),
             'date':
                 (DateFormat('dd-MM-yyyy').format(DateTime.now())).toString(),
             'access': false,
-            'password': _passwordController.text,
+            'password': _passwordController.text.trim(),
           }
         ]);
 
         SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('email', _emailController.text);
-        await prefs.setString('name', _usernameController.text);
+        await prefs.setString('email', _emailController.text.trim());
+        await prefs.setString('name', _usernameController.text.trim());
 
         setState(() {
           _passwordController.clear();

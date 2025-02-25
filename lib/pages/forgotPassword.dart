@@ -196,7 +196,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return passwordChars.join();
   }
 
-  Future<void> _signInWithEmailPassword() async {
+  Future<void> vadlidateIfExists() async {
     setState(() {
       _isGoogleSignInInProgress = true;
     });
@@ -500,7 +500,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         ElevatedButton.icon(
                           onPressed: () {
                             FocusScope.of(context).requestFocus(FocusNode());
-                            _signInWithEmailPassword();
+                            vadlidateIfExists();
                           },
                           icon: _isSending
                               ? LoadingAnimationWidget.inkDrop(

@@ -1239,9 +1239,9 @@ class _smallrecipeState extends State<smallrecipe>
                     // Update the ingredient in the database
                     await context.read<database>().updateIngredient(
                           ingredientId,
-                          textController.text,
+                          textController.text.trim(),
                           widget.type!,
-                          quantityController.text,
+                          quantityController.text.trim(),
                           adjustedUnit,
                         );
 
@@ -1427,7 +1427,7 @@ class _smallrecipeState extends State<smallrecipe>
                   if (textController.text.trim().isNotEmpty) {
                     await context.read<database>().addRecipe(
                           widget.serial!,
-                          textController.text,
+                          textController.text.trim(),
                           widget.type!,
                           widget.dish!,
                         );
@@ -1612,7 +1612,7 @@ class _smallrecipeState extends State<smallrecipe>
                     await context.read<database>().updateRecipe(
                           widget.serial!,
                           recipeId,
-                          textController.text,
+                          textController.text.trim(),
                           widget.type!,
                           widget.dish!,
                         );
@@ -1745,8 +1745,8 @@ class _smallrecipeState extends State<smallrecipe>
                   titleController.text.isNotEmpty &&
                   urlRegExp.hasMatch(textController.text)) {
                 await context.read<database>().addLink(
-                    titleController.text,
-                    textController.text,
+                    titleController.text.trim(),
+                    textController.text.trim(),
                     widget.serial!,
                     widget.type!,
                     widget.dish!); // Pass additional data
@@ -1893,8 +1893,8 @@ class _smallrecipeState extends State<smallrecipe>
                   titleController.text.isNotEmpty &&
                   urlRegExp.hasMatch(textController.text)) {
                 await context.read<database>().addLink(
-                    titleController.text,
-                    textController.text,
+                    titleController.text.trim(),
+                    textController.text.trim(),
                     widget.serial!,
                     widget.type!,
                     widget.dish!); // Pass additional data

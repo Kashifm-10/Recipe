@@ -35,8 +35,8 @@ class _LoginScreenState extends State<LoginScreen> {
       final response = await Supabase.instance.client
           .from('users')
           .select('email, password, name, access, date')
-          .eq('email', _emailController.text.toLowerCase())
-          .eq('password', _passwordController.text);
+          .eq('email', _emailController.text.toLowerCase().trim())
+          .eq('password', _passwordController.text.trim());
 
       final data = List<Map<String, dynamic>>.from(response);
 
