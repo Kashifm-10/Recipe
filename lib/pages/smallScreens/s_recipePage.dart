@@ -2112,7 +2112,7 @@ class _smallrecipeState extends State<smallrecipe>
                       child: Text(
                         instructions[
                             _currentPage], // Display instruction for current page
-                        style: const TextStyle(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,

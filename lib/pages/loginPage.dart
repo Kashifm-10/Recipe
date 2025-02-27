@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:ionicons/ionicons.dart';
+import 'package:page_transition/page_transition.dart';
 import 'package:recipe/models/auth_service.dart';
 import 'package:recipe/pages/forgotPassword.dart';
 import 'package:recipe/pages/biggerScreens/home.dart';
@@ -196,7 +197,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: SingleChildScrollView(
                 child: Container(
                   padding: EdgeInsets.all(screenWidth * 0.06),
-                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
+                  margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.12),
                   decoration: BoxDecoration(
                     color: Colors.white.withOpacity(0.8),
                     borderRadius: BorderRadius.circular(20),
@@ -222,26 +223,27 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       SizedBox(height: 3.h), // Responsive height
                       SizedBox(
-                        height: 5.h, // Responsive text field height
+                        height: 5.h,
                         child: _buildTextField(
                           controller: _emailController,
                           label: 'Email Address',
-                          hintText: ' ',
+                          hintText: 'Enter your email address',
                           keyboardType: TextInputType.emailAddress,
                           icon: Icons.email,
                         ),
                       ),
-                      SizedBox(height: 2.h), // Responsive spacing
+                      SizedBox(height: 2.h),
                       SizedBox(
-                        height: 5.h, // Responsive text field height
+                        height: 5.h,
                         child: _buildTextField(
                           controller: _passwordController,
                           label: 'Password',
-                          hintText: ' ',
+                          hintText: 'Enter your password',
                           obscureText: true,
                           icon: Icons.lock,
                         ),
                       ),
+
                       SizedBox(height: screenHeight * 0.02),
                       SizedBox(
                         width: double.infinity,
@@ -317,8 +319,11 @@ class _LoginScreenState extends State<LoginScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(
-                                builder: (context) => ForgotPasswordScreen()),
+                            PageTransition(
+                                curve: Curves.linear,
+                                type: PageTransitionType.rightToLeft,
+                                //   duration: const Duration(milliseconds: 500),
+                                child: ForgotPasswordScreen()),
                           );
                         },
                         child: Text(
@@ -343,7 +348,11 @@ class _LoginScreenState extends State<LoginScreen> {
                   onPressed: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => RegisterScreen()),
+                      PageTransition(
+                          curve: Curves.linear,
+                          type: PageTransitionType.rightToLeft,
+                          //duration: const Duration(milliseconds: 800),
+                          child: RegisterScreen()),
                     );
                   },
                   child: Text(
@@ -378,37 +387,59 @@ class _LoginScreenState extends State<LoginScreen> {
     return ValueListenableBuilder<bool>(
       valueListenable: isObscured,
       builder: (context, value, child) {
-        return TextField(
+        return TextFormField(
           controller: controller,
           obscureText: value,
           keyboardType: keyboardType,
           decoration: InputDecoration(
             labelText: label,
             hintText: hintText,
-            filled: true,
-            fillColor: const Color(0xFFFEE1D5),
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide.none,
+            labelStyle: GoogleFonts.hammersmithOne(
+              color: Colors.black,
+              fontSize: 14.sp,
             ),
-            suffixIcon: label.toLowerCase() == 'password'
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey[300]!,
+              ),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey[300]!,
+              ),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(
+                color: Colors.grey[300]!,
+              ),
+            ),
+            filled: true,
+            fillColor: Colors.grey[50],
+            floatingLabelBehavior: FloatingLabelBehavior.auto,
+            suffixIcon: obscureText
                 ? IconButton(
                     icon: Icon(
-                      value ? HeroiconsMicro.eyeSlash : HeroiconsMicro.eye,
-                      color: const Color(0xFF5C2C2C),
-                      size: 4.w, // Responsive icon size
+                      value ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.black,
                     ),
                     onPressed: () {
                       isObscured.value = !value;
                     },
                   )
                 : null,
-            labelStyle: GoogleFonts.hammersmithOne(
-              fontSize: 3.w, // Responsive font size
-              color: const Color(0xFF5C2C2C),
-            ),
-            floatingLabelBehavior: FloatingLabelBehavior.never,
           ),
+          style: GoogleFonts.hammersmithOne(
+            fontSize: 14.sp,
+          ),
+          validator: (value) {
+            if (value == null || value.isEmpty) {
+              return '$label is required';
+            }
+            return null;
+          },
         );
       },
     );

@@ -9,6 +9,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gif/gif.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:heroicons_flutter/heroicons_flutter.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:lottie/lottie.dart';
 import 'package:mailer/mailer.dart';
@@ -39,6 +40,10 @@ class _ProfilePageState extends State<ProfilePage>
   final TextEditingController _confirmPasswordController =
       TextEditingController();
   final TextEditingController _emailController = TextEditingController();
+
+  bool _obscureCurrentPassword = true;
+  bool _obscureNewPassword = true;
+  bool _obscureConfirmPassword = true;
 
   final _femailController = TextEditingController();
   bool _isGoogleSignInInProgress = false;
@@ -80,7 +85,7 @@ class _ProfilePageState extends State<ProfilePage>
     }).join(' ');
   }
 
-  Future<void> changePasswordDialog() async {
+/*   Future<void> changePasswordDialog() async {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -360,8 +365,8 @@ class _ProfilePageState extends State<ProfilePage>
       },
     );
   }
-
-  Future<void> _showForgotPasswordDialog(BuildContext context) async {
+ */
+/*   Future<void> _showForgotPasswordDialog(BuildContext context) async {
     double screenWidth = MediaQuery.of(context).size.width;
     double screenHeight = MediaQuery.of(context).size.height;
     _femailController.clear();
@@ -496,13 +501,13 @@ class _ProfilePageState extends State<ProfilePage>
       },
     );
   }
-
+ */
   Future<void> vadlidateIfExists() async {
     try {
       final response = await Supabase.instance.client
           .from('users')
           .select('email, password, name')
-          .eq('email', _femailController.text.toLowerCase().trim());
+          .eq('email', email!.toLowerCase().trim());
 
       final data = List<Map<String, dynamic>>.from(response);
 
@@ -559,7 +564,7 @@ class _ProfilePageState extends State<ProfilePage>
       _isGoogleSignInInProgress = true;
     }); */
 
-    final recipient = _femailController.text.trim();
+    final recipient = email!.trim();
     if (recipient.isEmpty) {
       const snackBar = SnackBar(
         /// need to set following properties for best effect of awesome_snackbar_content
@@ -643,6 +648,10 @@ class _ProfilePageState extends State<ProfilePage>
       ScaffoldMessenger.of(context)
           .hideCurrentMaterialBanner(); // Hide the banner after 3 seconds
     });
+    final response = await Supabase.instance.client
+        .from('users')
+        .update({'password': otp}) // Update password field with the new value
+        .eq('email', email!.toLowerCase()); // Filter by email
 
     setState(() {
       _isGoogleSignInInProgress = false;
@@ -947,7 +956,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   _currentPasswordController.clear();
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red, // Blue color
+                                  backgroundColor: Colors.redAccent, // Blue color
                                   shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(10)),
                                   shadowColor: Colors.transparent,
@@ -1017,7 +1026,7 @@ class _ProfilePageState extends State<ProfilePage>
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.red, // Blue color
+                                  backgroundColor: Colors.redAccent, // Blue color
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(10),
                                   ),
@@ -1081,7 +1090,8 @@ class _ProfilePageState extends State<ProfilePage>
                                             TextFormField(
                                               controller:
                                                   _currentPasswordController,
-                                              obscureText: true,
+                                                  
+          obscureText: _obscureCurrentPassword,
                                               decoration: InputDecoration(
                                                 labelText: 'Current Password',
                                                 hintText:
@@ -1114,6 +1124,22 @@ class _ProfilePageState extends State<ProfilePage>
                                                     color: Colors.grey[300]!,
                                                   ),
                                                 ),
+                                                suffixIcon: IconButton(
+                                                  icon: Icon(
+                                                    _obscureCurrentPassword
+                                                        ? HeroiconsMicro
+                                                            .eyeSlash
+                                                        : HeroiconsMicro.eye,
+                                                    color: Colors.black,
+                                                    size: 18.sp,
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _obscureCurrentPassword =
+                                                          !_obscureCurrentPassword;
+                                                    });
+                                                  },
+                                                ),
                                                 filled: true,
                                                 fillColor: Colors.grey[50],
                                                 floatingLabelBehavior:
@@ -1136,7 +1162,7 @@ class _ProfilePageState extends State<ProfilePage>
                                             TextFormField(
                                               controller:
                                                   _newPasswordController,
-                                              obscureText: true,
+                                              obscureText: _obscureNewPassword,
                                               decoration: InputDecoration(
                                                 labelText: 'New Password',
                                                 hintText:
@@ -1168,6 +1194,24 @@ class _ProfilePageState extends State<ProfilePage>
                                                   borderSide: BorderSide(
                                                     color: Colors.grey[300]!,
                                                   ),
+                                                ),
+                                               suffixIcon: IconButton(
+                                                  icon: Icon(
+                                                    _obscureConfirmPassword
+                                                        ? HeroiconsMicro
+                                                            .eyeSlash
+                                                        : HeroiconsMicro.eye,
+                                                    color: Colors.black,
+                                                    size: 18.sp,
+                                                  ),
+                                                  onPressed: () {
+                                                    setState(() {
+                                                      _obscureConfirmPassword =
+                                                          !_obscureConfirmPassword;
+                                                      _obscureNewPassword =
+                                                          !_obscureNewPassword;
+                                                    });
+                                                  },
                                                 ),
                                                 filled: true,
                                                 fillColor: Colors.grey[50],
@@ -1204,7 +1248,7 @@ class _ProfilePageState extends State<ProfilePage>
                                             TextFormField(
                                               controller:
                                                   _confirmPasswordController,
-                                              obscureText: true,
+                                              obscureText: _obscureConfirmPassword,
                                               decoration: InputDecoration(
                                                 labelText: 'Confirm Password',
                                                 hintText:
@@ -1237,6 +1281,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                     color: Colors.grey[300]!,
                                                   ),
                                                 ),
+                                                
                                                 filled: true,
                                                 fillColor: Colors.grey[50],
                                                 floatingLabelBehavior:
@@ -1270,7 +1315,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                       ElevatedButton.styleFrom(
                                                     minimumSize: const Size(100,
                                                         30), // Set a fixed width and height
-                                                    backgroundColor: Colors.red,
+                                                    backgroundColor: Colors.redAccent,
                                                     foregroundColor:
                                                         Colors.white,
                                                     padding: const EdgeInsets
@@ -1375,7 +1420,9 @@ class _ProfilePageState extends State<ProfilePage>
                                                                   'email',
                                                                   email!
                                                                       .toLowerCase());
-
+                                                      setState(() {
+                                                        changePassword = '0';
+                                                      });
                                                       const snackBar = SnackBar(
                                                         elevation: 0,
                                                         behavior:
@@ -1407,7 +1454,7 @@ class _ProfilePageState extends State<ProfilePage>
                                                       ElevatedButton.styleFrom(
                                                     minimumSize: const Size(100,
                                                         30), // Set a fixed width and height
-                                                    backgroundColor: Colors.red,
+                                                    backgroundColor: Colors.redAccent,
                                                     foregroundColor:
                                                         Colors.white,
                                                     padding: const EdgeInsets
@@ -1462,6 +1509,11 @@ class _ProfilePageState extends State<ProfilePage>
                                               setState(() {
                                                 changePassword = '1';
                                               });
+                                              _currentPasswordController
+                                                  .clear();
+                                              _newPasswordController.clear();
+                                              _confirmPasswordController
+                                                  .clear();
                                             },
                                             icon: Icon(
                                               FontAwesomeIcons.arrowLeft,
@@ -1479,7 +1531,7 @@ class _ProfilePageState extends State<ProfilePage>
                                       ],
                                     ),
                                     SizedBox(height: screenHeight * 0.01),
-                                    TextFormField(
+                                    /* TextFormField(
                                       controller: _femailController,
                                       decoration: InputDecoration(
                                         labelText: 'Email Address',
@@ -1534,7 +1586,8 @@ class _ProfilePageState extends State<ProfilePage>
                                         // Check if the email format is correct
                                         return null;
                                       },
-                                    ),
+                                    ), */
+                                    Text(email!),
                                     SizedBox(height: screenHeight * 0.02),
                                     ElevatedButton.icon(
                                       onPressed: () {
@@ -1574,7 +1627,7 @@ class _ProfilePageState extends State<ProfilePage>
                                         ),
                                       ),
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.red,
+                                        backgroundColor: Colors.redAccent,
                                         minimumSize: Size(double.infinity,
                                             screenHeight * 0.04),
                                         shape: RoundedRectangleBorder(

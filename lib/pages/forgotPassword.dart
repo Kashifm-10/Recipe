@@ -168,7 +168,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     const String upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const String lowerCase = 'abcdefghijklmnopqrstuvwxyz';
     const String numbers = '0123456789';
-    const String specialChars = '@#%&*!?';//'@#%^&*!()_+[]{}|;:,.<>?';
+    const String specialChars = '@#%&*!?'; //'@#%^&*!()_+[]{}|;:,.<>?';
 
     // Combine all characters into one pool (without special characters initially)
     final String allCharacters = upperCase + lowerCase + numbers;
@@ -541,10 +541,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 padding: EdgeInsets.only(bottom: screenHeight * 0.05),
                 child: TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                    Navigator.pop(context); // Navigate back when pressed
                   },
                   child: Text(
                     "Back to Login",

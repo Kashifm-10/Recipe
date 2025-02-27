@@ -13,6 +13,7 @@ import 'package:material_dialogs/widgets/buttons/icon_button.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:recipe/models/auth_service.dart';
 import 'package:recipe/pages/loginPage.dart';
+import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
@@ -280,7 +281,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   key: _formKey,
                   child: Container(
                     padding: EdgeInsets.all(screenWidth * 0.06),
-                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.2),
+                    margin: EdgeInsets.symmetric(horizontal: screenWidth * 0.12),
                     decoration: BoxDecoration(
                       color: Colors.white.withOpacity(0.8),
                       borderRadius: BorderRadius.circular(20),
@@ -298,7 +299,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         Text(
                           'Create an Account',
                           style: GoogleFonts.hammersmithOne(
-                            fontSize: screenWidth * 0.04,
+                            fontSize: 6.w,
                             fontWeight: FontWeight.bold,
                             color: const Color(0xFF5C2C2C),
                           ),
@@ -308,8 +309,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           controller: _usernameController,
                           label: 'Username',
                           hintText: 'Enter your username',
-                          icon: Icons.person,
-                          errorText: _usernameError,
+                           errorText: _usernameError,
                           screenWidth: screenWidth,
                         ),
                         SizedBox(height: screenHeight * 0.02),
@@ -318,8 +318,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           label: 'Email Address',
                           hintText: 'Enter your email',
                           keyboardType: TextInputType.emailAddress,
-                          icon: Icons.email,
-                          errorText: _emailError,
+                           errorText: _emailError,
                           screenWidth: screenWidth,
                         ),
                         SizedBox(height: screenHeight * 0.02),
@@ -429,177 +428,158 @@ class _RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _buildTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-    required IconData icon,
-    required String? errorText,
-    required double screenWidth,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.05,
-          child: TextFormField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            decoration: InputDecoration(
-              labelText: label,
-              // hintText: hintText,
-              filled: true,
-              fillColor: const Color(0xFFFEE1D5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-              labelStyle: GoogleFonts.hammersmithOne(
-                fontSize: screenWidth * 0.03,
-                color: const Color(0xFF5C2C2C),
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field is required';
-              }
-              return null;
-            },
-          ),
+Widget _buildTextField({
+  required TextEditingController controller,
+  required String label,
+  required String hintText,
+  bool obscureText = false,
+  TextInputType keyboardType = TextInputType.text,
+  required double screenWidth,
+  String? errorText,
+}) {
+  return TextFormField(
+    controller: controller,
+    obscureText: obscureText,
+    keyboardType: keyboardType,
+    decoration: InputDecoration(
+      labelText: label,
+      hintText: hintText,
+      labelStyle: GoogleFonts.hammersmithOne(
+        color: Colors.black,
+        fontSize: 14.sp,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      filled: true,
+      fillColor: Colors.grey[50],
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      errorText: errorText,
+    ),
+    style: GoogleFonts.hammersmithOne(fontSize: 14.sp),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'This field is required';
+      }
+      return null;
+    },
+  );
+}
+
+Widget _buildEmailTextField({
+  required TextEditingController controller,
+  required String label,
+  required String hintText,
+  bool obscureText = false,
+  TextInputType keyboardType = TextInputType.emailAddress,
+  required double screenWidth,
+  String? errorText,
+}) {
+  return TextFormField(
+    controller: controller,
+    obscureText: obscureText,
+    keyboardType: keyboardType,
+    decoration: InputDecoration(
+      labelText: label,
+      hintText: hintText,
+      labelStyle: GoogleFonts.hammersmithOne(
+        color: Colors.black,
+        fontSize: 14.sp,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      filled: true,
+      fillColor: Colors.grey[50],
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+      errorText: errorText,
+    ),
+    style: GoogleFonts.hammersmithOne(fontSize: 14.sp),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'This field is required';
+      }
+      final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+      if (!emailRegex.hasMatch(value)) {
+        return 'Please enter a valid email address';
+      }
+      return null;
+    },
+  );
+}
+
+Widget _buildPasswordTextField(double screenWidth) {
+  return TextFormField(
+    controller: _passwordController,
+    obscureText: _obscureText,
+    decoration: InputDecoration(
+      suffixIcon: IconButton(
+        icon: Icon(
+          _obscureText ? HeroiconsMicro.eyeSlash : HeroiconsMicro.eye,
+          color: Colors.black,
+          size: 18.sp,
         ),
-      ],
-    );
-  }
-
-  Widget _buildEmailTextField({
-    required TextEditingController controller,
-    required String label,
-    required String hintText,
-    bool obscureText = false,
-    TextInputType keyboardType = TextInputType.text,
-    required IconData icon,
-    required String? errorText,
-    required double screenWidth,
-  }) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.05,
-          child: TextFormField(
-            controller: controller,
-            obscureText: obscureText,
-            keyboardType: keyboardType,
-            decoration: InputDecoration(
-              labelText: label,
-              //  hintText: hintText,
-              filled: true,
-              fillColor: const Color(0xFFFEE1D5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              // prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
-              labelStyle: GoogleFonts.hammersmithOne(
-                fontSize: screenWidth * 0.03,
-                color: const Color(0xFF5C2C2C),
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'This field is required';
-              }
-
-              // Email validation using regex pattern
-              final emailRegex =
-                  RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
-              if (!emailRegex.hasMatch(value)) {
-                return 'Please enter a valid email address';
-              }
-              return null; // Valid email
-            },
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPasswordTextField(double screenWidth) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SizedBox(
-          height: MediaQuery.of(context).size.height * 0.05,
-          child: TextFormField(
-            controller: _passwordController,
-            obscureText: _obscureText,
-            decoration: InputDecoration(
-              suffixIcon: IconButton(
-                icon: Icon(
-                  _obscureText ? HeroiconsMicro.eyeSlash : HeroiconsMicro.eye,
-                  color: const Color(0xFF5C2C2C),
-                  size: screenWidth * 0.04,
-                ),
-                onPressed: () {
-                  setState(() {
-                    _obscureText = !_obscureText;
-                  });
-                },
-              ),
-              labelText: 'Password',
-              filled: true,
-              fillColor: const Color(0xFFFEE1D5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide.none,
-              ),
-              labelStyle: GoogleFonts.hammersmithOne(
-                fontSize: screenWidth * 0.03,
-                color: const Color(0xFF5C2C2C),
-              ),
-              floatingLabelBehavior: FloatingLabelBehavior.never,
-            ),
-            validator: (value) {
-              if (value == null || value.isEmpty) {
-                return 'Password is required';
-              }
-
-              // At least 8 characters
-              if (value.length < 8) {
-                return 'Password must be at least 8 characters';
-              }
-
-              // Check for at least one uppercase letter, one lowercase letter, one number, and one symbol
-              final regex = RegExp(
-                  r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&*(),.?":{}|<>]).{8,}$');
-              if (!regex.hasMatch(value)) {
-                return 'Password requires uppercase, lowercase, number, and symbol';
-              }
-
-              // Check if the password is a simple word (basic example: simple dictionary check)
-              List<String> commonPasswords = [
-                'password',
-                '123456',
-                'qwerty',
-                'abc123',
-                'letmein'
-              ];
-              if (commonPasswords
-                  .any((word) => value.toLowerCase().contains(word))) {
-                return 'Password is too common, try something more complex';
-              }
-
-              return null; // Valid password
-            },
-          ),
-        ),
-      ],
-    );
-  }
+        onPressed: () {
+          setState(() {
+            _obscureText = !_obscureText;
+          });
+        },
+      ),
+      labelText: 'Password',
+      hintText: 'Enter your password',
+      labelStyle: GoogleFonts.hammersmithOne(
+        color: Colors.black,
+        fontSize: 14.sp,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(10),
+        borderSide: BorderSide(color: Colors.grey[300]!),
+      ),
+      filled: true,
+      fillColor: Colors.grey[50],
+      floatingLabelBehavior: FloatingLabelBehavior.auto,
+    ),
+    style: GoogleFonts.hammersmithOne(fontSize: 14.sp),
+    validator: (value) {
+      if (value == null || value.isEmpty) {
+        return 'Password is required';
+      }
+      if (value.length < 8) {
+        return 'Password must be at least 8 characters';
+      }
+      final regex = RegExp(
+          r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#\$%\^&*(),.?":{}|<>]).{8,}$');
+      if (!regex.hasMatch(value)) {
+        return 'Password requires uppercase, lowercase, number, and symbol';
+      }
+      return null;
+    },
+  );
+}
 }
