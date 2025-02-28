@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
@@ -9,6 +11,7 @@ import 'package:lottie/lottie.dart';
 import 'package:page_transition/page_transition.dart';
 import 'package:provider/provider.dart';
 import 'package:recipe/collections/dishes.dart';
+import 'package:recipe/main.dart';
 import 'package:recipe/models/br_database.dart';
 import 'package:recipe/pages/biggerScreens/allDishes.dart';
 import 'package:recipe/pages/biggerScreens/dishesPage.dart';
@@ -271,6 +274,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
   String searchQuery = '';
   bool _isErrorDialogShown = false;
   final FocusNode _focusNode = FocusNode();
+  String quote = ' ';
 
 /*   List<Color> colorList = [
     const Color.fromARGB(255, 249, 168, 37), // #F9A825
@@ -438,6 +442,28 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
       await _speech.stop(); // Stop the speech recognition
       setState(() => _isListening = false); // Update state
       print("Listening stopped..."); // Debugging statement
+    }
+  }
+
+  Future<void> fetchRandomQuote() async {
+    try {
+      final response = await supabase.from('kitchen_quotes').select('quote');
+
+      if (response.isNotEmpty) {
+        final randomIndex =
+            Random().nextInt(response.length); // Pick a random index
+        final randomQuote = response[randomIndex]['quote'];
+
+        setState(() {
+          quote = "- $randomQuote";
+        });
+
+        print(quote);
+      } else {
+        print('No quotes found');
+      }
+    } catch (error) {
+      print('Error fetching quote: $error');
     }
   }
 
@@ -747,7 +773,7 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                     ),
                                   ),
                                   Divider(
-                                    color: Colors.grey,
+                                    color: Colors.grey.shade200,
                                     height: 1,
                                     thickness: 0.4,
                                     indent:
@@ -758,20 +784,22 @@ class _MySmallHomePageState extends State<MySmallHomePage> {
                                 ],
                               );
                             },
-                            onSuggestionSelected: (suggestion) {
-                              setState(() {
-                                Navigator.of(context).push(MaterialPageRoute(
-                                    builder: (context) => smallrecipe(
-                                          serial: suggestion.serial,
-                                          type: suggestion.type,
-                                          dish: suggestion.name,
-                                          category: suggestion.category,
-                                          access: true,
-                                          imageURL: suggestion.imageUrl ?? ' ',
-                                          background: colorList[
-                                              int.parse(suggestion.type!) - 1],
-                                        )));
-                              });
+                            onSuggestionSelected: (suggestion) async {
+                              await fetchRandomQuote();
+
+                              Navigator.of(context).push(MaterialPageRoute(
+                                  builder: (context) => smallrecipe(
+                                        serial: suggestion.serial,
+                                        type: suggestion.type,
+                                        dish: suggestion.name,
+                                        category: suggestion.category,
+                                        access: true,
+                                        imageURL: suggestion.imageUrl ?? ' ',
+                                        background: colorList[
+                                            int.parse(suggestion.type!) - 1],
+                                        quote: quote,
+                                      )));
+
                               print("suggestion: ${suggestion.name}");
                             },
                             suggestionsBoxDecoration: SuggestionsBoxDecoration(
@@ -1085,6 +1113,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
   late String _currentLabel;
   late TextEditingController _labelController;
   bool _isEditing = false;
+  String quote = ' ';
 
   @override
   void initState() {
@@ -1447,6 +1476,28 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
     }
   }
 
+  Future<void> fetchRandomQuote() async {
+    try {
+      final response = await supabase.from('kitchen_quotes').select('quote');
+
+      if (response.isNotEmpty) {
+        final randomIndex =
+            Random().nextInt(response.length); // Pick a random index
+        final randomQuote = response[randomIndex]['quote'];
+
+        setState(() {
+          quote = "- $randomQuote";
+        });
+
+        print(quote);
+      } else {
+        print('No quotes found');
+      }
+    } catch (error) {
+      print('Error fetching quote: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -1603,7 +1654,8 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                 },
               );
             }, */
-            onTap: () {
+            onTap: () async {
+              await fetchRandomQuote();
               Navigator.of(context).push(
                 PageTransition(
                   curve: Curves.linear,
@@ -1614,6 +1666,7 @@ class _EditableCategoryCardState extends State<EditableCategoryCard> {
                   child: smalldishesList(
                     type: widget.type,
                     title: _currentLabel,
+                    quote: quote,
                   ),
                 ),
               );

@@ -56,6 +56,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
   bool _isSearchVisible = false;
   final FocusNode _focusNode = FocusNode();
     bool connectivity = true;
+      String quote = ' ';
+
 
 
   late SharedPreferences prefs;
@@ -674,6 +676,29 @@ class _smallalldishesListState extends State<smallalldishesList> {
     'Salads',
     'Others'
   ];
+
+Future<void> fetchRandomQuote() async {
+    try {
+      final response = await supabase.from('kitchen_quotes').select('quote');
+
+      if (response.isNotEmpty) {
+        final randomIndex =
+            Random().nextInt(response.length); // Pick a random index
+        final randomQuote = response[randomIndex]['quote'];
+
+        setState(() {
+          quote = "- $randomQuote";
+        });
+
+        print(quote);
+      } else {
+        print('No quotes found');
+      }
+    } catch (error) {
+      print('Error fetching quote: $error');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final noteDatabase = context.watch<database>();
@@ -1393,8 +1418,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
                               final note = _sortededNotes[index];
 
                               return GestureDetector(
-                                onTap: () {
-                                  setState(() {
+                                onTap: () async{
+                                 await fetchRandomQuote();
                                     Navigator.of(context).push(PageTransition(
                                       curve: Curves.linear,
                                       type: PageTransitionType.rightToLeft,
@@ -1409,9 +1434,10 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                         access: false,
                                         imageURL: note.imageUrl,
                                         background: widget.scafColor,
+                                        quote: quote,
                                       ),
                                     ));
-                                  });
+                               
                                 },
                                 child: AnimatedBuilder(
                                   animation: animation,

@@ -24,6 +24,7 @@ import 'package:recipe/list_view/recipeList.dart';
 import 'package:linkable/linkable.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
@@ -39,7 +40,8 @@ class smallrecipe extends StatefulWidget {
       required this.category,
       required this.access,
       required this.background,
-      required this.imageURL});
+      required this.imageURL,
+      required this.quote});
   String? serial;
   String? type;
   String? dish;
@@ -47,6 +49,7 @@ class smallrecipe extends StatefulWidget {
   bool? access;
   Color? background;
   String? imageURL;
+  String? quote;
 
   @override
   State<smallrecipe> createState() => _smallrecipeState();
@@ -76,7 +79,7 @@ class _smallrecipeState extends State<smallrecipe>
     super.initState();
     currentNotes.clear();
     _createTutorial();
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 3), () {
       setState(() {
         _isLoading = false;
       });
@@ -2489,10 +2492,30 @@ class _smallrecipeState extends State<smallrecipe>
                                   : images[
                                       0], // fallback to first image if type is invalid
                               fit: BoxFit.cover,
-                              placeholder: (context, url) => const Center(
-                                child: CircularProgressIndicator(
-                                    color: Colors.white),
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor:
+                                    Colors.grey[350]!, // Softer base color
+                                highlightColor:
+                                    Colors.grey[200]!, // Smooth highlight
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[
+                                        100], // Light background to blend well
+                                    borderRadius: BorderRadius.circular(
+                                        12), // Smooth edges
+                                  ),
+                                  width: double.infinity,
+                                  height: double.infinity,
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    Icons.image_outlined, // Minimalistic icon
+                                    size: 50,
+                                    color:
+                                        Colors.grey[300], // Subtle icon color
+                                  ),
+                                ),
                               ),
+
                               errorWidget: (context, url, error) =>
                                   const Icon(Icons.error),
                             ),
@@ -2647,101 +2670,126 @@ class _smallrecipeState extends State<smallrecipe>
                               barrierColor: Colors.transparent,
                               backgroundColor: Colors.white,
                               content: Column(
-  crossAxisAlignment: CrossAxisAlignment.center,
-  mainAxisSize: MainAxisSize.min,
-  children: [
-    Text(
-      'How to Add, Edit, or Remove',
-      style: GoogleFonts.hammersmithOne(
-        fontSize: MediaQuery.of(context).size.width * 0.035,
-        color: Colors.black,
-      ),
-    ),
-    Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        TextButton(
-          onPressed: () async {
-            setState(() {
-              help = '0';
-            });
-            Navigator.pop(context);
-            dishHelp(context);
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            overlayColor: MaterialStateProperty.all(Colors.transparent),
-          ),
-          child: Text(
-            'Ingredient',
-            style: GoogleFonts.hammersmithOne(
-              fontSize: MediaQuery.of(context).size.width * 0.035,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        const Text("|"),
-        TextButton(
-          onPressed: () async {
-            setState(() {
-              help = '1';
-            });
-            Navigator.pop(context);
-            dishHelp(context);
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            overlayColor: MaterialStateProperty.all(Colors.transparent),
-          ),
-          child: Text(
-            'Recipe',
-            style: GoogleFonts.hammersmithOne(
-              fontSize: MediaQuery.of(context).size.width * 0.035,
-              color: Colors.black,
-            ),
-          ),
-        ),
-        const Text("|"),
-        TextButton(
-          onPressed: () async {
-            setState(() {
-              help = '2';
-            });
-            Navigator.pop(context);
-            dishHelp(context);
-          },
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all(Colors.transparent),
-            shape: MaterialStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            overlayColor: MaterialStateProperty.all(Colors.transparent),
-          ),
-          child: Text(
-            'Link',
-            style: GoogleFonts.hammersmithOne(
-              fontSize: MediaQuery.of(context).size.width * 0.035,
-              color: Colors.black,
-            ),
-          ),
-        ),
-      ],
-    ),
-  ],
-),
-
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'How to Add, Edit, or Remove',
+                                    style: GoogleFonts.hammersmithOne(
+                                      fontSize:
+                                          MediaQuery.of(context).size.width *
+                                              0.035,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            help = '0';
+                                          });
+                                          Navigator.pop(context);
+                                          dishHelp(context);
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                        ),
+                                        child: Text(
+                                          'Ingredient',
+                                          style: GoogleFonts.hammersmithOne(
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.035,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      const Text("|"),
+                                      TextButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            help = '1';
+                                          });
+                                          Navigator.pop(context);
+                                          dishHelp(context);
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                        ),
+                                        child: Text(
+                                          'Recipe',
+                                          style: GoogleFonts.hammersmithOne(
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.035,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      const Text("|"),
+                                      TextButton(
+                                        onPressed: () async {
+                                          setState(() {
+                                            help = '2';
+                                          });
+                                          Navigator.pop(context);
+                                          dishHelp(context);
+                                        },
+                                        style: ButtonStyle(
+                                          backgroundColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                          shape: MaterialStateProperty.all(
+                                            RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          overlayColor:
+                                              MaterialStateProperty.all(
+                                                  Colors.transparent),
+                                        ),
+                                        child: Text(
+                                          'Link',
+                                          style: GoogleFonts.hammersmithOne(
+                                            fontSize: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.035,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
                               child: Padding(
                                 padding:
                                     const EdgeInsets.symmetric(horizontal: 7),
@@ -3116,20 +3164,48 @@ class _smallrecipeState extends State<smallrecipe>
                                             : null,
                                       ),
                                       Padding(
-                                        padding:
-                                            const EdgeInsets.only(left: 20.0),
+                                        padding: EdgeInsets.only(
+                                            left: _isLoading ? 0 : 20.0),
                                         child: _isLoading
-                                            ? Center(
-                                                child: ColorFiltered(
-                                                colorFilter:
-                                                    const ColorFilter.mode(
-                                                        Colors.white,
-                                                        BlendMode.srcIn),
-                                                child: Lottie.asset(
-                                                  'assets/lottie_json/loadingspoons.json',
-                                                  width: screenWidth * 0.4,
-                                                ),
-                                              )) // Show loading indicator
+                                            ? Align(
+                                                alignment: Alignment.center,
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  children: [
+                                                    ColorFiltered(
+                                                      colorFilter:
+                                                          const ColorFilter
+                                                              .mode(
+                                                              Colors.white,
+                                                              BlendMode.srcIn),
+                                                      child: Lottie.asset(
+                                                        'assets/lottie_json/loadingspoons.json',
+                                                        width:
+                                                            screenWidth * 0.4,
+                                                      ),
+                                                    ),
+                                                    Padding(
+                                                      padding:
+                                                          EdgeInsets.symmetric(
+                                                              horizontal:
+                                                                  screenWidth *
+                                                                      0.05),
+                                                      child: Text(
+                                                        widget.quote ?? ' ',
+                                                        textAlign:
+                                                            TextAlign.center,
+                                                        style: GoogleFonts
+                                                            .hammersmithOne(
+                                                          fontSize:
+                                                              screenWidth *
+                                                                  0.03,
+                                                          color: Colors.white70,
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                )) // Show loading indicator
                                             : currentNotes.isEmpty
                                                 ? Center(
                                                     child: Padding(

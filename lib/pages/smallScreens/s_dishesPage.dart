@@ -43,11 +43,15 @@ import 'package:http/http.dart' as http;
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:image_cropper/image_cropper.dart';
 
-
 class smalldishesList extends StatefulWidget {
-  smalldishesList({super.key, required this.type, required this.title});
+  smalldishesList(
+      {super.key,
+      required this.type,
+      required this.title,
+      required this.quote});
   String? type;
   String? title;
+  String? quote;
 
   State<smalldishesList> createState() => _smalldishesListState();
 }
@@ -62,6 +66,7 @@ class _smalldishesListState extends State<smalldishesList> {
   late SharedPreferences prefs;
   bool positive = false;
   bool connectivity = true;
+  String quote = ' ';
 
   bool ai = false;
   File? _image;
@@ -133,7 +138,7 @@ class _smalldishesListState extends State<smalldishesList> {
     selectedLottie = _lottieFiles[_random.nextInt(_lottieFiles.length)];
     fetchAIKey();
     _createTutorial();
-    Timer(const Duration(seconds: 2), () {
+    Timer(const Duration(seconds: 3), () {
       setState(() {
         _isLoading = false;
       });
@@ -189,6 +194,28 @@ class _smalldishesListState extends State<smalldishesList> {
       key = response['key'] ?? 0;
     });
     print(key); // Replace with your column name
+  }
+
+  Future<void> fetchRandomQuote() async {
+    try {
+      final response = await supabase.from('kitchen_quotes').select('quote');
+
+      if (response.isNotEmpty) {
+        final randomIndex =
+            Random().nextInt(response.length); // Pick a random index
+        final randomQuote = response[randomIndex]['quote'];
+
+        setState(() {
+          quote = "- $randomQuote";
+        });
+
+        print(quote);
+      } else {
+        print('No quotes found');
+      }
+    } catch (error) {
+      print('Error fetching quote: $error');
+    }
   }
 
   void _startListening() async {
@@ -1588,61 +1615,60 @@ class _smalldishesListState extends State<smalldishesList> {
   }
 
   // Pick an image from the gallery or camera
-Future<void> _pickImage(ImageSource source) async {
-  try {
-    final pickedFile = await picker.pickImage(source: source);
-    
-    if (pickedFile == null) {
-      debugPrint("No image selected.");
-      return;
+  Future<void> _pickImage(ImageSource source) async {
+    try {
+      final pickedFile = await picker.pickImage(source: source);
+
+      if (pickedFile == null) {
+        debugPrint("No image selected.");
+        return;
+      }
+
+      File imageFile = File(pickedFile.path);
+
+      if (!await imageFile.exists()) {
+        debugPrint("Error: Picked file does not exist!");
+        return;
+      }
+
+      File? croppedFile = await _cropImage(imageFile);
+
+      if (croppedFile != null && mounted) {
+        setState(() {
+          _image = croppedFile;
+        });
+      }
+    } catch (e) {
+      debugPrint("Error picking image: $e");
     }
-
-    File imageFile = File(pickedFile.path);
-
-    if (!await imageFile.exists()) {
-      debugPrint("Error: Picked file does not exist!");
-      return;
-    }
-
-    File? croppedFile = await _cropImage(imageFile);
-
-    if (croppedFile != null && mounted) {
-      setState(() {
-        _image = croppedFile;
-      });
-    }
-  } catch (e) {
-    debugPrint("Error picking image: $e");
   }
-}
 
-Future<File?> _cropImage(File imageFile) async {
-  try {
-    CroppedFile? croppedFile = await ImageCropper().cropImage(
-      sourcePath: imageFile.path,
-      aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1), // 1:1 ratio
-      compressQuality: 100, // Max quality
-      uiSettings: [
-        AndroidUiSettings(
-          toolbarTitle: 'Crop Image',
-          toolbarColor: Colors.blue,
-          toolbarWidgetColor: Colors.white,
-          lockAspectRatio: true, // Lock to 1:1
-        ),
-        IOSUiSettings(
-          title: 'Crop Image',
-          aspectRatioLockEnabled: true,
-        ),
-      ],
-    );
+  Future<File?> _cropImage(File imageFile) async {
+    try {
+      CroppedFile? croppedFile = await ImageCropper().cropImage(
+        sourcePath: imageFile.path,
+        aspectRatio: CropAspectRatio(ratioX: 1, ratioY: 1), // 1:1 ratio
+        compressQuality: 100, // Max quality
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Image',
+            toolbarColor: Colors.blue,
+            toolbarWidgetColor: Colors.white,
+            lockAspectRatio: true, // Lock to 1:1
+          ),
+          IOSUiSettings(
+            title: 'Crop Image',
+            aspectRatioLockEnabled: true,
+          ),
+        ],
+      );
 
-    return croppedFile != null ? File(croppedFile.path) : null;
-  } catch (e) {
-    debugPrint("Error cropping image: $e");
-    return null;
+      return croppedFile != null ? File(croppedFile.path) : null;
+    } catch (e) {
+      debugPrint("Error cropping image: $e");
+      return null;
+    }
   }
-}
-
 
 /*   Future<void> generateAIImage(String serial) async {
     // Get the prompt from the TextField
@@ -2115,7 +2141,7 @@ Future<File?> _cropImage(File imageFile) async {
                       child: Text(
                         instructions[
                             _currentPage], // Display instruction for current page
-                        style:   GoogleFonts.hammersmithOne(
+                        style: GoogleFonts.hammersmithOne(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
                           color: Colors.black,
@@ -2263,7 +2289,7 @@ Future<File?> _cropImage(File imageFile) async {
                             Colors.transparent), // Disable splash effect
                       ),
                       child: Text(
-  'How to Add, Edit, or Remove a Dish',
+                        'How to Add, Edit, or Remove a Dish',
                         style: GoogleFonts.hammersmithOne(
                           fontSize: MediaQuery.of(context).size.width * 0.035,
                           color: Colors.black,
@@ -2734,14 +2760,36 @@ Future<File?> _cropImage(File imageFile) async {
             // The ListView to display the filtered notes
             Expanded(
               child: _isLoading
-                  ? Center(
-                      child: ColorFiltered(
-                        colorFilter: const ColorFilter.mode(
-                            Colors.white, BlendMode.srcIn),
-                        child: Lottie.asset(
-                          'assets/lottie_json/loadingspoons.json',
-                          width: screenWidth * 0.4,
-                        ),
+                  ? Align(
+                      alignment: Alignment.center,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          ColorFiltered(
+                            colorFilter: const ColorFilter.mode(
+                                Colors.white, BlendMode.srcIn),
+                            child: Lottie.asset(
+                              'assets/lottie_json/loadingspoons.json',
+                              width: screenWidth * 0.4,
+                            ),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: screenWidth * 0.05),
+                            child: Text(
+                              widget.quote??' ',
+                              textAlign: TextAlign.center,
+                              style: GoogleFonts.hammersmithOne(
+                                fontSize: screenWidth * 0.03,
+                                color: Colors.white70,
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: screenHeight * 0.3,
+                          )
+                        ],
                       ),
                     ) // Show loading indicator
                   : _sortededNotes.isEmpty
@@ -2788,7 +2836,8 @@ Future<File?> _cropImage(File imageFile) async {
                                     Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: ElevatedButton(
-                                        onPressed: () {
+                                        onPressed: () async {
+                                          await fetchRandomQuote();
                                           Navigator.pushReplacement(
                                             context,
                                             MaterialPageRoute(
@@ -2796,6 +2845,7 @@ Future<File?> _cropImage(File imageFile) async {
                                                   smalldishesList(
                                                 type: widget.type,
                                                 title: widget.title,
+                                                quote: quote,
                                               ),
                                             ),
                                           );
@@ -2882,26 +2932,26 @@ Future<File?> _cropImage(File imageFile) async {
                                   // Call your update function when a long press is detected
                                   updateDish(note, widget.type!, note.name);
                                 },
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.of(context).push(PageTransition(
-                                        curve: Curves.linear,
-                                        type: PageTransitionType
-                                            .rightToLeftWithFade,
-                                        duration: const Duration(
-                                            milliseconds:
-                                                300), // Adjust duration to slow down the transition
-                                        child: smallrecipe(
-                                          serial: note.serial,
-                                          type: widget.type,
-                                          dish: note.name,
-                                          category: note.category,
-                                          access: true,
-                                          background: colorList[
-                                              int.parse(widget.type!) - 1],
-                                          imageURL: note.imageUrl,
-                                        )));
-                                  });
+                                onTap: () async {
+                                  await fetchRandomQuote();
+                                  Navigator.of(context).push(PageTransition(
+                                      curve: Curves.linear,
+                                      type: PageTransitionType
+                                          .rightToLeftWithFade,
+                                      duration: const Duration(
+                                          milliseconds:
+                                              300), // Adjust duration to slow down the transition
+                                      child: smallrecipe(
+                                        serial: note.serial,
+                                        type: widget.type,
+                                        dish: note.name,
+                                        category: note.category,
+                                        access: true,
+                                        background: colorList[
+                                            int.parse(widget.type!) - 1],
+                                        imageURL: note.imageUrl,
+                                        quote: quote,
+                                      )));
                                 },
                                 child: AnimatedBuilder(
                                   animation: animation,
