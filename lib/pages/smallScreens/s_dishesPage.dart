@@ -568,6 +568,11 @@ class _smalldishesListState extends State<smalldishesList> {
                         ),
                       ],
                     ),
+                  if (ai)
+                    Text(
+                        '(AI Generated images might not be accurate sometimes)',
+                        style: GoogleFonts.hammersmithOne( fontSize: 8,
+                            color: colorList[int.parse(widget.type!) - 1])),
                 ],
               ),
             ),
@@ -2179,7 +2184,7 @@ class _smalldishesListState extends State<smalldishesList> {
             leading: Padding(
               padding: EdgeInsets.only(top: screenHeight * 0.015, left: 10),
               child: IconButton(
-                icon: Icon(FontAwesomeIcons.arrowDown, size: iconSize),
+                icon: Icon(FontAwesomeIcons.chevronDown, size: iconSize),
                 onPressed: () {
                   Navigator.pop(context);
                 },

@@ -160,7 +160,7 @@ class DishTile extends StatelessWidget {
                     ),
                   ),
                 ),
-                SizedBox(height: 8),
+                SizedBox(height: 12),
                 // Title
                 Expanded(
                   flex: 0,
@@ -173,7 +173,7 @@ class DishTile extends StatelessWidget {
                           Expanded(
                             child: Text(
                               text,
-                              maxLines: 1, // 👈 always 2 lines
+                              maxLines: 1,  
                               overflow: TextOverflow.ellipsis,
                               softWrap: true,
                               style: GoogleFonts.hammersmithOne(
@@ -266,13 +266,19 @@ class DishTile extends StatelessWidget {
             ),
           ),
           Positioned(
-            right: 15,
-            top: 15,
+            right: screenWidth > 600 ? 20 : 15,
+            top: screenWidth > 600 ? 20 : 15,
             child: Container(
               padding: const EdgeInsets.all(3),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(4), // 👈 rounded square
+                borderRadius: BorderRadius.circular(6),
+                border: Border.all(
+                  color: category == "1"
+                      ? Colors.red.shade400
+                      : Colors.green.shade400,
+                  width: 1,
+                ),
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withOpacity(0.15),

@@ -20,6 +20,12 @@ import 'package:material_dialogs/widgets/buttons/icon_outline_button.dart';
 // Make sure AuthService is available
 
 class ForgotPasswordScreen extends StatefulWidget {
+  ForgotPasswordScreen({
+    super.key,
+    required this.from,
+  });
+  String? from;
+
   @override
   _ForgotPasswordScreenState createState() => _ForgotPasswordScreenState();
 }
@@ -39,17 +45,28 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final int port = 465; // Port for TLS
   final String username = 'noreplyoraction@gmail.com';
 //final String password = 'dhur bvcc xvhu fqgg';
-  final String password = 'pyaf nqep hcif qnqk';
+  final String password = 'bleg aekf hbvf dodm';
 
   // Your custom HTML template
 
   @override
   void initState() {
     super.initState();
-    // Add listeners to check if all fields are filled
+
+    _loadEmailFromPrefs();
+
     _usernameController.addListener(_updateButtonState);
     _emailController.addListener(_updateButtonState);
     _passwordController.addListener(_updateButtonState);
+  }
+
+  Future<void> _loadEmailFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedEmail = prefs.getString('email');
+
+    if (savedEmail != null && savedEmail.isNotEmpty) {
+      _emailController.text = savedEmail;
+    }
   }
 
   @override
@@ -170,7 +187,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     const String upperCase = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
     const String lowerCase = 'abcdefghijklmnopqrstuvwxyz';
     const String numbers = '0123456789';
-    const String specialChars = '@#%^&*!()_+[]{}|;:,.<>?';
+    //const String specialChars = '@#%^&*!()_+[]{}|;:,.<>?';
+    const String specialChars = '@';
 
     // Combine all characters into one pool (without special characters initially)
     final String allCharacters = upperCase + lowerCase + numbers;
@@ -198,8 +216,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return passwordChars.join();
   }
 
-  
-
   Future<void> _signInWithEmailPassword() async {
     try {
       final response = await Supabase.instance.client
@@ -212,7 +228,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       if (data.isNotEmpty) {
         _sendForgotMail();
       } else {
-         const snackBar = SnackBar(
+        const snackBar = SnackBar(
           /// need to set following properties for best effect of awesome_snackbar_content
           elevation: 0,
           behavior: SnackBarBehavior.floating,
@@ -233,25 +249,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       }
     } catch (e) {
       print("Email sign-in error: $e");
-             const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Login failed!',
-            message: 'No Internet Connection',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Login failed!',
+          message: 'No Internet Connection',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
-
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
   }
 
@@ -262,24 +277,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     final recipient = _emailController.text.trim();
     if (recipient.isEmpty) {
-       const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Invalid!',
-            message: 'Please enter a valid email address',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Invalid!',
+          message: 'Please enter a valid email address',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
       return;
     }
 
@@ -296,7 +311,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final message = Message()
       ..from = Address(username, 'Cook Book')
       ..recipients.add(recipient)
-      ..subject = 'Your OTP for Cook Book'
+      ..subject = 'Your new password for Cook Book'
       ..html = htmlContent;
 
     await send(message, smtpServer);
@@ -320,7 +335,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         fit: BoxFit.contain,
       ),
       dialogWidth: kIsWeb ? 0.3 : null,
-      
       context: context,
       actions: [
         IconsButton(
@@ -363,8 +377,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           backgroundColor: Colors.transparent,
           title: Text(
             "",
-            style:
-                GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold, fontSize: 40),
+            style: GoogleFonts.hammersmithOne(
+                fontWeight: FontWeight.bold, fontSize: 40),
           ),
           leading: Padding(
             padding: const EdgeInsets.only(left: 10, bottom: 10),
@@ -417,13 +431,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      child: Image.asset(
-                        'assets/images/banner.png',
-                        width: screenWidth > 600
-                            ? screenWidth * 0.3
-                            : screenWidth * 0.4,
-                      ),
+                    Image.asset(
+                      'assets/images/banner.png',
+                      width: screenWidth > 600
+                          ? screenWidth * 0.3
+                          : screenWidth * 0.4,
                     ),
                     /*  SizedBox(height: screenHeight * 0.09),
                     Text(
@@ -455,7 +467,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
                           blurRadius: 8,
-                          offset: Offset(0, 4),
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
@@ -484,19 +496,24 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                             enabledBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
                                   30.0), // Rounded corners
-                              borderSide: BorderSide(color: Colors.transparent),
+                              borderSide: const BorderSide(color: Colors.transparent),
                             ),
                             focusedBorder: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(
                                   30.0), // Rounded corners
-                              borderSide: BorderSide(color: Colors.transparent),
+                              borderSide: const BorderSide(color: Colors.transparent),
                             ),
                             floatingLabelBehavior: FloatingLabelBehavior
                                 .never, // Prevent label from floating
                           ),
                           keyboardType: TextInputType.emailAddress,
                         ),
-                        SizedBox(height: screenHeight * 0.02),
+                        const SizedBox(height: 10),
+                        Text(
+                            'Enter your registered email to receive a new password.',
+                            style: GoogleFonts.hammersmithOne(
+                                fontSize: 12, color: Colors.grey)),
+                        const SizedBox(height: 10),
                         ElevatedButton.icon(
                           onPressed: _signInWithEmailPassword,
                           icon: _isSending
@@ -504,7 +521,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                                   size: screenWidth * 0.04,
                                   color: Colors.white,
                                 )
-                              : Icon(
+                              : const Icon(
                                   Icons.mail,
                                   color: Colors.white,
                                 ),
@@ -538,13 +555,18 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 padding: EdgeInsets.only(bottom: screenHeight * 0.05),
                 child: TextButton(
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => LoginScreen()),
-                    );
+                    widget.from == 'login'
+                        ? Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => LoginScreen()),
+                          )
+                        : Navigator.of(context).pop();
                   },
                   child: Text(
-                    "Back to Login",
+                    widget.from == 'login'
+                        ? "Back to Login"
+                        : "Back to Profile",
                     style: GoogleFonts.hammersmithOne(
                       color: Colors.white,
                       fontSize: screenWidth > 600
@@ -583,14 +605,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             labelText: label,
             hintText: hintText,
             filled: true,
-            fillColor: Color(0xFFFEE1D5),
+            fillColor: const Color(0xFFFEE1D5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
+            prefixIcon: Icon(icon, color: const Color(0xFF5C2C2C)),
             labelStyle: GoogleFonts.hammersmithOne(
-              color: Color(0xFF5C2C2C),
+              color: const Color(0xFF5C2C2C),
             ),
           ),
           validator: (value) {
@@ -625,14 +647,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             labelText: label,
             hintText: hintText,
             filled: true,
-            fillColor: Color(0xFFFEE1D5),
+            fillColor: const Color(0xFFFEE1D5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            prefixIcon: Icon(icon, color: Color(0xFF5C2C2C)),
+            prefixIcon: Icon(icon, color: const Color(0xFF5C2C2C)),
             labelStyle: GoogleFonts.hammersmithOne(
-              color: Color(0xFF5C2C2C),
+              color: const Color(0xFF5C2C2C),
             ),
           ),
           validator: (value) {
@@ -664,14 +686,14 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             labelText: 'Password',
             hintText: 'Enter your password',
             filled: true,
-            fillColor: Color(0xFFFEE1D5),
+            fillColor: const Color(0xFFFEE1D5),
             border: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
               borderSide: BorderSide.none,
             ),
-            prefixIcon: Icon(Icons.lock, color: Color(0xFF5C2C2C)),
+            prefixIcon: const Icon(Icons.lock, color: Color(0xFF5C2C2C)),
             labelStyle: GoogleFonts.hammersmithOne(
-              color: Color(0xFF5C2C2C),
+              color: const Color(0xFF5C2C2C),
             ),
           ),
           validator: (value) {

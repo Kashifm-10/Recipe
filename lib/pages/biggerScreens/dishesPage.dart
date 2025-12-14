@@ -134,17 +134,21 @@ class _dishesListState extends State<dishesList> {
   }
 
   Future<void> fetchAIKey() async {
-    final response = await supabase
-        .from('keys') // Replace with your table name
-        .select(
-            'key') // Replace with the column name where the serial is stored
-        .eq('name', 'imagine')
-        .single();
+    try {
+      final response = await supabase
+          .from('keys')
+          .select('key')
+          .eq('name', 'imagine1')
+          .limit(1);
 
-    setState(() {
-      key = response['key'] ?? 0;
-    });
-    print(key); // Replace with your column name
+      setState(() {
+        key = response.isNotEmpty ? response[0]['key'] as String : '';
+      });
+
+      print(key);
+    } catch (e) {
+      debugPrint('Error fetching AI key: $e');
+    }
   }
 
   void _startListening() async {
@@ -806,6 +810,12 @@ class _dishesListState extends State<dishesList> {
                         ),
                       ],
                     ),
+                  if (ai)
+                    Text(
+                        '(AI Generated images might not be accurate sometimes)',
+                        style: GoogleFonts.hammersmithOne(
+                            fontSize: 10,
+                            color: colorList[int.parse(widget.type!) - 1])),
                 ],
               ),
             ),
@@ -1828,7 +1838,7 @@ class _dishesListState extends State<dishesList> {
         screenWidth * 0.08; // Adjust icon size based on screen width
     final titleFontSize = screenWidth * 0.1;
     _filterAndSortNotes();
-    readDishes(widget.type!);
+    //readDishes(widget.type!);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -1857,7 +1867,7 @@ class _dishesListState extends State<dishesList> {
                   top: MediaQuery.of(context).size.width > 600 ? 20.0 : 15,
                   left: 10),
               child: IconButton(
-                icon: Icon(FontAwesomeIcons.arrowDown,
+                icon: Icon(FontAwesomeIcons.chevronDown,
                     size: MediaQuery.of(context).size.width > 600
                         ? 40
                         : iconSize),
@@ -2227,7 +2237,7 @@ class _dishesListState extends State<dishesList> {
                                 horizontal: 16.0, vertical: 8.0),
                             gridDelegate:
                                 SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2,
+                              crossAxisCount: 3,
                               crossAxisSpacing: 12.0,
                               mainAxisSpacing: 12.0,
                               childAspectRatio:

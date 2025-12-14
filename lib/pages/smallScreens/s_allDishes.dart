@@ -711,7 +711,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                       : MediaQuery.of(context).size.height * 0.02,
                   left: 10),
               child: IconButton(
-                icon: Icon(FontAwesomeIcons.arrowDown,
+                icon: Icon(FontAwesomeIcons.chevronDown,
                     size: MediaQuery.of(context).size.width > 600
                         ? 40
                         : iconSize),

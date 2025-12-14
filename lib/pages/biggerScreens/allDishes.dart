@@ -437,7 +437,7 @@ class _alldishesListState extends State<alldishesList> {
   }
 
   Future<void> _loadData() async {
-    final noteDatabase = context.watch<database>();
+    final noteDatabase = context.read<database>();
     await noteDatabase.fetchAllIngredients();
     //setState(() {
     // _isLoading = false;
@@ -609,8 +609,8 @@ class _alldishesListState extends State<alldishesList> {
     // Update notes based on selected filter, sort, and search
     _filterAndSortNotes();
     //_filterbying();
-    readDishes();
-    _loadData();
+    // readDishes();
+    // _loadData();
 
     return Scaffold(
       backgroundColor: widget.scafColor,
@@ -638,7 +638,7 @@ class _alldishesListState extends State<alldishesList> {
                   top: MediaQuery.of(context).size.width > 600 ? 20.0 : 15,
                   left: 10),
               child: IconButton(
-                icon: Icon(FontAwesomeIcons.arrowDown,
+                icon: Icon(FontAwesomeIcons.chevronDown,
                     size: MediaQuery.of(context).size.width > 600
                         ? 40
                         : iconSize),
@@ -1222,40 +1222,41 @@ class _alldishesListState extends State<alldishesList> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Padding(
-                                  padding: const EdgeInsets.only(left: 170.0),
-                                  child: ElevatedButton(
-                                    onPressed: () {
-                                      _resetAll();
-                                      _searchControllerIng.clear();
-                                      setState(() {
-                                        searchQueryIng =
-                                            ''; // Reset the search query
-                                        _filterbying(); // Call your filtering method
-                                      });
-                                    },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor:
-                                          Colors.red, // Button background color
-                                      foregroundColor:
-                                          Colors.white, // Text color
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(
-                                            8.0), // Rounded corners
+                                if (selectedIngredients.isNotEmpty)
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 170.0),
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        _resetAll();
+                                        _searchControllerIng.clear();
+                                        setState(() {
+                                          searchQueryIng =
+                                              ''; // Reset the search query
+                                          _filterbying(); // Call your filtering method
+                                        });
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors
+                                            .red, // Button background color
+                                        foregroundColor:
+                                            Colors.white, // Text color
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                              8.0), // Rounded corners
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 12.0,
+                                            vertical: 8.0), // Smaller padding
+                                        minimumSize: const Size(50,
+                                            30), // Ensures the button has a small size
                                       ),
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 12.0,
-                                          vertical: 8.0), // Smaller padding
-                                      minimumSize: const Size(50,
-                                          30), // Ensures the button has a small size
-                                    ),
-                                    child: Text(
-                                      'Reset All',
-                                      style: GoogleFonts.hammersmithOne(
-                                          fontSize: 12), // Smaller font size
+                                      child: Text(
+                                        'Reset All',
+                                        style: GoogleFonts.hammersmithOne(
+                                            fontSize: 12), // Smaller font size
+                                      ),
                                     ),
                                   ),
-                                ),
                                 Expanded(
                                   child: SizedBox(
                                     width: 250,

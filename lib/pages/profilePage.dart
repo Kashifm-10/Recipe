@@ -6,6 +6,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gif/gif.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:recipe/pages/forgotPassword.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:recipe/pages/loginPage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -386,188 +387,180 @@ class _ProfilePageState extends State<ProfilePage>
                               final TextEditingController _emailController =
                                   TextEditingController();
 
-                              return Container(
-                                child: AlertDialog(
-                                  title: Text('Enter New Password',
-                                      style: GoogleFonts.hammersmithOne()),
-                                  content: Form(
-                                    key: _formKey,
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        // Current Password Field
-                                        TextFormField(
-                                          controller:
-                                              _currentPasswordController,
-                                          obscureText: true,
-                                          decoration: InputDecoration(
-                                            labelText: 'Current Password',
-                                            hintText:
-                                                'Enter your current password',
-                                            filled: true,
-                                            fillColor: const Color(0xFFFEE1D5),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            /*  prefixIcon: Icon(Icons.lock,
-                                                color: Color(0xFF5C2C2C)), */
-                                            labelStyle:
-                                                GoogleFonts.hammersmithOne(
-                                              color: const Color(0xFF5C2C2C),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.never,
+                              return AlertDialog(
+                                backgroundColor:
+                                    const Color.fromARGB(255, 255, 255, 255),
+                                title: Text('Enter New Password',
+                                    style: GoogleFonts.hammersmithOne()),
+                                content: Form(
+                                  key: _formKey,
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      // Current Password Field
+                                      TextFormField(
+                                        controller: _currentPasswordController,
+                                        obscureText: true,
+                                        decoration: InputDecoration(
+                                          labelText: 'Current Password',
+                                          hintText:
+                                              'Enter your current password',
+                                          filled: true,
+                                          fillColor: Colors.grey.shade300,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide.none,
                                           ),
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Current password is required';
-                                            }
-                                            return null;
-                                          },
+                                          /*  prefixIcon: Icon(Icons.lock,
+                                              color: Color(0xFF5C2C2C)), */
+                                          labelStyle:
+                                              GoogleFonts.hammersmithOne(
+                                                  color: Colors.grey.shade900),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
                                         ),
-                                        const SizedBox(height: 10),
-
-                                        // New Password Field
-                                        TextFormField(
-                                          controller: _newPasswordController,
-                                          obscureText: true,
-                                          decoration: InputDecoration(
-                                            labelText: 'New Password',
-                                            hintText: 'Enter your new password',
-                                            filled: true,
-                                            fillColor: const Color(0xFFFEE1D5),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            /*  prefixIcon: Icon(Icons.lock,
-                                                color: Color(0xFF5C2C2C)), */
-                                            labelStyle:
-                                                GoogleFonts.hammersmithOne(
-                                              color: const Color(0xFF5C2C2C),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.never,
-                                          ),
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'Password is required';
-                                            }
-                                            if (value.length < 8) {
-                                              return 'Password must be at least 8 characters';
-                                            }
-                                            final regex = RegExp(
-                                                r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$');
-                                            if (!regex.hasMatch(value)) {
-                                              return 'Password requires uppercase, lowercase, number, and symbol';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                        const SizedBox(height: 10),
-
-                                        // Confirm Password Field
-                                        TextFormField(
-                                          controller:
-                                              _confirmPasswordController,
-                                          obscureText: true,
-                                          decoration: InputDecoration(
-                                            labelText: 'Confirm Password',
-                                            hintText:
-                                                'Re-enter your new password',
-                                            filled: true,
-                                            fillColor: const Color(0xFFFEE1D5),
-                                            border: OutlineInputBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(12),
-                                              borderSide: BorderSide.none,
-                                            ),
-                                            /*  prefixIcon: Icon(Icons.lock,
-                                                color: Color(0xFF5C2C2C)), */
-                                            labelStyle:
-                                                GoogleFonts.hammersmithOne(
-                                              color: const Color(0xFF5C2C2C),
-                                            ),
-                                            floatingLabelBehavior:
-                                                FloatingLabelBehavior.never,
-                                          ),
-                                          validator: (value) {
-                                            if (value !=
-                                                _newPasswordController.text) {
-                                              return 'Passwords do not match';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.of(context)
-                                            .pop(); // Close the dialog
-                                      },
-                                      child: Text('Cancel',
-                                          style: GoogleFonts.hammersmithOne()),
-                                    ),
-                                    ElevatedButton(
-                                      onPressed: () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          // Validate Current Password with Supabase
-                                          final validateResponse =
-                                              await Supabase
-                                                  .instance.client
-                                                  .from('users')
-                                                  .select(
-                                                      'email, password, name')
-                                                  .eq('email',
-                                                      email!.toLowerCase())
-                                                  .eq(
-                                                      'password',
-                                                      _currentPasswordController
-                                                          .text);
-
-                                          if (validateResponse.isEmpty) {
-                                            const snackBar = SnackBar(
-                                              /// need to set following properties for best effect of awesome_snackbar_content
-                                              elevation: 0,
-                                              behavior:
-                                                  SnackBarBehavior.floating,
-                                              backgroundColor:
-                                                  Colors.transparent,
-                                              content: AwesomeSnackbarContent(
-                                                color: Colors.red,
-                                                title: 'Oh Snap!',
-                                                message:
-                                                    'Invalid current password',
-
-                                                /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-                                                contentType:
-                                                    ContentType.failure,
-                                                inMaterialBanner: true,
-                                              ),
-                                            );
-
-                                            return;
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Current password is required';
                                           }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
 
-                                          // Update Password in Supabase
-                                          final updateResponse = await Supabase
-                                              .instance.client
-                                              .from('users')
-                                              .update({
-                                            'password':
-                                                _newPasswordController.text
-                                          }).eq('email', email!.toLowerCase());
+                                      // New Password Field
+                                      TextFormField(
+                                        controller: _newPasswordController,
+                                        obscureText: true,
+                                        decoration: InputDecoration(
+                                          labelText: 'New Password',
+                                          hintText: 'Enter your new password',
+                                          filled: true,
+                                          fillColor: Colors.grey.shade300,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          /*  prefixIcon: Icon(Icons.lock,
+                                              color: Color(0xFF5C2C2C)), */
+                                          labelStyle:
+                                              GoogleFonts.hammersmithOne(
+                                                  color: Colors.grey.shade900),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
+                                        ),
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'Password is required';
+                                          }
+                                          if (value.length < 8) {
+                                            return 'Password must be at least 8 characters';
+                                          }
+                                          final regex = RegExp(
+                                              r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>]).{8,}$');
+                                          if (!regex.hasMatch(value)) {
+                                            return 'Password requires uppercase, lowercase, number, and symbol';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      const SizedBox(height: 10),
 
-                                          Navigator.of(context)
-                                              .pop(); // Close the dialog
+                                      // Confirm Password Field
+                                      TextFormField(
+                                        controller: _confirmPasswordController,
+                                        obscureText: true,
+                                        decoration: InputDecoration(
+                                          labelText: 'Confirm Password',
+                                          hintText:
+                                              'Re-enter your new password',
+                                          filled: true,
+                                          fillColor: Colors.grey.shade300,
+                                          border: OutlineInputBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12),
+                                            borderSide: BorderSide.none,
+                                          ),
+                                          /*  prefixIcon: Icon(Icons.lock,
+                                              color: Color(0xFF5C2C2C)), */
+                                          labelStyle:
+                                              GoogleFonts.hammersmithOne(
+                                                  color: Colors.grey.shade900),
+                                          floatingLabelBehavior:
+                                              FloatingLabelBehavior.never,
+                                        ),
+                                        validator: (value) {
+                                          if (value !=
+                                              _newPasswordController.text) {
+                                            return 'Passwords do not match';
+                                          }
+                                          return null;
+                                        },
+                                      ),
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(top: 15.0),
+                                        child: Align(
+                                          alignment: Alignment.bottomLeft,
+                                          child: GestureDetector(
+                                            onTap: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        ForgotPasswordScreen(
+                                                          from: 'profile',
+                                                        )),
+                                              );
+                                            },
+                                            child: Text(
+                                              'Forgot Password?',
+                                              style: GoogleFonts.hammersmithOne(
+                                                  color:
+                                                      const Color(0xFFF59E9E),
+                                                  fontSize: 10
+                                                  //fontWeight: FontWeight.bold,
+                                                  ),
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.of(context)
+                                          .pop(); // Close the dialog
+                                    },
+                                    child: Text('Cancel',
+                                        style: GoogleFonts.hammersmithOne(
+                                          color: Colors.black,
+                                        )),
+                                  ),
+                                  ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      elevation: 0,
+                                      backgroundColor: const Color.fromARGB(
+                                          255, 247, 172, 207),
+                                    ),
+                                    onPressed: () async {
+                                      if (_formKey.currentState!.validate()) {
+                                        // Validate Current Password with Supabase
+                                        final validateResponse = await Supabase
+                                            .instance.client
+                                            .from('users')
+                                            .select('email, password, name')
+                                            .eq('email', email!.toLowerCase())
+                                            .eq(
+                                                'password',
+                                                _currentPasswordController
+                                                    .text);
+
+                                        if (validateResponse.isEmpty) {
                                           const snackBar = SnackBar(
                                             /// need to set following properties for best effect of awesome_snackbar_content
                                             elevation: 0,
@@ -575,25 +568,56 @@ class _ProfilePageState extends State<ProfilePage>
                                             backgroundColor: Colors.transparent,
                                             content: AwesomeSnackbarContent(
                                               color: Colors.red,
-                                              title: 'Yay!',
+                                              title: 'Oh Snap!',
                                               message:
-                                                  'Password changed successfully!',
+                                                  'Invalid current password',
 
                                               /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
                                               contentType: ContentType.failure,
                                               inMaterialBanner: true,
                                             ),
                                           );
-                                          ScaffoldMessenger.of(context)
-                                            ..hideCurrentSnackBar()
-                                            ..showSnackBar(snackBar);
+
+                                          return;
                                         }
-                                      },
-                                      child: Text('Confirm',
-                                          style: GoogleFonts.hammersmithOne()),
-                                    ),
-                                  ],
-                                ),
+
+                                        // Update Password in Supabase
+                                        final updateResponse = await Supabase
+                                            .instance.client
+                                            .from('users')
+                                            .update({
+                                          'password':
+                                              _newPasswordController.text
+                                        }).eq('email', email!.toLowerCase());
+
+                                        Navigator.of(context)
+                                            .pop(); // Close the dialog
+                                        const snackBar = SnackBar(
+                                          /// need to set following properties for best effect of awesome_snackbar_content
+                                          elevation: 0,
+                                          behavior: SnackBarBehavior.floating,
+                                          backgroundColor: Colors.transparent,
+                                          content: AwesomeSnackbarContent(
+                                            color: Colors.green,
+                                            title: 'Yay!',
+                                            message:
+                                                'Password changed successfully!',
+
+                                            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+                                            contentType: ContentType.success,
+                                            inMaterialBanner: true,
+                                          ),
+                                        );
+                                        ScaffoldMessenger.of(context)
+                                          ..hideCurrentSnackBar()
+                                          ..showSnackBar(snackBar);
+                                      }
+                                    },
+                                    child: Text('Confirm',
+                                        style: GoogleFonts.hammersmithOne(
+                                            color: Colors.white)),
+                                  ),
+                                ],
                               );
                             },
                           );
@@ -660,7 +684,7 @@ class _ProfilePageState extends State<ProfilePage>
                             await firebase_auth.FirebaseAuth.instance.signOut();
                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setBool("isLoggedIn", false);
-
+                            await prefs.remove('email');
                             Navigator.pushAndRemoveUntil(
                               context,
                               MaterialPageRoute(

@@ -22,6 +22,14 @@
           }
         },
         {
+          "client_id": "1081967173605-cl8vfjpnmgvht34ta9e7lnono1r3l6kc.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.recipe",
+            "certificate_hash": "54e90b928d5e2e2637877d2107f7abfdd408c626"
+          }
+        },
+        {
           "client_id": "1081967173605-v7f79g4n0rv2ocd0uu9uterh554fhvu5.apps.googleusercontent.com",
           "client_type": 3
         }

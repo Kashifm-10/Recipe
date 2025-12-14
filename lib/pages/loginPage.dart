@@ -60,7 +60,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   : const MySmallHomePage()),
         );
       } else {
-       const snackBar = SnackBar(
+        const snackBar = SnackBar(
           /// need to set following properties for best effect of awesome_snackbar_content
           elevation: 0,
           behavior: SnackBarBehavior.floating,
@@ -80,25 +80,24 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       print("Email sign-in error: $e");
-            const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'Login failed!',
-            message: 'No Internet Connection',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'Login failed!',
+          message: 'No Internet Connection',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
-
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     }
     setState(() {
       _isEmailSignInInProgress = false;
@@ -113,25 +112,24 @@ class _LoginScreenState extends State<LoginScreen> {
     try {
       await AuthService().signInWithGoogle(context);
     } catch (e) {
-             const snackBar = SnackBar(
-          /// need to set following properties for best effect of awesome_snackbar_content
-          elevation: 0,
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Colors.transparent,
-          content: AwesomeSnackbarContent(
-            color: Colors.red,
-            title: 'OOPS!',
-            message: 'Something went wrong',
+      const snackBar = SnackBar(
+        /// need to set following properties for best effect of awesome_snackbar_content
+        elevation: 0,
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: Colors.transparent,
+        content: AwesomeSnackbarContent(
+          color: Colors.red,
+          title: 'OOPS!',
+          message: 'Something went wrong',
 
-            /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
-            contentType: ContentType.failure,
-            inMaterialBanner: true,
-          ),
-        );
-        ScaffoldMessenger.of(context)
-          ..hideCurrentSnackBar()
-          ..showSnackBar(snackBar);
-
+          /// change contentType to ContentType.success, ContentType.warning or ContentType.help for variants
+          contentType: ContentType.failure,
+          inMaterialBanner: true,
+        ),
+      );
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(snackBar);
     } finally {
       setState(() {
         _isGoogleSignInInProgress = false;
@@ -321,7 +319,9 @@ class _LoginScreenState extends State<LoginScreen> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => ForgotPasswordScreen()),
+                                builder: (context) => ForgotPasswordScreen(
+                                      from: 'login',
+                                    )),
                           );
                         },
                         child: Text(
