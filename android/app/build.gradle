@@ -62,10 +62,10 @@ flutter {
 
 dependencies {
     // Firebase BoM to manage versions of Firebase libraries
-    implementation platform('com.google.firebase:firebase-bom:33.5.1')
+    // implementation platform('com.google.firebase:firebase-bom:33.5.1')
 
-    // Add Firebase dependencies you want to use. Example:
-    implementation 'com.google.firebase:firebase-auth'  // Firebase Auth
-    implementation 'com.google.firebase:firebase-firestore'  // Firestore
-    // Other Firebase products can be added as needed.
+    // // Add Firebase dependencies you want to use. Example:
+    // implementation 'com.google.firebase:firebase-auth'  // Firebase Auth
+    // implementation 'com.google.firebase:firebase-firestore'  // Firestore
+    // // Other Firebase products can be added as needed.
 }

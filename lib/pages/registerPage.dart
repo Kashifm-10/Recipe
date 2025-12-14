@@ -184,7 +184,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     });
   }
 
-  Future<void> _signInWithGoogle() async {
+  /* Future<void> _signInWithGoogle() async {
     setState(() {
       _isGoogleSignInInProgress = true;
     });
@@ -216,7 +216,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       });
     }
   }
-
+ */
   @override
   Widget build(BuildContext context) {
     final screenHeight = MediaQuery.of(context).size.height;
@@ -358,7 +358,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                                       ),
                           ),
                         ),
-                        Text(
+                        /* Text(
                           'or',
                           style: GoogleFonts.hammersmithOne(
                               color: const Color(0xFFF59E9E),
@@ -395,7 +395,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                        ),
+                        ), */
                       ],
                     ),
                   ),

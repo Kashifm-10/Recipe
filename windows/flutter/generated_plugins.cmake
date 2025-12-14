@@ -6,11 +6,12 @@ list(APPEND FLUTTER_PLUGIN_LIST
   app_links
   connectivity_plus
   file_selector_windows
-  firebase_auth
-  firebase_core
   isar_flutter_libs
   rive_common
+  screen_retriever_windows
   url_launcher_windows
+  window_manager
+  window_size
 )
 
 list(APPEND FLUTTER_FFI_PLUGIN_LIST

@@ -1,8 +1,7 @@
 import 'dart:math';
 
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:recipe/pages/biggerScreens/home.dart';
 import 'package:recipe/pages/loginPage.dart';
@@ -44,7 +43,7 @@ class AuthService {
     return passwordChars.join();
   }
 
-  Future<void> signInWithGoogle(BuildContext context) async {
+  /* Future<void> signInWithGoogle(BuildContext context) async {
     try {
       // Start the Google Sign-In process
       final GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
@@ -177,7 +176,7 @@ class AuthService {
   Future<void> signOut(BuildContext context) async {
     try {
       // Sign out from Firebase
-      await FirebaseAuth.instance.signOut();
+    //  await FirebaseAuth.instance.signOut();
 
       // Sign out from Google
       await GoogleSignIn().signOut();
@@ -193,5 +192,5 @@ class AuthService {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text('Sign out failed: $e')));
     }
-  }
+  } */
 }

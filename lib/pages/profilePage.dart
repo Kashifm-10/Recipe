@@ -1,6 +1,5 @@
 import 'package:awesome_snackbar_content/awesome_snackbar_content.dart';
-import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
-import 'package:flutter/material.dart';
+ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:gif/gif.dart';
@@ -23,8 +22,7 @@ class _ProfilePageState extends State<ProfilePage>
     with TickerProviderStateMixin {
   late GifController _controller;
 
-  final firebase_auth.User? user =
-      firebase_auth.FirebaseAuth.instance.currentUser;
+   
   String? email = '';
   String? username = '';
   String? date = '';
@@ -260,7 +258,7 @@ class _ProfilePageState extends State<ProfilePage>
                 // Profile Picture
                 CircleAvatar(
                   radius: 60,
-                  backgroundImage: NetworkImage(user?.photoURL ??
+                  backgroundImage: NetworkImage( 
                       'https://images.deepai.org/art-image/d02f0423812a476e90df7368aafb8062/cookbook-minimalist-logo-b477d8-thumb.jpg'),
                   backgroundColor: Colors.white.withOpacity(0.3),
                 ),
@@ -286,7 +284,7 @@ class _ProfilePageState extends State<ProfilePage>
                           FittedBox(
                             fit: BoxFit.scaleDown,
                             child: Text(
-                              toTitleCase(user?.displayName ?? username!),
+                              toTitleCase(  username!),
                               style: GoogleFonts.hammersmithOne(
                                 fontWeight: FontWeight.bold,
                                 fontSize:
@@ -296,7 +294,7 @@ class _ProfilePageState extends State<ProfilePage>
                             ),
                           ),
                           Text(
-                            user?.email ?? email!,
+                            email!,
                             style: GoogleFonts.hammersmithOne(
                                 fontSize:
                                     MediaQuery.of(context).size.width * 0.03,
@@ -681,8 +679,7 @@ class _ProfilePageState extends State<ProfilePage>
                           if (confirmLogout) {
                             // Logout logic
                             await GoogleSignIn().signOut();
-                            await firebase_auth.FirebaseAuth.instance.signOut();
-                            final prefs = await SharedPreferences.getInstance();
+                             final prefs = await SharedPreferences.getInstance();
                             await prefs.setBool("isLoggedIn", false);
                             await prefs.remove('email');
                             Navigator.pushAndRemoveUntil(

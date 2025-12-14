@@ -104,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
-  Future<void> _signInWithGoogle() async {
+  /* Future<void> _signInWithGoogle() async {
     setState(() {
       _isGoogleSignInInProgress = true;
     });
@@ -135,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
         _isGoogleSignInInProgress = false;
       });
     }
-  }
+  } */
 
   @override
   Widget build(BuildContext context) {
@@ -274,7 +274,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                     ),
                         ),
                       ),
-                      Text(
+/*                       Text(
                         'or',
                         style: GoogleFonts.hammersmithOne(
                             color: const Color(0xFFF59E9E),
@@ -313,7 +313,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
                       ),
-                      SizedBox(height: screenHeight * 0.02),
+ */                      SizedBox(height: screenHeight * 0.02),
                       GestureDetector(
                         onTap: () {
                           Navigator.push(
