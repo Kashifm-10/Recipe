@@ -640,9 +640,7 @@ class _ProfilePageState extends State<ProfilePage>
                               fontWeight: FontWeight.bold),
                         ),
                       ),
-                      /* SizedBox(
-                          height: MediaQuery.of(context).size.height * 0.01), */
-
+                      const SizedBox(height: 10),
                       ElevatedButton(
                         onPressed: () async {
                           bool confirmLogout = await showDialog<bool>(
