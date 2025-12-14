@@ -33,7 +33,6 @@ import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'dart:async'; // For using Timer
 
-
 class smallalldishesList extends StatefulWidget {
   smallalldishesList({super.key, required this.title, required this.scafColor});
   String? title;
@@ -55,8 +54,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
   List<String> finalSerials = [];
   bool _isSearchVisible = false;
   final FocusNode _focusNode = FocusNode();
-    bool connectivity = true;
-
+  bool connectivity = true;
 
   late SharedPreferences prefs;
 
@@ -87,7 +85,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
   ];
   final Random _random = Random();
 
-    final List<String> _lottieFiles = [
+  final List<String> _lottieFiles = [
     'assets/lottie_json/cat.json',
     'assets/lottie_json/ghost.json',
     'assets/lottie_json/fall.json',
@@ -140,7 +138,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
   @override
   void initState() {
     super.initState();
-        printCurrentConnection();
+    printCurrentConnection();
     selectedLottie = _lottieFiles[_random.nextInt(_lottieFiles.length)];
 
     _createTutorial();
@@ -161,7 +159,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
     _speech = stt.SpeechToText();
   }
 
-    Future<void> printCurrentConnection() async {
+  Future<void> printCurrentConnection() async {
     setState(() {
       connectivity = true;
     });
@@ -194,7 +192,6 @@ class _smallalldishesListState extends State<smallalldishesList> {
       print('Unknown connectivity status. $connectivity');
     }
   }
-
 
   Future<void> fetchSortingOptions() async {
     final response = await supabase
@@ -545,11 +542,8 @@ class _smallalldishesListState extends State<smallalldishesList> {
   }
 
   Future<void> _loadData() async {
-    final noteDatabase = context.watch<database>();
+    final noteDatabase = context.read<database>();
     await noteDatabase.fetchAllIngredients();
-    //setState(() {
-    // _isLoading = false;
-    //});
   }
 
 // Function to handle selection/deselection of ingredients
@@ -680,7 +674,6 @@ class _smallalldishesListState extends State<smallalldishesList> {
     final currentAllIng = noteDatabase.currentAllIng;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
-    
 
     // Adjust sizes dynamically
     final iconSize =
@@ -709,6 +702,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
             toolbarHeight: screenHeight * 0.08,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             foregroundColor: Colors.white,
             leading: Padding(
               padding: EdgeInsets.only(
@@ -765,39 +759,16 @@ class _smallalldishesListState extends State<smallalldishesList> {
                 scrollDirection: Axis.horizontal,
                 child: Padding(
                   padding: const EdgeInsets.only(top: 10.0),
-                  child: connectivity? Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(
-                              15.0), // All corners rounded
-                          // Rounded except top-right and bottom-right
-                          boxShadow: const [
-                            BoxShadow(
-                              color: Colors.transparent,
-                              spreadRadius: 0,
-                              blurRadius: 0,
-                            ),
-                          ],
-                        ),
-                        child: Row(
+                  child: connectivity
+                      ? Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Container(
-                              margin: const EdgeInsets.all(0),
-                              width: MediaQuery.of(context).size.width * 0.125,
-                              height:
-                                  MediaQuery.of(context).size.height * 0.036,
                               decoration: BoxDecoration(
-                                color: Colors.transparent,
-                                borderRadius: !_isSearchVisible
-                                    ? BorderRadius.circular(
-                                        15.0) // All corners rounded
-                                    : const BorderRadius.only(
-                                        topLeft: Radius.circular(15.0),
-                                        bottomLeft: Radius.circular(15.0),
-                                      ), // Rounded except top-right and bottom-right
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(
+                                    15.0), // All corners rounded
+                                // Rounded except top-right and bottom-right
                                 boxShadow: const [
                                   BoxShadow(
                                     color: Colors.transparent,
@@ -807,345 +778,435 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                 ],
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  IconButton(
-                                    icon: Icon(
-                                      _isSearchVisible
-                                          ? Icons.arrow_back
-                                          : Icons.search,
-                                      size: MediaQuery.of(context).size.width *
-                                          0.045,
+                                  Container(
+                                    margin: const EdgeInsets.all(0),
+                                    width: MediaQuery.of(context).size.width *
+                                        0.125,
+                                    height: MediaQuery.of(context).size.height *
+                                        0.036,
+                                    decoration: BoxDecoration(
+                                      color: Colors.transparent,
+                                      borderRadius: !_isSearchVisible
+                                          ? BorderRadius.circular(
+                                              15.0) // All corners rounded
+                                          : const BorderRadius.only(
+                                              topLeft: Radius.circular(15.0),
+                                              bottomLeft: Radius.circular(15.0),
+                                            ), // Rounded except top-right and bottom-right
+                                      boxShadow: const [
+                                        BoxShadow(
+                                          color: Colors.transparent,
+                                          spreadRadius: 0,
+                                          blurRadius: 0,
+                                        ),
+                                      ],
                                     ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _isSearchVisible = !_isSearchVisible;
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        IconButton(
+                                          icon: Icon(
+                                            _isSearchVisible
+                                                ? Icons.arrow_back
+                                                : Icons.search,
+                                            size: MediaQuery.of(context)
+                                                    .size
+                                                    .width *
+                                                0.045,
+                                          ),
+                                          onPressed: () {
+                                            setState(() {
+                                              _isSearchVisible =
+                                                  !_isSearchVisible;
 
-                                        if (!_isSearchVisible) {
-                                          _searchController.clear();
-                                          searchQuery = '';
-                                          _filterAndSortNotes();
-                                        }
-                                      });
+                                              if (!_isSearchVisible) {
+                                                _searchController.clear();
+                                                searchQuery = '';
+                                                _filterAndSortNotes();
+                                              }
+                                            });
 
-                                      if (_isSearchVisible) {
-                                        WidgetsBinding.instance
-                                            .addPostFrameCallback((_) {
-                                          FocusScope.of(context)
-                                              .requestFocus(_focusNode);
-                                        });
-                                      }
-                                    },
+                                            if (_isSearchVisible) {
+                                              WidgetsBinding.instance
+                                                  .addPostFrameCallback((_) {
+                                                FocusScope.of(context)
+                                                    .requestFocus(_focusNode);
+                                              });
+                                            }
+                                          },
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  AnimatedSize(
+                                    duration: const Duration(milliseconds: 300),
+                                    curve: Curves.easeInOut,
+                                    child: _isSearchVisible
+                                        ? Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                horizontal: 0.0),
+                                            child: Container(
+                                              margin: const EdgeInsets.all(0),
+                                              width: MediaQuery.of(context)
+                                                      .size
+                                                      .width *
+                                                  0.81,
+                                              height: MediaQuery.of(context)
+                                                      .size
+                                                      .height *
+                                                  0.035,
+                                              decoration: const BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius: BorderRadius.only(
+                                                  topRight:
+                                                      Radius.circular(15.0),
+                                                  bottomRight:
+                                                      Radius.circular(15.0),
+                                                  topLeft:
+                                                      Radius.circular(15.0),
+                                                  bottomLeft:
+                                                      Radius.circular(15.0),
+                                                ),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black26,
+                                                    spreadRadius: 0,
+                                                    blurRadius: 2,
+                                                  ),
+                                                ],
+                                              ),
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceBetween,
+                                                children: [
+                                                  Expanded(
+                                                    child: TextField(
+                                                      controller:
+                                                          _searchController,
+                                                      focusNode: _focusNode,
+                                                      decoration:
+                                                          InputDecoration(
+                                                        hintText:
+                                                            'Search Dishes',
+                                                        border:
+                                                            InputBorder.none,
+                                                        contentPadding:
+                                                            const EdgeInsets
+                                                                .symmetric(
+                                                          vertical: 8,
+                                                          horizontal: 12,
+                                                        ),
+                                                        suffixIcon: Row(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .end,
+                                                          mainAxisSize:
+                                                              MainAxisSize.min,
+                                                          children: [
+                                                            IconButton(
+                                                              icon: const Icon(
+                                                                Ionicons
+                                                                    .close_circle,
+                                                                color:
+                                                                    Colors.grey,
+                                                                size: 20,
+                                                              ),
+                                                              onPressed: () {
+                                                                _searchController
+                                                                    .clear();
+                                                                setState(() {
+                                                                  searchQuery =
+                                                                      '';
+                                                                  _filterAndSortNotes();
+                                                                });
+                                                              },
+                                                            ),
+                                                            const Text('|'),
+                                                            IconButton(
+                                                              icon: Icon(
+                                                                _isListening
+                                                                    ? Icons.mic
+                                                                    : Icons
+                                                                        .mic_none,
+                                                                color:
+                                                                    _isListening
+                                                                        ? Colors
+                                                                            .red
+                                                                        : Colors
+                                                                            .grey,
+                                                                size: 20,
+                                                              ),
+                                                              onPressed: !_isListening
+                                                                  ? _startListening
+                                                                  : _stopListening,
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                      onChanged: (value) {
+                                                        setState(() {
+                                                          searchQuery = value
+                                                              .toLowerCase();
+                                                          _filterAndSortNotes();
+                                                        });
+                                                      },
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          )
+                                        : Container(),
                                   ),
                                 ],
                               ),
                             ),
-                            AnimatedSize(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                              child: _isSearchVisible
-                                  ? Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 0.0),
-                                      child: Container(
-                                        margin: const EdgeInsets.all(0),
-                                        width:
-                                            MediaQuery.of(context).size.width *
-                                                0.81,
+                            SizedBox(
+                                width:
+                                    MediaQuery.of(context).size.width * 0.01),
+                            /*  SizedBox(
+                          width: _isSearchVisible
+                              ? MediaQuery.of(context).size.width * 0.01
+                              : MediaQuery.of(context).size.width * 0.14), */
+                            Row(
+                              children: [
+                                Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(horizontal: 0),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      // Your existing toggle switch
+
+                                      AnimatedToggleSwitch<int>.size(
+                                        key: _categoryButtonKey,
+                                        textDirection: TextDirection.rtl,
+                                        current: _currentIndex,
+                                        values: const [2, 1, 0],
+                                        iconOpacity: 0.50,
                                         height:
                                             MediaQuery.of(context).size.height *
                                                 0.035,
-                                        decoration: const BoxDecoration(
-                                          color: Colors.white,
-                                          borderRadius: BorderRadius.only(
-                                            topRight: Radius.circular(15.0),
-                                            bottomRight: Radius.circular(15.0),
-                                            topLeft: Radius.circular(15.0),
-                                            bottomLeft: Radius.circular(15.0),
-                                          ),
+                                        indicatorSize: const Size.fromWidth(37),
+                                        spacing: 0,
+                                        iconBuilder: iconBuilder,
+                                        borderWidth: 1.0,
+                                        iconAnimationType:
+                                            AnimationType.onHover,
+                                        style: ToggleStyle(
+                                          borderColor: Colors.transparent,
+                                          borderRadius:
+                                              BorderRadius.circular(15.0),
                                           boxShadow: [
-                                            BoxShadow(
+                                            const BoxShadow(
                                               color: Colors.black26,
                                               spreadRadius: 0,
                                               blurRadius: 2,
                                             ),
                                           ],
                                         ),
-                                        child: Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Expanded(
-                                              child: TextField(
-                                                controller: _searchController,
-                                                focusNode: _focusNode,
-                                                decoration: InputDecoration(
-                                                  hintText: 'Search Dishes',
-                                                  border: InputBorder.none,
-                                                  contentPadding:
-                                                      const EdgeInsets
-                                                          .symmetric(
-                                                    vertical: 8,
-                                                    horizontal: 12,
-                                                  ),
-                                                  suffixIcon: Row(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment.end,
-                                                    mainAxisSize:
-                                                        MainAxisSize.min,
-                                                    children: [
-                                                      IconButton(
-                                                        icon: const Icon(
-                                                          Ionicons.close_circle,
-                                                          color: Colors.grey,
-                                                          size: 20,
-                                                        ),
-                                                        onPressed: () {
-                                                          _searchController
-                                                              .clear();
-                                                          setState(() {
-                                                            searchQuery = '';
-                                                            _filterAndSortNotes();
-                                                          });
-                                                        },
-                                                      ),
-                                                      const Text('|'),
-                                                      IconButton(
-                                                        icon: Icon(
-                                                          _isListening
-                                                              ? Icons.mic
-                                                              : Icons.mic_none,
-                                                          color: _isListening
-                                                              ? Colors.red
-                                                              : Colors.grey,
-                                                          size: 20,
-                                                        ),
-                                                        onPressed: !_isListening
-                                                            ? _startListening
-                                                            : _stopListening,
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                onChanged: (value) {
-                                                  setState(() {
-                                                    searchQuery =
-                                                        value.toLowerCase();
-                                                    _filterAndSortNotes();
-                                                  });
-                                                },
-                                              ),
-                                            ),
-                                          ],
+                                        styleBuilder: (i) => ToggleStyle(
+                                          indicatorColor: colorBuilder(i),
                                         ),
-                                      ),
-                                    )
-                                  : Container(),
-                            ),
-                          ],
-                        ),
-                      ),
-                      SizedBox(width: MediaQuery.of(context).size.width * 0.01),
-                      /*  SizedBox(
-                          width: _isSearchVisible
-                              ? MediaQuery.of(context).size.width * 0.01
-                              : MediaQuery.of(context).size.width * 0.14), */
-                      Row(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Your existing toggle switch
-
-                                AnimatedToggleSwitch<int>.size(
-                                  key: _categoryButtonKey,
-                                  textDirection: TextDirection.rtl,
-                                  current: _currentIndex,
-                                  values: const [2, 1, 0],
-                                  iconOpacity: 0.50,
-                                  height: MediaQuery.of(context).size.height *
-                                      0.035,
-                                  indicatorSize: const Size.fromWidth(37),
-                                  spacing: 0,
-                                  iconBuilder: iconBuilder,
-                                  borderWidth: 1.0,
-                                  iconAnimationType: AnimationType.onHover,
-                                  style: ToggleStyle(
-                                    borderColor: Colors.transparent,
-                                    borderRadius: BorderRadius.circular(15.0),
-                                    boxShadow: [
-                                      const BoxShadow(
-                                        color: Colors.black26,
-                                        spreadRadius: 0,
-                                        blurRadius: 2,
-                                      ),
-                                    ],
-                                  ),
-                                  styleBuilder: (i) => ToggleStyle(
-                                    indicatorColor: colorBuilder(i),
-                                  ),
-                                  onChanged: (i) {
-                                    setState(() {
-                                      _currentIndex = i;
-                                      _filterAndSortNotes(); // Apply filter and sort
-                                      //  print(i); // Debug print
-                                    });
-                                  },
-                                ),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01),
-
-                                // Your existing dropdown for sorting
-                                GestureDetector(
-                                  onTap: () {
-                                    DropDownState(
-                                      DropDown(
-                                        isDismissible: true,
-                                        isSearchVisible: false,
-                                        bottomSheetTitle: Text(
-                                          'Sort Options',
-                                          style: GoogleFonts.hammersmithOne(
-                                              fontWeight: FontWeight.bold,
-                                              fontSize: 20.0),
-                                        ),
-                                        submitButtonChild: Text(
-                                          'Done',
-                                          style: GoogleFonts.hammersmithOne(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        clearButtonChild: Text(
-                                          'Clear',
-                                          style: GoogleFonts.hammersmithOne(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                        data: _sortingOptions,
-                                        onSelected: _onSortChanged,
-                                        enableMultipleSelection: false,
-                                      ),
-                                    ).showModal(context);
-                                  },
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.2, // 90% of screen width
-                                    height: MediaQuery.of(context).size.height *
-                                        0.035,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.2),
-                                          spreadRadius: 1,
-                                          blurRadius: 1,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 6.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          //Text(dropdownValue),
-                                          Text(
-                                            "Sort By",
-                                            style: GoogleFonts.hammersmithOne(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: screenWidth * 0.03),
-                                          ),
-                                          Icon(Icons.arrow_drop_down, size: 30),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                                SizedBox(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.01),
-                                GestureDetector(
-                                  onTap: () {
-                                    DropDownState(
-                                      DropDown(
-                                        onSelected: _onFilterChanged,
-                                        data: _filterOptions,
-                                        isDismissible: true,
-                                        isSearchVisible: true,
-                                        enableMultipleSelection: true,
-                                        bottomSheetTitle: Text(
-                                          'Filter',
-                                          style: GoogleFonts.hammersmithOne(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 20.0,
-                                          ),
-                                        ),
-                                        submitButtonChild: Text(
-                                          'Done',
-                                          style: GoogleFonts.hammersmithOne(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        clearButtonChild: Text(
-                                          'Clear',
-                                          style: GoogleFonts.hammersmithOne(
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                        ),
-                                        bottomSheetListener: (notification) {
-                                          // This ensures the dropdown expands as the user scrolls
-                                          return true; // Return true to allow scrolling expansion
+                                        onChanged: (i) {
+                                          setState(() {
+                                            _currentIndex = i;
+                                            _filterAndSortNotes(); // Apply filter and sort
+                                            //  print(i); // Debug print
+                                          });
                                         },
                                       ),
-                                    ).showModal(context);
-                                  },
-                                  child: Container(
-                                    width: MediaQuery.of(context).size.width *
-                                        0.25, // 90% of screen width
-                                    height: MediaQuery.of(context).size.height *
-                                        0.035,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(15.0),
-                                      color: Colors.white,
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.2),
-                                          spreadRadius: 1,
-                                          blurRadius: 1,
-                                        ),
-                                      ],
-                                    ),
-                                    child: Padding(
-                                      padding: EdgeInsets.only(left: 5.0),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          //Text(dropdownValue),
-                                          Text(
-                                            "Filter By",
-                                            style: GoogleFonts.hammersmithOne(
-                                                fontWeight: FontWeight.bold),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.01),
+
+                                      // Your existing dropdown for sorting
+                                      GestureDetector(
+                                        onTap: () {
+                                          DropDownState(
+                                            DropDown(
+                                              isDismissible: true,
+                                              isSearchVisible: false,
+                                              bottomSheetTitle: Text(
+                                                'Sort Options',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 20.0),
+                                              ),
+                                              submitButtonChild: Text(
+                                                'Done',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                              ),
+                                              clearButtonChild: Text(
+                                                'Clear',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                        fontSize: 16,
+                                                        fontWeight:
+                                                            FontWeight.bold),
+                                              ),
+                                              data: _sortingOptions,
+                                              onSelected: _onSortChanged,
+                                              enableMultipleSelection: false,
+                                            ),
+                                          ).showModal(context);
+                                        },
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.2, // 90% of screen width
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.035,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0),
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.2),
+                                                spreadRadius: 1,
+                                                blurRadius: 1,
+                                              ),
+                                            ],
                                           ),
-                                          Icon(Icons.arrow_drop_down, size: 30),
-                                        ],
+                                          child: Padding(
+                                            padding: EdgeInsets.only(left: 6.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                //Text(dropdownValue),
+                                                Text(
+                                                  "Sort By",
+                                                  style: GoogleFonts
+                                                      .hammersmithOne(
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                          fontSize:
+                                                              screenWidth *
+                                                                  0.03),
+                                                ),
+                                                Icon(Icons.arrow_drop_down,
+                                                    size: 30),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      SizedBox(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.01),
+                                      GestureDetector(
+                                        onTap: () {
+                                          DropDownState(
+                                            DropDown(
+                                              onSelected: _onFilterChanged,
+                                              data: _filterOptions,
+                                              isDismissible: true,
+                                              isSearchVisible: true,
+                                              enableMultipleSelection: true,
+                                              bottomSheetTitle: Text(
+                                                'Filter',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 20.0,
+                                                ),
+                                              ),
+                                              submitButtonChild: Text(
+                                                'Done',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              clearButtonChild: Text(
+                                                'Clear',
+                                                style:
+                                                    GoogleFonts.hammersmithOne(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                              bottomSheetListener:
+                                                  (notification) {
+                                                // This ensures the dropdown expands as the user scrolls
+                                                return true; // Return true to allow scrolling expansion
+                                              },
+                                            ),
+                                          ).showModal(context);
+                                        },
+                                        child: Container(
+                                          width: MediaQuery.of(context)
+                                                  .size
+                                                  .width *
+                                              0.25, // 90% of screen width
+                                          height: MediaQuery.of(context)
+                                                  .size
+                                                  .height *
+                                              0.035,
+                                          decoration: BoxDecoration(
+                                            borderRadius:
+                                                BorderRadius.circular(15.0),
+                                            color: Colors.white,
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color: Colors.grey
+                                                    .withOpacity(0.2),
+                                                spreadRadius: 1,
+                                                blurRadius: 1,
+                                              ),
+                                            ],
+                                          ),
+                                          child: Padding(
+                                            padding: EdgeInsets.only(left: 5.0),
+                                            child: Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                //Text(dropdownValue),
+                                                Text(
+                                                  "Filter By",
+                                                  style: GoogleFonts
+                                                      .hammersmithOne(
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                ),
+                                                Icon(Icons.arrow_drop_down,
+                                                    size: 30),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
                               ],
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ): null,
+                          ],
+                        )
+                      : null,
                 ),
               ),
             ),
@@ -1169,7 +1230,7 @@ class _smallalldishesListState extends State<smallalldishesList> {
                             padding: EdgeInsets.symmetric(
                                 vertical: screenWidth * 0.3),
                             child: GestureDetector(
-                              onTap:  null,
+                              onTap: null,
                               child: Column(
                                 children: [
                                   Lottie.asset(
@@ -1204,13 +1265,18 @@ class _smallalldishesListState extends State<smallalldishesList> {
                                     Padding(
                                       padding: const EdgeInsets.all(10.0),
                                       child: ElevatedButton(
-                                        onPressed: () {Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(
-                                              builder: (context) =>
-                                                   smallalldishesList(title: widget.title, scafColor:  widget.scafColor)),
-                                           // Remove all previous routes
-                                        );},
+                                        onPressed: () {
+                                          Navigator.pushReplacement(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    smallalldishesList(
+                                                        title: widget.title,
+                                                        scafColor:
+                                                            widget.scafColor)),
+                                            // Remove all previous routes
+                                          );
+                                        },
                                         child: Text(
                                           'Retry',
                                           style: GoogleFonts.hammersmithOne(
@@ -1225,10 +1291,11 @@ class _smallalldishesListState extends State<smallalldishesList> {
                               ),
                             ),
                           ), // Show this if list is empty
-                        ): Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        /* Padding(
+                        )
+                      : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            /* Padding(
                           padding: const EdgeInsets.only(left: 10.0),
                           child: Container(
                             decoration: BoxDecoration(
@@ -1342,9 +1409,9 @@ class _smallalldishesListState extends State<smallalldishesList> {
                             ),
                           ),
                         ), */
-                        Expanded(
-                          child:
-                              /* ListView.builder(
+                            Expanded(
+                              child:
+                                  /* ListView.builder(
                             itemCount: _sortededNotes.length,
                             itemBuilder: (context, index) {
                               final note = _sortededNotes[index];
@@ -1381,66 +1448,75 @@ class _smallalldishesListState extends State<smallalldishesList> {
                               );
                             },
                           ), */
-                              LiveList(
-                            delay: const Duration(
-                                milliseconds:
-                                    0), // Delay before the first item appears
-                            showItemInterval: const Duration(
-                                milliseconds:
-                                    100), // Interval between showing items
-                            itemCount: _sortededNotes.length,
-                            itemBuilder: (context, index, animation) {
-                              final note = _sortededNotes[index];
-
-                              return GestureDetector(
-                                onTap: () {
-                                  setState(() {
-                                    Navigator.of(context).push(PageTransition(
-                                      curve: Curves.linear,
-                                      type: PageTransitionType.rightToLeft,
-                                      duration: const Duration(
-                                          milliseconds:
-                                              300), // Adjust duration to slow down the transition
-                                      child: smallrecipe(
-                                        serial: note.serial,
-                                        type: note.type,
-                                        dish: note.name,
-                                        category: note.category,
-                                        access: false,
-                                        imageURL: note.imageUrl,
-                                        background: widget.scafColor,
-                                      ),
-                                    ));
-                                  });
-                                },
-                                child: AnimatedBuilder(
-                                  animation: animation,
-                                  builder: (context, child) {
-                                    return FadeTransition(
-                                      opacity:
-                                          animation, // This applies the fade animation
-                                      child:
-                                          child, // Your original widget (DishTile)
-                                    );
-                                  },
-                                  child: DishTile(
-                                    duration: note.duration,
-                                    category: note.category,
-                                    dish: note.name,
-                                    type: note.type,
-                                    text: note.name,
-                                    serial: note.serial,
-                                    imageURL: note.imageUrl,
-                                    fromType:
-                                        typeList[int.parse(note.type!) - 1],
-                                  ),
+                                  LiveGrid(
+                                delay: const Duration(milliseconds: 0),
+                                showItemInterval:
+                                    const Duration(milliseconds: 200),
+                                showItemDuration:
+                                    const Duration(milliseconds: 300),
+                                visibleFraction: 0.05,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 16.0, vertical: 8.0),
+                                gridDelegate:
+                                    SliverGridDelegateWithFixedCrossAxisCount(
+                                  crossAxisCount: 2,
+                                  crossAxisSpacing: 12.0,
+                                  mainAxisSpacing: 12.0,
+                                  childAspectRatio:
+                                      MediaQuery.of(context).size.width > 600
+                                          ? 0.9
+                                          : 0.9,
                                 ),
-                              );
-                            },
-                          ),
+                                itemCount: _sortededNotes.length,
+                                itemBuilder: (context, index, animation) {
+                                  final note = _sortededNotes[index];
+
+                                  return GestureDetector(
+                                    onTap: () {
+                                      Navigator.of(context).push(
+                                        PageTransition(
+                                          curve: Curves.linear,
+                                          type: PageTransitionType.rightToLeft,
+                                          duration:
+                                              const Duration(milliseconds: 300),
+                                          child: recipe(
+                                            serial: note.serial,
+                                            type: note.type,
+                                            dish: note.name,
+                                            category: note.category,
+                                            access: false,
+                                            background: widget.scafColor,
+                                            imageURL: note.imageUrl,
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                    child: AnimatedBuilder(
+                                      animation: animation,
+                                      builder: (context, child) {
+                                        return FadeTransition(
+                                          opacity: animation,
+                                          child: child,
+                                        );
+                                      },
+                                      child: DishTile(
+                                        duration: note.duration,
+                                        category: note.category,
+                                        dish: note.name,
+                                        type: note.type,
+                                        text: note.name,
+                                        serial: note.serial,
+                                        imageURL: note.imageUrl,
+                                        fromType:
+                                            typeList[int.parse(note.type!) - 1],
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
             ),
           ],
         ),

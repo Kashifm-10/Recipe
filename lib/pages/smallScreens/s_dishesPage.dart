@@ -176,17 +176,21 @@ class _smalldishesListState extends State<smalldishesList> {
   }
 
   Future<void> fetchAIKey() async {
-    final response = await supabase
-        .from('keys') // Replace with your table name
-        .select(
-            'key') // Replace with the column name where the serial is stored
-        .eq('name', 'imagine')
-        .single();
+    try {
+      final response = await supabase
+          .from('keys')
+          .select('key')
+          .eq('name', 'imagine1')
+          .limit(1);
 
-    setState(() {
-      key = response['key'] ?? 0;
-    });
-    print(key); // Replace with your column name
+      setState(() {
+        key = response.isNotEmpty ? response[0]['key'] as String : '';
+      });
+
+      print(key);
+    } catch (e) {
+      debugPrint('Error fetching AI key: $e');
+    }
   }
 
   void _startListening() async {
@@ -2170,6 +2174,7 @@ class _smalldishesListState extends State<smalldishesList> {
             toolbarHeight: screenHeight * 0.08,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             foregroundColor: Colors.white,
             leading: Padding(
               padding: EdgeInsets.only(top: screenHeight * 0.015, left: 10),
@@ -2817,52 +2822,58 @@ class _smalldishesListState extends State<smalldishesList> {
                               );
                             },
                           ), */
-                              LiveList(
-                            delay: const Duration(
-                                milliseconds:
-                                    0), // Delay before the first item appears
-                            showItemInterval: const Duration(
-                                milliseconds:
-                                    100), // Interval between showing items
-
+                              LiveGrid(
+                            delay: const Duration(milliseconds: 0),
+                            showItemInterval: const Duration(milliseconds: 100),
+                            showItemDuration: const Duration(milliseconds: 300),
+                            visibleFraction: 0.05,
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, // 2 cards per row
+                              crossAxisSpacing: 12.0,
+                              mainAxisSpacing: 12.0,
+                              childAspectRatio:
+                                  MediaQuery.of(context).size.width > 600
+                                      ? 0.9
+                                      : 0.9,
+                            ),
                             itemCount: _sortededNotes.length,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
                             itemBuilder: (context, index, animation) {
                               final note = _sortededNotes[index];
 
                               return GestureDetector(
                                 onLongPress: () {
-                                  // Call your update function when a long press is detected
                                   updateDish(note, widget.type!, note.name);
                                 },
                                 onTap: () {
                                   setState(() {
                                     Navigator.of(context).push(PageTransition(
-                                        curve: Curves.linear,
-                                        type: PageTransitionType
-                                            .rightToLeftWithFade,
-                                        duration: const Duration(
-                                            milliseconds:
-                                                300), // Adjust duration to slow down the transition
-                                        child: smallrecipe(
-                                          serial: note.serial,
-                                          type: widget.type,
-                                          dish: note.name,
-                                          category: note.category,
-                                          access: true,
-                                          background: colorList[
-                                              int.parse(widget.type!) - 1],
-                                          imageURL: note.imageUrl,
-                                        )));
+                                      curve: Curves.linear,
+                                      type: PageTransitionType
+                                          .rightToLeftWithFade,
+                                      duration:
+                                          const Duration(milliseconds: 300),
+                                      child: smallrecipe(
+                                        serial: note.serial,
+                                        type: widget.type,
+                                        dish: note.name,
+                                        category: note.category,
+                                        access: true,
+                                        background: colorList[
+                                            int.parse(widget.type!) - 1],
+                                        imageURL: note.imageUrl,
+                                      ),
+                                    ));
                                   });
                                 },
                                 child: AnimatedBuilder(
                                   animation: animation,
                                   builder: (context, child) {
                                     return FadeTransition(
-                                      opacity:
-                                          animation, // This applies the fade animation
-                                      child:
-                                          child, // Your original widget (DishTile)
+                                      opacity: animation,
+                                      child: child,
                                     );
                                   },
                                   child: DishTile(

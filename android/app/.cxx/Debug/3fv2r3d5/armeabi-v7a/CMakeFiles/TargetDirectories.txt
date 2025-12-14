@@ -1,0 +1,2 @@
+K:/Development/Clavnyc/Recipe/android/app/.cxx/Debug/3fv2r3d5/armeabi-v7a/CMakeFiles/edit_cache.dir
+K:/Development/Clavnyc/Recipe/android/app/.cxx/Debug/3fv2r3d5/armeabi-v7a/CMakeFiles/rebuild_cache.dir

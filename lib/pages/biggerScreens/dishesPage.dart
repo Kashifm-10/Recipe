@@ -955,7 +955,8 @@ class _dishesListState extends State<dishesList> {
                                   Navigator.pop(context); // Close update dialog
                                 },
                                 child: Text("Yes, Delete",
-                                    style: GoogleFonts.hammersmithOne(color: Colors.red)),
+                                    style: GoogleFonts.hammersmithOne(
+                                        color: Colors.red)),
                               ),
                               TextButton(
                                 onPressed: () {
@@ -1849,6 +1850,7 @@ class _dishesListState extends State<dishesList> {
                 : screenHeight * 0.06,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             foregroundColor: Colors.white,
             leading: Padding(
               padding: EdgeInsets.only(
@@ -2216,31 +2218,40 @@ class _dishesListState extends State<dishesList> {
                         )
                       : Padding(
                           padding: const EdgeInsets.only(top: 10.0),
-                          child: LiveList(
-                            delay: Duration(
-                                milliseconds:
-                                    100), // Delay before the first item appears
-                            showItemInterval: Duration(
-                                milliseconds:
-                                    100), // Interval between showing items
-
+                          child: LiveGrid(
+                            delay: const Duration(milliseconds: 100),
+                            showItemInterval: const Duration(milliseconds: 100),
+                            showItemDuration: const Duration(milliseconds: 300),
+                            visibleFraction: 0.05,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12.0,
+                              mainAxisSpacing: 12.0,
+                              childAspectRatio:
+                                  MediaQuery.of(context).size.width > 600
+                                      ? 0.9
+                                      : 0.9,
+                            ),
                             itemCount: _sortededNotes.length,
                             itemBuilder: (context, index, animation) {
                               final note = _sortededNotes[index];
 
                               return GestureDetector(
                                 onLongPress: () {
-                                  // Call your update function when a long press is detected
                                   updateDish(note, widget.type!, note.name);
                                 },
                                 onTap: () {
                                   setState(() {
-                                    Navigator.of(context).push(PageTransition(
+                                    Navigator.of(context).push(
+                                      PageTransition(
                                         curve: Curves.linear,
-                                        type: PageTransitionType.rightToLeft,
-                                        duration: const Duration(
-                                            milliseconds:
-                                                300), // Adjust duration to slow down the transition
+                                        type: PageTransitionType
+                                            .rightToLeftWithFade,
+                                        duration:
+                                            const Duration(milliseconds: 300),
                                         child: recipe(
                                           serial: note.serial,
                                           type: widget.type,
@@ -2250,17 +2261,17 @@ class _dishesListState extends State<dishesList> {
                                           background: colorList[
                                               int.parse(widget.type!) - 1],
                                           imageURL: note.imageUrl,
-                                        )));
+                                        ),
+                                      ),
+                                    );
                                   });
                                 },
                                 child: AnimatedBuilder(
                                   animation: animation,
                                   builder: (context, child) {
                                     return FadeTransition(
-                                      opacity:
-                                          animation, // This applies the fade animation
-                                      child:
-                                          child, // Your original widget (DishTile)
+                                      opacity: animation,
+                                      child: child,
                                     );
                                   },
                                   child: DishTile(

@@ -631,6 +631,7 @@ class _alldishesListState extends State<alldishesList> {
                 : screenHeight * 0.06,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             foregroundColor: Colors.white,
             leading: Padding(
               padding: EdgeInsets.only(
@@ -1356,26 +1357,35 @@ class _alldishesListState extends State<alldishesList> {
                             },
                           ), */
 
-                              LiveList(
-                            delay: const Duration(
-                                milliseconds:
-                                    0), // Delay before the first item appears
-                            showItemInterval: const Duration(
-                                milliseconds:
-                                    200), // Interval between showing items
+                              LiveGrid(
+                            delay: const Duration(milliseconds: 0),
+                            showItemInterval: const Duration(milliseconds: 200),
+                            showItemDuration: const Duration(milliseconds: 300),
+                            visibleFraction: 0.05,
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16.0, vertical: 8.0),
+                            gridDelegate:
+                                SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2,
+                              crossAxisSpacing: 12.0,
+                              mainAxisSpacing: 12.0,
+                              childAspectRatio:
+                                  MediaQuery.of(context).size.width > 600
+                                      ? 0.9
+                                      : 0.9,
+                            ),
                             itemCount: _sortededNotes.length,
                             itemBuilder: (context, index, animation) {
                               final note = _sortededNotes[index];
 
                               return GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    Navigator.of(context).push(PageTransition(
+                                  Navigator.of(context).push(
+                                    PageTransition(
                                       curve: Curves.linear,
                                       type: PageTransitionType.rightToLeft,
-                                      duration: const Duration(
-                                          milliseconds:
-                                              300), // Adjust duration to slow down the transition
+                                      duration:
+                                          const Duration(milliseconds: 300),
                                       child: recipe(
                                         serial: note.serial,
                                         type: note.type,
@@ -1385,17 +1395,15 @@ class _alldishesListState extends State<alldishesList> {
                                         background: widget.scafColor,
                                         imageURL: note.imageUrl,
                                       ),
-                                    ));
-                                  });
+                                    ),
+                                  );
                                 },
                                 child: AnimatedBuilder(
                                   animation: animation,
                                   builder: (context, child) {
                                     return FadeTransition(
-                                      opacity:
-                                          animation, // This applies the fade animation
-                                      child:
-                                          child, // Your original widget (DishTile)
+                                      opacity: animation,
+                                      child: child,
                                     );
                                   },
                                   child: DishTile(

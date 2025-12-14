@@ -10,18 +10,20 @@ import 'package:shimmer/shimmer.dart';
 import 'package:tutorial_coach_mark/tutorial_coach_mark.dart';
 
 class DishTile extends StatelessWidget {
-  DishTile(
-      {super.key,
-      required this.dish,
-      required this.duration,
-      required this.category,
-      required this.text,
-      required this.type,
-      this.onEditPressed,
-      this.onDeletePressed,
-      this.fromType,
-      this.serial,
-      this.imageURL});
+  DishTile({
+    super.key,
+    required this.dish,
+    required this.duration,
+    required this.category,
+    required this.text,
+    required this.type,
+    this.onEditPressed,
+    this.onDeletePressed,
+    this.fromType,
+    this.serial,
+    this.imageURL,
+  });
+
   String? type;
   String? dish;
   String? duration;
@@ -32,6 +34,7 @@ class DishTile extends StatelessWidget {
   final String text;
   final void Function()? onEditPressed;
   final void Function()? onDeletePressed;
+
   List<String> images = [
     'https://img.freepik.com/free-photo/breakfast-consists-bread-fried-egg-salad-dressing-black-grapes-tomatoes-sliced-a-a-onions_1150-24459.jpg?t=st=1737460645~exp=1737464245~hmac=211ae8a793b1d99d23e0892b0f71f4b0efecbc65ea11ee8131a0fc260f287918&w=1380',
     'https://images.pexels.com/photos/25225626/pexels-photo-25225626/free-photo-of-sandwich-baked-potatoes-and-salad-on-plate.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
@@ -58,24 +61,18 @@ class DishTile extends StatelessWidget {
     Colors.deepPurple.shade300,
   ];
 
-  
-
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
     final GlobalKey _floatingButtonKey = GlobalKey();
-    Future<void> createTutorial() async {
-      // Get SharedPreferences instance
-      final prefs = await SharedPreferences.getInstance();
 
-      // Check if the tutorial has already been shown
+    Future<void> createTutorial() async {
+      final prefs = await SharedPreferences.getInstance();
       bool isTutorialShown = prefs.getBool('tutorialShowndishes') ?? false;
 
-      // If it has been shown, return early
       if (isTutorialShown) return;
 
-      // Define the tutorial targets
       final targets = [
         TargetFocus(
           identify: 'floatingButton',
@@ -100,193 +97,198 @@ class DishTile extends StatelessWidget {
         targets: targets,
       );
 
-      // Show the tutorial after a delay
       Future.delayed(const Duration(milliseconds: 500), () {
         tutorial.show(context: context);
-
-        // Once the tutorial is shown, set the flag in SharedPreferences
-         prefs.setBool('tutorialShowndishes', true);
+        prefs.setBool('tutorialShowndishes', true);
       });
     }
 
     createTutorial();
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 16.0),
-      child: Container(
-        key: _floatingButtonKey,
-        width: screenWidth * 0.1,
-        height: screenWidth > 600 ? screenHeight * 0.081 : screenHeight * 0.07,
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(15),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 1,
-              offset: Offset(0, 4),
-            ),
-          ],
-        ),
-        child: Stack(
-          children: [
-            Positioned(
-              right: 5,
-              top: 5,
-              child: CircleAvatar(
-                radius: 10,
-                backgroundColor: Colors.white.withOpacity(0.0),
-                child: category == "1"
-                    ? Icon(Icons.circle_rounded,
-                        color: Colors.red,
-                        size: screenWidth > 600 ? 15 : screenWidth * 0.025)
-                    : Icon(Icons.circle_rounded,
-                        color: Colors.green,
-                        size: screenWidth > 600 ? 15 : screenWidth * 0.025),
-              ),
-            ),
-            Padding(
-              padding: screenWidth > 600
-                  ? EdgeInsets.only(left: 10.0, top: 5, bottom: 5)
-                  : EdgeInsets.only(
-                      left: screenWidth > 600 ? 15.0 : screenWidth * 0.015,
-                      top: 0,
-                      bottom: 5),
-              child: Row(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.only(
-                        right: 10.0,
-                        top: screenWidth > 600 ? 0 : screenHeight * 0.006),
-                    child: Container(
-                        width: screenWidth > 600
-                            ? screenWidth * 0.15
-                            : screenWidth * 0.2,
-                        height: screenWidth > 600
-                            ? screenHeight * 0.065
-                            : screenHeight * 0.1,
-                        child: ClipRRect(
-                            borderRadius: BorderRadius.circular(
-                                screenWidth > 600
-                                    ? 10
-                                    : 8.0), // Adjust the radius as needed
-                            child: CachedNetworkImage(
-                              imageUrl: imageURL!,
-                              fit: BoxFit.cover,
-                              placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey[300]!,
-                                highlightColor: Colors.grey[100]!,
-                                child: Center(
-                                  child: Container(
-                                    color: Colors.white,
-                                    height: double
-                                        .infinity, // Adjust based on the aspect ratio of the image
-                                    width: double.infinity,
-                                  ),
-                                ),
-                              ),
-                              errorWidget: (context, url, error) => ClipRRect(
-                                borderRadius: BorderRadius.circular(
-                                    8.0), // Same border radius
-                                child: CachedNetworkImage(
-                                  imageUrl: images[int.parse(type!) - 1],
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) =>
-                                      Shimmer.fromColors(
-                                    baseColor: Colors.grey[200]!,
-                                    highlightColor: Colors.grey[100]!,
-                                    child: Center(
-                                      child: Container(
-                                        color: Colors.white,
-                                        height: double.infinity,
-                                        width: double.infinity,
-                                      ),
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) =>
-                                      Icon(Icons.error),
-                                ),
-                              ),
-                            ))),
-                  ),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: screenWidth > 600
-                        ? MainAxisAlignment.start
-                        : MainAxisAlignment.spaceEvenly,
-                    children: [
-                      Text(
-                        screenWidth > 600
-                            ? text
-                            : text.length > 28
-                                ? "${text.substring(0, 25)}..."
-                                : text,
-                        style: GoogleFonts.hammersmithOne(
-                          color: Colors.black,
-                          fontSize:
-                              screenWidth > 600 ? 24 : screenWidth * 0.045,
-                          fontWeight: FontWeight.bold,
+
+    return Container(
+      key: _floatingButtonKey,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(15),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 8,
+            offset: Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Main content
+          Padding(
+            padding: EdgeInsets.all(screenWidth > 600 ? 12.0 : 10.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // Image
+                Expanded(
+                  flex: 2,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: CachedNetworkImage(
+                      imageUrl: imageURL!,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      placeholder: (context, url) => Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(
+                          color: Colors.white,
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          /*  Padding(
-                            padding: const EdgeInsets.only(bottom: 4.0),
-                            child: Icon(Icons.timer, color: Colors.grey.shade400),
+                      errorWidget: (context, url, error) => ClipRRect(
+                        borderRadius: BorderRadius.circular(10),
+                        child: CachedNetworkImage(
+                          imageUrl: images[int.parse(type!) - 1],
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          placeholder: (context, url) => Shimmer.fromColors(
+                            baseColor: Colors.grey[200]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(color: Colors.white),
                           ),
-                          SizedBox(width: 5), */
-                          if (fromType! != 'no')
-                            Padding(
-                              padding: EdgeInsets.only(
-                                  right: MediaQuery.of(context).size.width > 600
-                                      ? 0
-                                      : MediaQuery.of(context).size.width *
-                                          0.02),
-                              child: Text(
-                                fromType!,
-                                style: GoogleFonts.hammersmithOne(
-                                  color: Colors.grey.shade500,
-                                  fontSize: screenWidth > 600
-                                      ? 12
-                                      : screenWidth * 0.025,
-                                ),
+                          errorWidget: (context, url, error) =>
+                              Center(child: Icon(Icons.error)),
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 8),
+                // Title
+                Expanded(
+                  flex: 0,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              text,
+                              maxLines: 1, // 👈 always 2 lines
+                              overflow: TextOverflow.ellipsis,
+                              softWrap: true,
+                              style: GoogleFonts.hammersmithOne(
+                                color: Colors.black,
+                                fontSize: screenWidth > 600 ? 16 : 14,
+                                fontWeight: FontWeight.bold,
+                                height: 1.2, // 👈 consistent line height
                               ),
                             ),
-                          Text(
-                            duration != null
-                                ? (() {
-                                    double durations =
-                                        double.tryParse(duration!) ?? 0.0;
-                                    int hours = durations.toInt();
-                                    int minutes =
-                                        ((durations - hours) * 60).toInt();
-
-                                    if (hours > 0 && minutes > 0) {
-                                      return '$hours hour ${minutes} minutes';
-                                    } else if (hours > 0) {
-                                      return '$hours hour';
-                                    } else if (minutes > 0) {
-                                      return '$minutes minutes';
-                                    } else {
-                                      return '0 minutes';
-                                    }
-                                  }())
-                                : 'Invalid duration',
-                            style: GoogleFonts.hammersmithOne(
-                              color: Colors.grey.shade500,
-                              fontSize:
-                                  screenWidth > 600 ? 12 : screenWidth * 0.025,
-                            ),
                           ),
+                          if (fromType! == 'no') SizedBox(width: 6),
+                          if (fromType! == 'no')
+                            Text(
+                              duration != null
+                                  ? (() {
+                                      double durations =
+                                          double.tryParse(duration!) ?? 0.0;
+                                      int hours = durations.toInt();
+                                      int minutes =
+                                          ((durations - hours) * 60).toInt();
+
+                                      if (hours > 0 && minutes > 0) {
+                                        return '$hours hr $minutes min';
+                                      } else if (hours > 0) {
+                                        return '$hours hr';
+                                      } else if (minutes > 0) {
+                                        return '$minutes min';
+                                      } else {
+                                        return '0 min';
+                                      }
+                                    }())
+                                  : 'Invalid duration',
+                              style: GoogleFonts.hammersmithOne(
+                                color: Colors.grey.shade500,
+                                fontSize: screenWidth > 600 ? 11 : 10,
+                              ),
+                            ),
                         ],
                       ),
+                      SizedBox(height: 4),
+                      // From type
+
+                      // Duration
+                      if (fromType! != 'no')
+                        Row(
+                          mainAxisAlignment: fromType! != 'no'
+                              ? MainAxisAlignment.spaceBetween
+                              : MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              fromType!,
+                              style: GoogleFonts.hammersmithOne(
+                                color: Colors.grey.shade500,
+                                fontSize: screenWidth > 600 ? 11 : 10,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            Text(
+                              duration != null
+                                  ? (() {
+                                      double durations =
+                                          double.tryParse(duration!) ?? 0.0;
+                                      int hours = durations.toInt();
+                                      int minutes =
+                                          ((durations - hours) * 60).toInt();
+
+                                      if (hours > 0 && minutes > 0) {
+                                        return '$hours hr $minutes min';
+                                      } else if (hours > 0) {
+                                        return '$hours hr';
+                                      } else if (minutes > 0) {
+                                        return '$minutes min';
+                                      } else {
+                                        return '0 min';
+                                      }
+                                    }())
+                                  : 'Invalid duration',
+                              style: GoogleFonts.hammersmithOne(
+                                color: Colors.grey.shade500,
+                                fontSize: screenWidth > 600 ? 11 : 10,
+                              ),
+                            ),
+                          ],
+                        ),
                     ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Positioned(
+            right: 15,
+            top: 15,
+            child: Container(
+              padding: const EdgeInsets.all(3),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(4), // 👈 rounded square
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
                   ),
                 ],
               ),
+              child: Icon(
+                Icons.circle_rounded,
+                color: category == "1" ? Colors.red : Colors.green,
+                size: screenWidth > 600 ? 10 : 8,
+              ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

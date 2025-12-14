@@ -11,7 +11,7 @@ import 'package:recipe/pages/splash_screen.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Enforce portrait mode
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -21,8 +21,8 @@ Future<void> main() async {
   await Firebase.initializeApp();
   await database.initialize();
   await Supabase.initialize(
-    url: 'https://vgkxpwyszheougrhippw.supabase.co',
-    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZna3hwd3lzemhlb3VncmhpcHB3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mjk2NjA3NzgsImV4cCI6MjA0NTIzNjc3OH0.YzFunbFqLYXYn9-trGWtgElmi9rVp-D5_m_yuTXy0qo',
+    url: 'https://dbofzegzkrkdwwefhlkh.supabase.co',
+    anonKey: 'sb_publishable_gf9rw3O64RtxB7qXiz0HNQ_LuVqZQzT',
   );
 
   runApp(MultiProvider(

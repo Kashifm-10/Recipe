@@ -172,7 +172,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   color: (Theme.of(context).primaryColor),
                 ),
                 const SizedBox(width: 20),
-                 Text("Processing...",  style: GoogleFonts.hammersmithOne()),
+                Text("Processing...", style: GoogleFonts.hammersmithOne()),
               ],
             ),
           ),
@@ -270,19 +270,25 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                   context: context,
                                   builder: (BuildContext context) {
                                     return AlertDialog(
-                                      title:   Text('Confirm Deletion',  style: GoogleFonts.hammersmithOne()),
+                                      title: Text('Confirm Deletion',
+                                          style: GoogleFonts.hammersmithOne()),
                                       content: Text(
-                                          'Are you sure you want to delete "$name"?',  style: GoogleFonts.hammersmithOne()),
+                                          'Are you sure you want to delete "$name"?',
+                                          style: GoogleFonts.hammersmithOne()),
                                       actions: <Widget>[
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, false),
-                                          child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                                          child: Text('Cancel',
+                                              style:
+                                                  GoogleFonts.hammersmithOne()),
                                         ),
                                         TextButton(
                                           onPressed: () =>
                                               Navigator.pop(context, true),
-                                          child:   Text('Delete',  style: GoogleFonts.hammersmithOne()),
+                                          child: Text('Delete',
+                                              style:
+                                                  GoogleFonts.hammersmithOne()),
                                         ),
                                       ],
                                     );
@@ -444,7 +450,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     TextField(
                       controller: textController,
                       decoration: InputDecoration(
-                        labelStyle: GoogleFonts.hammersmithOne(color: Colors.black),
+                        labelStyle:
+                            GoogleFonts.hammersmithOne(color: Colors.black),
                         labelText: 'Ingredient Name',
                         border: OutlineInputBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -564,14 +571,17 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                       items: unitOptions.map((String unit) {
                                         return DropdownMenuItem<String>(
                                           value: unit,
-                                          child: Text(unit,  style: GoogleFonts.hammersmithOne()),
+                                          child: Text(unit,
+                                              style:
+                                                  GoogleFonts.hammersmithOne()),
                                         );
                                       }).toList(),
                                       onChanged: (String? value) {
                                         setState(() => selectedUnit = value);
                                       },
                                       value: selectedUnit,
-                                      hint:   Text('Select',  style: GoogleFonts.hammersmithOne()),
+                                      hint: Text('Select',
+                                          style: GoogleFonts.hammersmithOne()),
                                     ),
                                   ],
                                 ),
@@ -629,7 +639,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
 
               // Create Button
@@ -644,8 +654,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isName = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Ingredient name is required.',  style: GoogleFonts.hammersmithOne())),
+                      SnackBar(
+                          content: Text('Ingredient name is required.',
+                              style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -660,9 +671,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                      SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.hammersmithOne())),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',
+                              style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -677,7 +689,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.hammersmithOne())),
+                      SnackBar(
+                          content: Text('Please select a unit.',
+                              style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -715,7 +729,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   ),
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Create',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Create', style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -793,9 +807,11 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     showDialog(
                       context: context,
                       builder: (context) => AlertDialog(
-                        title:  Text("Confirm Action",  style: GoogleFonts.hammersmithOne()),
-                        content:   Text(
-                            "Are you sure you want to delete this ingredient?",  style: GoogleFonts.hammersmithOne()),
+                        title: Text("Confirm Action",
+                            style: GoogleFonts.hammersmithOne()),
+                        content: Text(
+                            "Are you sure you want to delete this ingredient?",
+                            style: GoogleFonts.hammersmithOne()),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -803,13 +819,16 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               Navigator.pop(context);
                               Navigator.pop(context);
                             },
-                            child:   Text("Yes, Delete",  style: GoogleFonts.hammersmithOne(color: Colors.red)),
+                            child: Text("Yes, Delete",
+                                style: GoogleFonts.hammersmithOne(
+                                    color: Colors.red)),
                           ),
                           TextButton(
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
+                            child: Text("Cancel",
+                                style: GoogleFonts.hammersmithOne()),
                           ),
                         ],
                       ),
@@ -902,14 +921,17 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                       items: unitOptions.map((String unit) {
                                         return DropdownMenuItem<String>(
                                           value: unit,
-                                          child: Text(unit,  style: GoogleFonts.hammersmithOne()),
+                                          child: Text(unit,
+                                              style:
+                                                  GoogleFonts.hammersmithOne()),
                                         );
                                       }).toList(),
                                       onChanged: (String? value) {
                                         setState(() => selectedUnit = value);
                                       },
                                       value: selectedUnit,
-                                      hint:   Text('Select',  style: GoogleFonts.hammersmithOne()),
+                                      hint: Text('Select',
+                                          style: GoogleFonts.hammersmithOne()),
                                     ),
                                   ],
                                 ),
@@ -966,7 +988,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
 
               // Update Button
@@ -981,8 +1003,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isName = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text('Ingredient name is required.',  style: GoogleFonts.hammersmithOne())),
+                      SnackBar(
+                          content: Text('Ingredient name is required.',
+                              style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -997,9 +1020,10 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isQuantity = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
+                      SnackBar(
                           content: Text(
-                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',  style: GoogleFonts.hammersmithOne())),
+                              'Please enter a valid quantity (e.g., 0.25, 0.5, or values >= 1).',
+                              style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -1014,7 +1038,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                       isUOM = true;
                     });
                     ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Please select a unit.',  style: GoogleFonts.hammersmithOne())),
+                      SnackBar(
+                          content: Text('Please select a unit.',
+                              style: GoogleFonts.hammersmithOne())),
                     );
                     return;
                   } else {
@@ -1068,7 +1094,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                   ),
                   textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
                 ),
-                child:   Text('Update',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Update', style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -1171,7 +1197,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     textInputAction: TextInputAction.newline,
                     decoration: InputDecoration(
                       hintText: 'Enter your recipe...',
-                      hintStyle: GoogleFonts.hammersmithOne(color: Colors.grey[400]),
+                      hintStyle:
+                          GoogleFonts.hammersmithOne(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1216,7 +1243,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context); // Close dialog
                 },
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1247,7 +1274,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     });
                   }
                 },
-                child:   Text('Add Recipe' ,  style: GoogleFonts.hammersmithOne()),
+                child: Text('Add Recipe', style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -1307,12 +1334,12 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                         ),
                         title: Text(
                           "Confirm Action",
-                          style:
-                              GoogleFonts.hammersmithOne(fontWeight: FontWeight.bold),
+                          style: GoogleFonts.hammersmithOne(
+                              fontWeight: FontWeight.bold),
                         ),
-                        content:   Text(
-                          "Are you sure you want to delete this recipe?",  style: GoogleFonts.hammersmithOne()
-                        ),
+                        content: Text(
+                            "Are you sure you want to delete this recipe?",
+                            style: GoogleFonts.hammersmithOne()),
                         actions: [
                           TextButton(
                             onPressed: () {
@@ -1323,7 +1350,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                             },
                             child: Text(
                               "Yes, Delete",
-                              style: GoogleFonts.hammersmithOne(color: Colors.red),
+                              style:
+                                  GoogleFonts.hammersmithOne(color: Colors.red),
                             ),
                           ),
                           TextButton(
@@ -1331,7 +1359,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                               Navigator.pop(
                                   context); // Close confirmation dialog
                             },
-                            child:   Text("Cancel",  style: GoogleFonts.hammersmithOne()),
+                            child: Text("Cancel",
+                                style: GoogleFonts.hammersmithOne()),
                           ),
                         ],
                       ),
@@ -1352,7 +1381,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     maxLines: 6,
                     decoration: InputDecoration(
                       hintText: 'Edit your recipe here...',
-                      hintStyle: GoogleFonts.hammersmithOne(color: Colors.grey[400]),
+                      hintStyle:
+                          GoogleFonts.hammersmithOne(color: Colors.grey[400]),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12.0),
                       ),
@@ -1397,7 +1427,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 onPressed: () {
                   Navigator.pop(context); // Close the dialog
                 },
-                child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+                child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
@@ -1430,7 +1460,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                     });
                   }
                 },
-                child:   Text('Update Recipe',  style: GoogleFonts.hammersmithOne()),
+                child:
+                    Text('Update Recipe', style: GoogleFonts.hammersmithOne()),
               ),
             ],
           );
@@ -1536,7 +1567,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+            child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
           ),
 
           // Create Button
@@ -1562,8 +1593,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 // Optionally, show an error message for invalid input
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                      content: Text('Please enter a valid URL',  style: GoogleFonts.hammersmithOne()),
+                    SnackBar(
+                      content: Text('Please enter a valid URL',
+                          style: GoogleFonts.hammersmithOne()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1579,7 +1611,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               ),
               textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Create',  style: GoogleFonts.hammersmithOne()),
+            child: Text('Create', style: GoogleFonts.hammersmithOne()),
           ),
         ],
       ),
@@ -1683,7 +1715,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
               textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Cancel',  style: GoogleFonts.hammersmithOne()),
+            child: Text('Cancel', style: GoogleFonts.hammersmithOne()),
           ),
 
           // Update Button
@@ -1710,8 +1742,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 // Optionally, show an error message for invalid input
                 if (!urlRegExp.hasMatch(textController.text)) {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                      content: Text('Please enter a valid URL',  style: GoogleFonts.hammersmithOne()),
+                    SnackBar(
+                      content: Text('Please enter a valid URL',
+                          style: GoogleFonts.hammersmithOne()),
                       duration: Duration(seconds: 2),
                     ),
                   );
@@ -1727,7 +1760,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
               ),
               textStyle: GoogleFonts.hammersmithOne(fontSize: 16),
             ),
-            child:   Text('Create',  style: GoogleFonts.hammersmithOne()),
+            child: Text('Create', style: GoogleFonts.hammersmithOne()),
           ),
         ],
       ),
@@ -1929,6 +1962,7 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                 : screenHeight * 0.06,
             elevation: 0,
             backgroundColor: Colors.transparent,
+            surfaceTintColor: Colors.transparent,
             foregroundColor: Theme.of(context).colorScheme.inversePrimary,
             leading: Padding(
               padding: EdgeInsets.only(
@@ -2014,8 +2048,9 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                 createLink();
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                      content: Text('No links available',  style: GoogleFonts.hammersmithOne())),
+                                  SnackBar(
+                                      content: Text('No links available',
+                                          style: GoogleFonts.hammersmithOne())),
                                 );
                                 return;
                               }
@@ -2181,7 +2216,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                               Expanded(
                                                 child: Text(
                                                   '1',
-                                                  style: GoogleFonts.hammersmithOne(
+                                                  style: GoogleFonts
+                                                      .hammersmithOne(
                                                     fontSize:
                                                         MediaQuery.of(context)
                                                                     .size
@@ -2204,8 +2240,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                                     value: item,
                                                     child: Text(
                                                       item,
-                                                      style:
-                                                          GoogleFonts.hammersmithOne(
+                                                      style: GoogleFonts
+                                                          .hammersmithOne(
                                                         fontSize: MediaQuery.of(
                                                                         context)
                                                                     .size
@@ -2307,7 +2343,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                                 const SizedBox(height: 10),
                                                 Text(
                                                   'No Ingredients Added',
-                                                  style: GoogleFonts.hammersmithOne(
+                                                  style: GoogleFonts
+                                                      .hammersmithOne(
                                                     fontSize:
                                                         screenWidth * 0.04,
                                                     fontWeight: FontWeight.bold,
@@ -2316,7 +2353,8 @@ class _recipeState extends State<recipe> with SingleTickerProviderStateMixin {
                                                 ),
                                                 Text(
                                                   'Tap to Add',
-                                                  style: GoogleFonts.hammersmithOne(
+                                                  style: GoogleFonts
+                                                      .hammersmithOne(
                                                     fontSize:
                                                         screenWidth * 0.03,
                                                     fontWeight: FontWeight.bold,
