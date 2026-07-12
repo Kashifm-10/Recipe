@@ -38,7 +38,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.recipe"  // Your unique app ID
-        minSdkVersion 23  // Set to 23 (or higher)
+        minSdkVersion flutter.minSdkVersion  // Set to 23 (or higher)
         targetSdk = flutter.targetSdkVersion
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName

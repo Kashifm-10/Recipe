@@ -18,14 +18,15 @@ pluginManagement {
 }
 
 plugins {
-    // Flutter plugin loader for Flutter integration
+    // Flutter plugin loader
     id "dev.flutter.flutter-plugin-loader" version "1.0.0"
 
-    // Android application plugin, set to version 8.1.1 (or the latest compatible version)
-    id "com.android.application" version "8.1.1" apply false
+    // Android Gradle Plugin
+    id "com.android.application" version "8.3.2" apply false
 
-    // Kotlin plugin for Android, ensure version is compatible with your project
-    id "org.jetbrains.kotlin.android" version "1.9.0" apply false  // Update to 1.9.0 for compatibility
+    // Kotlin Android plugin
+    id "org.jetbrains.kotlin.android" version "1.9.22" apply false
 }
+
 
 include ":app"
