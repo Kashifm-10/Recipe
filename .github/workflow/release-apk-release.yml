@@ -1,4 +1,4 @@
-name: Build Release APK
+name: Build and Release APK
 
 on:
   pull_request:
